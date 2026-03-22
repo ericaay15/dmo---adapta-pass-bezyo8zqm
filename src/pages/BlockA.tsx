@@ -104,8 +104,11 @@ export default function BlockA() {
 
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
           <div className="mb-10">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-3">
-              Sessão: AMPLIFICAR
+            <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-3">
+              Sessão:{' '}
+              <span className="bg-gradient-to-r from-[#4bb7a5] via-[#957588] to-[#f45961] bg-clip-text text-transparent font-extrabold">
+                AMPLIFICAR
+              </span>
             </h2>
             <p className="text-slate-400 text-sm md:text-base font-normal leading-relaxed">
               Nesse bloco avaliamos como está o uso e conhecimento de IA na sua empresa.
@@ -173,11 +176,12 @@ export default function BlockA() {
                   render={({ field }) => (
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                        A6. Algo mais a acrescentar sobre o uso de IA na sua empresa?
+                        A6. Qual foi o melhor resultado que você já teve usando IA? Se não teve, o
+                        que esperaria conseguir?
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Descreva brevemente sua situação atual (opcional)"
+                          placeholder="Sua resposta (opcional)"
                           className="bg-black/40 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[120px] resize-y"
                           {...field}
                         />
