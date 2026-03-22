@@ -16,6 +16,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
@@ -85,18 +86,31 @@ export default function BlockAu() {
 
   return (
     <div className="flex-1 flex flex-col items-center py-10 md:py-20 animate-fade-in-up">
-      <div className="w-full max-w-2xl mb-8 flex justify-between items-center px-4 md:px-0">
-        <Button
-          variant="ghost"
-          asChild
-          className="text-slate-400 hover:text-white hover:bg-white/5 -ml-4"
-        >
-          <Link to="/bloco-s">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-          </Link>
-        </Button>
-        <Logo className="text-2xl" />
-        <div className="w-[88px]" />
+      <div className="w-full max-w-2xl mb-8 flex flex-col gap-6 px-4 md:px-0">
+        <div className="flex justify-between items-center">
+          <Button
+            variant="ghost"
+            asChild
+            className="text-slate-400 hover:text-white hover:bg-white/5 -ml-4"
+          >
+            <Link to="/bloco-s">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+            </Link>
+          </Button>
+          <Logo className="text-2xl" />
+          <div className="w-[88px]" />
+        </div>
+
+        <div className="space-y-2 w-full">
+          <div className="flex justify-between text-xs text-slate-400 font-medium px-1">
+            <span>Passo 4 de 5: Automatizar</span>
+            <span>80%</span>
+          </div>
+          <Progress
+            value={80}
+            className="h-1.5 bg-white/10 [&>div]:bg-gradient-to-r [&>div]:from-[#4bb7a5] [&>div]:via-[#957588] [&>div]:to-[#f45961]"
+          />
+        </div>
       </div>
 
       <div className="w-full max-w-2xl relative">
@@ -105,7 +119,10 @@ export default function BlockAu() {
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
           <div className="mb-10">
             <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-3">
-              Sessão: <span className="text-[#2dd4bf] font-extrabold">AUTOMATIZAR</span>
+              Sessão:{' '}
+              <span className="bg-gradient-to-r from-[#4bb7a5] via-[#957588] to-[#f45961] bg-clip-text text-transparent font-extrabold">
+                AUTOMATIZAR
+              </span>
             </h2>
             <p className="text-slate-400 text-sm md:text-base font-normal leading-relaxed">
               Nesse bloco avaliamos o nível de automação de tarefas repetitivas e processos na sua
