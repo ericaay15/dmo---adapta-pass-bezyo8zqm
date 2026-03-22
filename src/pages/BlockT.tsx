@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { ArrowLeft, Send, Loader2, AlertCircle } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
+import { submitDiagnosis } from '@/services/diagnostics'
 
 const formSchema = z.object({
   t1: z.number().min(1).max(10),
@@ -72,14 +74,22 @@ export default function BlockT() {
   const isFormValid = form.formState.isValid
   const canSubmit = isPreviousValid && isFormValid && !isSubmitting
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
+    const finalData = { ...storeData, ...values }
     updateData(values)
 
-    // Simulate API submission and processing
-    setTimeout(() => {
+    try {
+      await submitDiagnosis(finalData)
+      toast.success('Diagnóstico processado com sucesso!')
       navigate('/resultados')
-    }, 2500)
+    } catch (error: any) {
+      console.error(error)
+      toast.error('Erro ao enviar diagnóstico', {
+        description: error.message || 'Tente novamente mais tarde.',
+      })
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -126,7 +136,6 @@ export default function BlockT() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
               <div className="space-y-8">
-                {/* T1 */}
                 <FormField
                   control={form.control}
                   name="t1"
@@ -167,7 +176,6 @@ export default function BlockT() {
                   )}
                 />
 
-                {/* T2 */}
                 <FormField
                   control={form.control}
                   name="t2"
@@ -206,7 +214,6 @@ export default function BlockT() {
                   )}
                 />
 
-                {/* T3 */}
                 <FormField
                   control={form.control}
                   name="t3"
@@ -245,7 +252,6 @@ export default function BlockT() {
                   )}
                 />
 
-                {/* T4 */}
                 <FormField
                   control={form.control}
                   name="t4"
