@@ -78,6 +78,13 @@ export type Database = {
             referencedRelation: 'empresas'
             referencedColumns: ['id']
           },
+          {
+            foreignKeyName: 'diagnosticos_empresa_id_fkey'
+            columns: ['empresa_id']
+            isOneToOne: false
+            referencedRelation: 'vw_diagnosticos_completos'
+            referencedColumns: ['empresa_id']
+          },
         ]
       }
       empresas: {
@@ -86,6 +93,7 @@ export type Database = {
           data_criacao: string
           email_admin: string | null
           id: string
+          nome: string | null
           responsavel_email: string | null
           responsavel_nome: string | null
         }
@@ -94,6 +102,7 @@ export type Database = {
           data_criacao?: string
           email_admin?: string | null
           id?: string
+          nome?: string | null
           responsavel_email?: string | null
           responsavel_nome?: string | null
         }
@@ -102,6 +111,7 @@ export type Database = {
           data_criacao?: string
           email_admin?: string | null
           id?: string
+          nome?: string | null
           responsavel_email?: string | null
           responsavel_nome?: string | null
         }
@@ -137,11 +147,41 @@ export type Database = {
             referencedRelation: 'diagnosticos'
             referencedColumns: ['id']
           },
+          {
+            foreignKeyName: 'respostas_abertas_diagnostico_id_fkey'
+            columns: ['diagnostico_id']
+            isOneToOne: false
+            referencedRelation: 'vw_diagnosticos_completos'
+            referencedColumns: ['diagnostico_id']
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      vw_diagnosticos_completos: {
+        Row: {
+          classificacao_a: string | null
+          classificacao_au: string | null
+          classificacao_s: string | null
+          cnpj: string | null
+          complemento_sucesso: string | null
+          data_preenchimento: string | null
+          diagnostico_id: string | null
+          email_admin: string | null
+          empresa_id: string | null
+          nome_empresa: string | null
+          nota_a: number | null
+          nota_au: number | null
+          nota_geral: number | null
+          nota_s: number | null
+          nota_t: number | null
+          pdf_url: string | null
+          quem_preencheu: string | null
+          responsavel_email: string | null
+          responsavel_nome: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
@@ -312,12 +352,33 @@ export const Constants = {
 //   responsavel_nome: text (nullable)
 //   responsavel_email: text (nullable)
 //   data_criacao: timestamp with time zone (not null, default: now())
+//   nome: text (nullable)
 // Table: respostas_abertas
 //   id: uuid (not null, default: gen_random_uuid())
 //   diagnostico_id: uuid (not null)
 //   tipo_bloco: text (not null)
 //   numero_pergunta: integer (not null)
 //   resposta: text (not null)
+// Table: vw_diagnosticos_completos
+//   diagnostico_id: uuid (nullable)
+//   data_preenchimento: timestamp with time zone (nullable)
+//   empresa_id: uuid (nullable)
+//   nome_empresa: text (nullable)
+//   cnpj: text (nullable)
+//   email_admin: text (nullable)
+//   responsavel_nome: text (nullable)
+//   responsavel_email: text (nullable)
+//   quem_preencheu: text (nullable)
+//   nota_geral: numeric (nullable)
+//   nota_a: numeric (nullable)
+//   nota_s: numeric (nullable)
+//   nota_au: numeric (nullable)
+//   nota_t: numeric (nullable)
+//   classificacao_a: text (nullable)
+//   classificacao_s: text (nullable)
+//   classificacao_au: text (nullable)
+//   complemento_sucesso: text (nullable)
+//   pdf_url: text (nullable)
 
 // --- CONSTRAINTS ---
 // Table: diagnosticos
