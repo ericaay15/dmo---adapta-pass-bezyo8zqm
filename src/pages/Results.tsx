@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
@@ -30,13 +30,26 @@ export default function Results() {
             registradas com sucesso e nossa equipe avaliará seu perfil em breve.
           </p>
 
-          <Button
-            asChild
-            onClick={() => resetData()}
-            className="bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 px-8 text-lg rounded-xl transition-all"
-          >
-            <Link to="/">Voltar ao Início</Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {data.pdfUrl && (
+              <Button
+                asChild
+                className="w-full sm:w-auto bg-white hover:bg-slate-200 text-black font-bold h-14 px-8 text-lg rounded-xl transition-all"
+              >
+                <a href={data.pdfUrl} target="_blank" rel="noopener noreferrer">
+                  <FileText className="mr-2 w-5 h-5" />
+                  Baixar Relatório PDF
+                </a>
+              </Button>
+            )}
+            <Button
+              asChild
+              onClick={() => resetData()}
+              className="w-full sm:w-auto bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 px-8 text-lg rounded-xl transition-all"
+            >
+              <Link to="/">Voltar ao Início</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

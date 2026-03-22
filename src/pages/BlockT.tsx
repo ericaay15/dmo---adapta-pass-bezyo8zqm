@@ -80,7 +80,10 @@ export default function BlockT() {
     updateData(values)
 
     try {
-      await submitDiagnosis(finalData)
+      const res = await submitDiagnosis(finalData)
+      if (res.pdfUrl) {
+        updateData({ pdfUrl: res.pdfUrl })
+      }
       toast.success('Diagnóstico processado com sucesso!')
       navigate('/resultados')
     } catch (error: any) {

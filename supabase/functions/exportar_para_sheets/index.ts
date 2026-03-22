@@ -88,7 +88,7 @@ Deno.serve(async (req: Request) => {
       metricas: metricasTexto,
       first_impact: firstImpactTexto,
       complemento_plano: t4Resposta,
-      link_pdf: '', // Placeholder for future PDF generation
+      link_pdf: (diagnostico as any).pdf_url || '',
     }
 
     // 4. Send to Google Apps Script

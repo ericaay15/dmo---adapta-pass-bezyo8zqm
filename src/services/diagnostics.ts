@@ -160,7 +160,30 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     if (abertasError) throw new Error(`Erro ao salvar respostas abertas: ${abertasError.message}`)
   }
 
-  // Aciona a exportação para o Google Sheets de forma assíncrona, não bloqueando a UI do usuário
+  // Generate PDF Document Synchronously to get the URL
+  let pdfUrl = ''
+  try {
+    const { data: pdfData, error: pdfError } = await supabase.functions.invoke(
+      'gerar_documento_pdf',
+      {
+        body: { diagnostico_id: diagnostico.id },
+      },
+    )
+
+    if (!pdfError && pdfData?.url) {
+      pdfUrl = pdfData.url
+      await supabase
+        .from('diagnosticos')
+        .update({ pdf_url: pdfUrl } as any)
+        .eq('id', diagnostico.id)
+    } else if (pdfError) {
+      console.error('Erro retornado pela Edge Function gerar_documento_pdf:', pdfError)
+    }
+  } catch (err) {
+    console.error('Falha ao invocar gerar_documento_pdf:', err)
+  }
+
+  // Aciona a exportação para o Google Sheets de forma assíncrona
   supabase.functions
     .invoke('exportar_para_sheets', {
       body: { diagnostico_id: diagnostico.id },
@@ -174,5 +197,5 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
       console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
     })
 
-  return { scoringData, diagnosticoId: diagnostico.id }
+  return { scoringData, diagnosticoId: diagnostico.id, pdfUrl }
 }
