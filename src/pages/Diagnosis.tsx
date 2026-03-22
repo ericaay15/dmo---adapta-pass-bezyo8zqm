@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { Loader2, ArrowLeft } from 'lucide-react'
-import { toast } from 'sonner'
+import { ArrowRight, ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -16,49 +15,50 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Logo } from '@/components/Logo'
-import { Link } from 'react-router-dom'
+import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
 const formSchema = z.object({
-  nome: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
-  email: z.string().email({ message: 'Insira um e-mail corporativo válido.' }),
-  empresa: z.string().min(2, { message: 'O nome da empresa é obrigatório.' }),
-  cargo: z.string({ required_error: 'Selecione o seu cargo.' }),
-  tamanhoEquipe: z.string({ required_error: 'Selecione o tamanho da equipe.' }),
+  cnpj: z.string().length(18, { message: 'O CNPJ deve estar completo (14 dígitos).' }),
+  adminEmail: z.string().email({ message: 'Insira um e-mail válido.' }),
+  userName: z.string().min(2, { message: 'O nome é obrigatório.' }),
+  leadName: z.string().min(2, { message: 'O nome do responsável é obrigatório.' }),
+  leadEmail: z.string().email({ message: 'Insira um e-mail válido.' }),
 })
 
+export const formatCnpj = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1/$2')
+    .replace(/(\d{4})(\d)/, '$1-$2')
+    .replace(/(-\d{2})\d+?$/, '$1')
+}
+
 export default function Diagnosis() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
+  const { data: storeData, updateData } = useDiagnosisStore()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange', // Validate on change to enable/disable button dynamically
     defaultValues: {
-      nome: '',
-      email: '',
-      empresa: '',
-      cargo: '',
-      tamanhoEquipe: '',
+      cnpj: storeData.cnpj || '',
+      adminEmail: storeData.adminEmail || '',
+      userName: storeData.userName || '',
+      leadName: storeData.leadName || '',
+      leadEmail: storeData.leadEmail || '',
     },
   })
 
+  const isFormValid = form.formState.isValid
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      toast.success('Diagnóstico enviado com sucesso!', {
-        description: 'Nossa equipe entrará em contato em breve com o seu plano personalizado.',
-      })
-      navigate('/')
-    }, 2000)
+    // Store data in local state
+    updateData(values)
+    // Redirect to the next block
+    navigate('/bloco-a')
   }
 
   return (
@@ -74,7 +74,7 @@ export default function Diagnosis() {
           </Link>
         </Button>
         <Logo className="text-2xl" />
-        <div className="w-[88px]" /> {/* Spacer to center logo properly against the back button */}
+        <div className="w-[88px]" /> {/* Spacer to center logo properly */}
       </div>
 
       <div className="w-full max-w-2xl relative">
@@ -85,24 +85,65 @@ export default function Diagnosis() {
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
           <div className="mb-8 text-center md:text-left">
             <h2 className="text-sm font-semibold text-[#2dd4bf] uppercase tracking-wider mb-2">
-              Passo 1 de 1: Informações Iniciais
+              Informações Iniciais
             </h2>
             <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-              Diagnóstico de Maturidade Organizacional
+              Dados da Empresa
             </h3>
             <p className="text-slate-400 mt-2 text-sm md:text-base">
-              Preencha os dados abaixo para que possamos entender o momento da sua empresa.
+              Preencha os dados abaixo para darmos início ao Diagnóstico de Maturidade
+              Organizacional.
             </p>
           </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="cnpj"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300">CNPJ</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="00.000.000/0000-00"
+                          {...field}
+                          onChange={(e) => field.onChange(formatCnpj(e.target.value))}
+                          maxLength={18}
+                          className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="adminEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300">E-mail do Admin</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="admin@empresa.com.br"
+                          {...field}
+                          className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
-                name="nome"
+                name="userName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Nome Completo</FormLabel>
+                    <FormLabel className="text-slate-300">Nome de quem está preenchendo</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Ex: João Silva"
@@ -115,108 +156,63 @@ export default function Diagnosis() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-300">E-mail Corporativo</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="joao@suaempresa.com.br"
-                          {...field}
-                          className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-rose-400" />
-                    </FormItem>
-                  )}
-                />
+              <div className="bg-white/5 border border-white/10 rounded-xl p-6 mt-8 space-y-6">
+                <div className="mb-4">
+                  <h4 className="text-lg font-medium text-white">
+                    Responsável pela Implementação de IA
+                  </h4>
+                  <p className="text-sm text-slate-400">
+                    Quem liderará esta iniciativa na empresa?
+                  </p>
+                </div>
 
-                <FormField
-                  control={form.control}
-                  name="empresa"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-300">Nome da Empresa</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="AdaptaTech Ltda."
-                          {...field}
-                          className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-rose-400" />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="cargo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-300">Cargo</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="leadName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-300">Nome do Responsável</FormLabel>
                         <FormControl>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-[#2dd4bf] h-12">
-                            <SelectValue placeholder="Selecione o seu cargo" />
-                          </SelectTrigger>
+                          <Input
+                            placeholder="Nome completo"
+                            {...field}
+                            className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
+                          />
                         </FormControl>
-                        <SelectContent className="bg-slate-900 border-white/10 text-white">
-                          <SelectItem value="ceo">CEO / Fundador</SelectItem>
-                          <SelectItem value="diretor">Diretor / C-Level</SelectItem>
-                          <SelectItem value="gerente">Gerente / Coordenador</SelectItem>
-                          <SelectItem value="outro">Outro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-rose-400" />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage className="text-rose-400" />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="tamanhoEquipe"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-300">Tamanho da Equipe</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormField
+                    control={form.control}
+                    name="leadEmail"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-300">E-mail do Responsável</FormLabel>
                         <FormControl>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-[#2dd4bf] h-12">
-                            <SelectValue placeholder="Selecione o tamanho" />
-                          </SelectTrigger>
+                          <Input
+                            placeholder="lider@empresa.com.br"
+                            {...field}
+                            className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
+                          />
                         </FormControl>
-                        <SelectContent className="bg-slate-900 border-white/10 text-white">
-                          <SelectItem value="1-10">1 a 10 pessoas</SelectItem>
-                          <SelectItem value="11-50">11 a 50 pessoas</SelectItem>
-                          <SelectItem value="51-200">51 a 200 pessoas</SelectItem>
-                          <SelectItem value="200+">Mais de 200 pessoas</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-rose-400" />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage className="text-rose-400" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <div className="pt-6">
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(45,212,191,0.3)]"
+                  disabled={!isFormValid}
+                  className="w-full bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] disabled:opacity-50 disabled:hover:shadow-none group"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Processando...
-                    </>
-                  ) : (
-                    'Enviar Diagnóstico'
-                  )}
+                  Próximo
+                  <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
             </form>
