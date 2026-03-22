@@ -91,8 +91,7 @@ export default function Diagnosis() {
               Dados da Empresa
             </h3>
             <p className="text-slate-400 mt-2 text-sm md:text-base">
-              Preencha os dados abaixo para darmos início ao Diagnóstico de Maturidade
-              Organizacional.
+              Preencha os dados abaixo para darmos início ao Diagnóstico.
             </p>
           </div>
 
