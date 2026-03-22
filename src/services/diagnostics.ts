@@ -174,6 +174,7 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
 
     if (updateDiagError) {
       console.error('Erro ao atualizar complemento_sucesso no banco:', updateDiagError.message)
+      throw new Error(`Erro ao atualizar plano de sucesso: ${updateDiagError.message}`)
     }
 
     const { error: abertasError } = await supabase.from('respostas_abertas').insert({
@@ -183,8 +184,9 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
       resposta: complemento.trim(),
     })
 
-    if (abertasError)
+    if (abertasError) {
       throw new Error(`Erro ao salvar complemento em respostas: ${abertasError.message}`)
+    }
   }
 
   let pdfUrl = ''
@@ -198,10 +200,14 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
 
     if (!pdfError && pdfData?.url) {
       pdfUrl = pdfData.url
-      await supabase
+      const { error: updatePdfError } = await supabase
         .from('diagnosticos')
         .update({ pdf_url: pdfUrl } as any)
         .eq('id', diagnosticoId)
+
+      if (updatePdfError) {
+        console.error('Erro ao atualizar pdf_url no banco:', updatePdfError.message)
+      }
     } else if (pdfError) {
       console.error('Erro retornado pela Edge Function gerar_documento_pdf:', pdfError)
     }

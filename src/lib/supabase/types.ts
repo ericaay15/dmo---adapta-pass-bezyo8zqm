@@ -670,14 +670,18 @@ export const Constants = {
 //           nota_geral, resposta_plano_sucesso, pdf_url
 //       )
 //       SELECT
-//           diagnostico_id, data_preenchimento, empresa_id, nome_empresa, cnpj, email_admin, responsavel_nome, responsavel_email, quem_preencheu,
-//           resposta_a1, resposta_a2, resposta_a3, resposta_a4, resposta_a5, resposta_aberta_a6, nota_a, classificacao_a,
-//           resposta_s1, resposta_s2, resposta_s3, resposta_s4, resposta_s5, resposta_aberta_s6, nota_s, classificacao_s,
-//           resposta_au1, resposta_au2, resposta_au3, resposta_au4, resposta_au5, resposta_aberta_au6, nota_au, classificacao_au,
-//           resposta_t1, resposta_t2, resposta_t3, resposta_aberta_t4, nota_t,
-//           nota_geral, resposta_plano_sucesso, pdf_url
-//       FROM public.vw_diagnosticos_completos
-//       WHERE diagnostico_id = p_diagnostico_id
+//           v.diagnostico_id, v.data_preenchimento, v.empresa_id, v.nome_empresa, v.cnpj, v.email_admin, v.responsavel_nome, v.responsavel_email, v.quem_preencheu,
+//           v.resposta_a1, v.resposta_a2, v.resposta_a3, v.resposta_a4, v.resposta_a5, v.resposta_aberta_a6, v.nota_a, v.classificacao_a,
+//           v.resposta_s1, v.resposta_s2, v.resposta_s3, v.resposta_s4, v.resposta_s5, v.resposta_aberta_s6, v.nota_s, v.classificacao_s,
+//           v.resposta_au1, v.resposta_au2, v.resposta_au3, v.resposta_au4, v.resposta_au5, v.resposta_aberta_au6, v.nota_au, v.classificacao_au,
+//           v.resposta_t1, v.resposta_t2, v.resposta_t3, v.resposta_aberta_t4, v.nota_t,
+//           v.nota_geral,
+//           -- Puxa diretamente da tabela de diagnósticos para garantir integridade do dado recém-salvo
+//           COALESCE(d.complemento_sucesso, v.resposta_plano_sucesso),
+//           COALESCE(d.pdf_url, v.pdf_url)
+//       FROM public.vw_diagnosticos_completos v
+//       JOIN public.diagnosticos d ON d.id = v.diagnostico_id
+//       WHERE v.diagnostico_id = p_diagnostico_id
 //       ON CONFLICT (diagnostico_id)
 //       DO UPDATE SET
 //           data_preenchimento = EXCLUDED.data_preenchimento,
