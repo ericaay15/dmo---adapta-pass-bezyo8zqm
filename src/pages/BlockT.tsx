@@ -1,12 +1,86 @@
-import { Link } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { ArrowLeft, Send, Loader2, AlertCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Slider } from '@/components/ui/slider'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
+const formSchema = z.object({
+  t1: z.number().min(1).max(10),
+  t2: z.number().min(1).max(10),
+  t3: z.number().min(1).max(10),
+  t4: z.string().min(3, { message: 'Por favor, detalhe um pouco mais a sua resposta.' }),
+})
+
 export default function BlockT() {
-  const { data } = useDiagnosisStore()
+  const navigate = useNavigate()
+  const { data: storeData, updateData } = useDiagnosisStore()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    mode: 'onChange',
+    defaultValues: {
+      t1: storeData.t1 || 5,
+      t2: storeData.t2 || 5,
+      t3: storeData.t3 || 5,
+      t4: storeData.t4 || '',
+    },
+  })
+
+  const hasCompletedPreviousBlocks = () => {
+    return Boolean(
+      storeData.cnpj &&
+      storeData.adminEmail &&
+      storeData.userName &&
+      storeData.leadName &&
+      storeData.leadEmail &&
+      storeData.a1 &&
+      storeData.a2 &&
+      storeData.a3 &&
+      storeData.a4 &&
+      storeData.a5 &&
+      storeData.s1 &&
+      storeData.s2 &&
+      storeData.s3 &&
+      storeData.s4 &&
+      storeData.s5 &&
+      storeData.au1 &&
+      storeData.au2 &&
+      storeData.au3 &&
+      storeData.au4 &&
+      storeData.au5,
+    )
+  }
+
+  const isPreviousValid = hasCompletedPreviousBlocks()
+  const isFormValid = form.formState.isValid
+  const canSubmit = isPreviousValid && isFormValid && !isSubmitting
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true)
+    updateData(values)
+
+    // Simulate API submission and processing
+    setTimeout(() => {
+      navigate('/resultados')
+    }, 2500)
+  }
 
   return (
     <div className="flex-1 flex flex-col items-center py-10 md:py-20 animate-fade-in-up">
@@ -15,6 +89,7 @@ export default function BlockT() {
           variant="ghost"
           asChild
           className="text-slate-400 hover:text-white hover:bg-white/5 -ml-4"
+          disabled={isSubmitting}
         >
           <Link to="/bloco-au">
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
@@ -25,64 +100,204 @@ export default function BlockT() {
       </div>
 
       <div className="w-full max-w-2xl relative">
-        <div className="absolute -inset-1 bg-gradient-to-r from-[#eab308]/20 to-[#f97316]/20 rounded-3xl blur-xl opacity-50 z-0"></div>
+        <div className="absolute -inset-1 bg-gradient-to-r from-black via-[#0d9488]/30 to-[#2dd4bf]/40 rounded-3xl blur-xl opacity-50 z-0"></div>
 
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-[#eab308] uppercase tracking-wider mb-2">
-              Bloco T
+          <div className="mb-10">
+            <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-3">
+              Sessão: <span className="text-[#2dd4bf] font-extrabold">TRANSFORMAR</span>
             </h2>
-            <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-              Transformar
-            </h3>
-            <p className="text-slate-400 mt-2 text-sm md:text-base">
-              Em breve. Suas respostas do Bloco Au foram salvas com sucesso.
+            <p className="text-slate-400 text-sm md:text-base font-normal leading-relaxed">
+              Nesse bloco final, queremos entender a sua visão e o momento atual de gestão da
+              empresa.
             </p>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <CheckCircle2 className="text-[#2dd4bf] w-6 h-6" />
-              <h4 className="text-lg font-medium text-white">Respostas do Bloco Au Salvas</h4>
+          {!isPreviousValid && (
+            <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-rose-400 mt-0.5 shrink-0" />
+              <p className="text-sm text-rose-200 leading-relaxed">
+                Atenção: Você possui perguntas obrigatórias pendentes nos blocos anteriores. Por
+                favor, retorne e preencha todos os campos para habilitar o envio do diagnóstico.
+              </p>
             </div>
-            <dl className="grid grid-cols-1 gap-4 text-sm">
-              <div className="grid grid-cols-2">
-                <dt className="text-slate-500">Au1. Tarefas automatizadas</dt>
-                <dd className="text-slate-200 font-medium">Nota: {data.au1 || 'Não respondido'}</dd>
-              </div>
-              <div className="grid grid-cols-2">
-                <dt className="text-slate-500">Au2. Automações rodando</dt>
-                <dd className="text-slate-200 font-medium">Nota: {data.au2 || 'Não respondido'}</dd>
-              </div>
-              <div className="grid grid-cols-2">
-                <dt className="text-slate-500">Au3. Processos manuais</dt>
-                <dd className="text-slate-200 font-medium">Nota: {data.au3 || 'Não respondido'}</dd>
-              </div>
-              <div className="grid grid-cols-2">
-                <dt className="text-slate-500">Au4. Tempo em tarefas operacionais</dt>
-                <dd className="text-slate-200 font-medium">Nota: {data.au4 || 'Não respondido'}</dd>
-              </div>
-              <div className="grid grid-cols-2">
-                <dt className="text-slate-500">Au5. Monitoramento de KPIs</dt>
-                <dd className="text-slate-200 font-medium">Nota: {data.au5 || 'Não respondido'}</dd>
-              </div>
-              {data.au6 && (
-                <div className="mt-2 pt-4 border-t border-white/10">
-                  <dt className="text-slate-500 mb-1">Au6. Tarefa para nunca mais fazer</dt>
-                  <dd className="text-slate-200 italic">"{data.au6}"</dd>
-                </div>
-              )}
-            </dl>
-          </div>
+          )}
 
-          <div className="pt-6">
-            <Button
-              asChild
-              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold h-14 text-lg rounded-xl transition-colors"
-            >
-              <Link to="/">Voltar ao Início</Link>
-            </Button>
-          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+              <div className="space-y-8">
+                {/* T1 */}
+                <FormField
+                  control={form.control}
+                  name="t1"
+                  render={({ field }) => (
+                    <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <FormLabel className="text-base text-slate-200 font-medium leading-relaxed md:max-w-[80%]">
+                          T1. Numa escala de 1-10, o quanto a empresa funciona sem você (dono) no
+                          operacional diário?
+                        </FormLabel>
+                        <Badge
+                          variant="outline"
+                          className="w-fit text-xs text-[#2dd4bf] border-[#2dd4bf]/30 bg-[#2dd4bf]/10 shrink-0 uppercase tracking-wide font-semibold"
+                        >
+                          Nota: {field.value}
+                        </Badge>
+                      </div>
+                      <FormControl>
+                        <div className="pt-4 pb-2">
+                          <Slider
+                            min={1}
+                            max={10}
+                            step={1}
+                            value={[field.value]}
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                            className="w-full [&>span:first-child]:bg-white/10 [&>span:first-child>span]:bg-[#2dd4bf] [&_[role=slider]]:border-[#2dd4bf] [&_[role=slider]]:bg-black [&_[role=slider]]:focus-visible:ring-[#2dd4bf]"
+                          />
+                        </div>
+                      </FormControl>
+                      <div className="flex justify-between text-xs text-slate-400 pt-1 w-full gap-4 font-medium">
+                        <span className="text-left leading-tight">1 = Muito dependente</span>
+                        <span className="text-right leading-tight">
+                          10 = Totalmente independente
+                        </span>
+                      </div>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
+
+                {/* T2 */}
+                <FormField
+                  control={form.control}
+                  name="t2"
+                  render={({ field }) => (
+                    <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <FormLabel className="text-base text-slate-200 font-medium leading-relaxed md:max-w-[80%]">
+                          T2. Numa escala de 1-10, quanto controle você tem sobre os números do
+                          negócio em tempo real?
+                        </FormLabel>
+                        <Badge
+                          variant="outline"
+                          className="w-fit text-xs text-[#2dd4bf] border-[#2dd4bf]/30 bg-[#2dd4bf]/10 shrink-0 uppercase tracking-wide font-semibold"
+                        >
+                          Nota: {field.value}
+                        </Badge>
+                      </div>
+                      <FormControl>
+                        <div className="pt-4 pb-2">
+                          <Slider
+                            min={1}
+                            max={10}
+                            step={1}
+                            value={[field.value]}
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                            className="w-full [&>span:first-child]:bg-white/10 [&>span:first-child>span]:bg-[#2dd4bf] [&_[role=slider]]:border-[#2dd4bf] [&_[role=slider]]:bg-black [&_[role=slider]]:focus-visible:ring-[#2dd4bf]"
+                          />
+                        </div>
+                      </FormControl>
+                      <div className="flex justify-between text-xs text-slate-400 pt-1 w-full gap-4 font-medium">
+                        <span className="text-left leading-tight">1 = Nenhum controle</span>
+                        <span className="text-right leading-tight">10 = Controle total</span>
+                      </div>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
+
+                {/* T3 */}
+                <FormField
+                  control={form.control}
+                  name="t3"
+                  render={({ field }) => (
+                    <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <FormLabel className="text-base text-slate-200 font-medium leading-relaxed md:max-w-[80%]">
+                          T3. Numa escala de 1-10, o quanto você sente que a empresa está preparada
+                          pro futuro com IA?
+                        </FormLabel>
+                        <Badge
+                          variant="outline"
+                          className="w-fit text-xs text-[#2dd4bf] border-[#2dd4bf]/30 bg-[#2dd4bf]/10 shrink-0 uppercase tracking-wide font-semibold"
+                        >
+                          Nota: {field.value}
+                        </Badge>
+                      </div>
+                      <FormControl>
+                        <div className="pt-4 pb-2">
+                          <Slider
+                            min={1}
+                            max={10}
+                            step={1}
+                            value={[field.value]}
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                            className="w-full [&>span:first-child]:bg-white/10 [&>span:first-child>span]:bg-[#2dd4bf] [&_[role=slider]]:border-[#2dd4bf] [&_[role=slider]]:bg-black [&_[role=slider]]:focus-visible:ring-[#2dd4bf]"
+                          />
+                        </div>
+                      </FormControl>
+                      <div className="flex justify-between text-xs text-slate-400 pt-1 w-full gap-4 font-medium">
+                        <span className="text-left leading-tight">1 = Nada preparada</span>
+                        <span className="text-right leading-tight">10 = Muito preparada</span>
+                      </div>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
+
+                {/* T4 */}
+                <FormField
+                  control={form.control}
+                  name="t4"
+                  render={({ field }) => (
+                    <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
+                      <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
+                        T4. Se você pudesse resolver UM problema do seu negócio nos próximos 90
+                        dias, qual seria?
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Descreva o problema aqui..."
+                          className="bg-black/40 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[120px] resize-y"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  asChild
+                  disabled={isSubmitting}
+                  className="w-full sm:w-1/3 border-white/10 text-white hover:bg-white/5 hover:text-white h-14 text-lg rounded-xl"
+                >
+                  <Link to="/bloco-au">Voltar</Link>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="w-full sm:w-2/3 bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] disabled:opacity-50 disabled:hover:shadow-none group"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                      Processando seu diagnóstico...
+                    </>
+                  ) : (
+                    <>
+                      Enviar Diagnóstico
+                      <Send className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
     </div>
