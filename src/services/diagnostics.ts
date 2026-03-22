@@ -81,10 +81,11 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     const { error: updateError } = await supabase
       .from('empresas')
       .update({
+        nome: data.companyName,
         email_admin: data.adminEmail || 'nao_informado@email.com',
         responsavel_nome: data.leadName,
         responsavel_email: data.leadEmail,
-      })
+      } as any)
       .eq('id', empresaId)
 
     if (updateError) throw new Error(`Erro ao atualizar empresa: ${updateError.message}`)
@@ -93,10 +94,11 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
       .from('empresas')
       .insert({
         cnpj: cnpjValue,
+        nome: data.companyName,
         email_admin: data.adminEmail || 'nao_informado@email.com',
         responsavel_nome: data.leadName,
         responsavel_email: data.leadEmail,
-      })
+      } as any)
       .select('id')
       .single()
 
@@ -165,7 +167,6 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
 
 export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: string) => {
   if (complemento && complemento.trim() !== '') {
-    // Salva na nova coluna da tabela
     const { error: updateDiagError } = await supabase
       .from('diagnosticos')
       .update({ complemento_sucesso: complemento.trim() } as any)
@@ -175,7 +176,6 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
       console.error('Erro ao atualizar complemento_sucesso no banco:', updateDiagError.message)
     }
 
-    // Mantém compatibilidade salvando também nas respostas abertas
     const { error: abertasError } = await supabase.from('respostas_abertas').insert({
       diagnostico_id: diagnosticoId,
       tipo_bloco: 'P',
@@ -209,7 +209,6 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
     console.error('Falha ao invocar gerar_documento_pdf:', err)
   }
 
-  // Aciona exportação para o Sheets enviando o ID do diagnóstico para que ele busque do banco
   supabase.functions
     .invoke('exportar_para_sheets', {
       body: { diagnostico_id: diagnosticoId },

@@ -20,6 +20,7 @@ import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
 const formSchema = z.object({
+  companyName: z.string().min(2, { message: 'O nome da empresa é obrigatório.' }),
   cnpj: z.string().length(18, { message: 'O CNPJ deve estar completo (14 dígitos).' }),
   adminEmail: z.string().email({ message: 'Insira um e-mail válido.' }),
   userName: z.string().min(2, { message: 'O nome é obrigatório.' }),
@@ -45,6 +46,7 @@ export default function Diagnosis() {
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: {
+      companyName: storeData.companyName || '',
       cnpj: storeData.cnpj || '',
       adminEmail: storeData.adminEmail || '',
       userName: storeData.userName || '',
@@ -110,6 +112,24 @@ export default function Diagnosis() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
+                  name="companyName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300">Nome da Empresa</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Sua Empresa Ltda"
+                          {...field}
+                          className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="cnpj"
                   render={({ field }) => (
                     <FormItem>
@@ -127,16 +147,36 @@ export default function Diagnosis() {
                     </FormItem>
                   )}
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="userName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300">Seu Nome (Preenchedor)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ex: João Silva"
+                          {...field}
+                          className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
                   name="adminEmail"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-300">E-mail do Admin</FormLabel>
+                      <FormLabel className="text-slate-300">Seu E-mail Institucional</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="admin@empresa.com.br"
+                          placeholder="voce@empresa.com.br"
                           {...field}
                           className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
                         />
@@ -146,24 +186,6 @@ export default function Diagnosis() {
                   )}
                 />
               </div>
-
-              <FormField
-                control={form.control}
-                name="userName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Nome de quem está preenchendo</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ex: João Silva"
-                        {...field}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-rose-400" />
-                  </FormItem>
-                )}
-              />
 
               <div className="bg-white/5 border border-white/10 rounded-xl p-6 mt-8 space-y-6">
                 <div className="mb-4">

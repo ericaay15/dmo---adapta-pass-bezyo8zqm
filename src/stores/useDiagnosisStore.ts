@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 
 export type DiagnosisState = {
+  companyName: string
   cnpj: string
   adminEmail: string
   userName: string
@@ -35,6 +36,7 @@ export type DiagnosisState = {
 }
 
 let store: DiagnosisState = {
+  companyName: '',
   cnpj: '',
   adminEmail: '',
   userName: '',
@@ -91,6 +93,7 @@ const useDiagnosisStore = () => {
 
   const resetData = () => {
     store = {
+      companyName: '',
       cnpj: '',
       adminEmail: '',
       userName: '',

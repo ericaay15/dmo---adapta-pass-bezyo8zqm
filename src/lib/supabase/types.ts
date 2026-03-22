@@ -14,6 +14,7 @@ export type Database = {
           classificacao_a: string | null
           classificacao_au: string | null
           classificacao_s: string | null
+          complemento_sucesso: string | null
           data_preenchimento: string
           empresa_id: string
           first_impact_json: Json | null
@@ -33,6 +34,7 @@ export type Database = {
           classificacao_a?: string | null
           classificacao_au?: string | null
           classificacao_s?: string | null
+          complemento_sucesso?: string | null
           data_preenchimento?: string
           empresa_id: string
           first_impact_json?: Json | null
@@ -52,6 +54,7 @@ export type Database = {
           classificacao_a?: string | null
           classificacao_au?: string | null
           classificacao_s?: string | null
+          complemento_sucesso?: string | null
           data_preenchimento?: string
           empresa_id?: string
           first_impact_json?: Json | null
@@ -301,6 +304,7 @@ export const Constants = {
 //   first_impact_json: jsonb (nullable)
 //   data_preenchimento: timestamp with time zone (not null, default: now())
 //   pdf_url: text (nullable)
+//   complemento_sucesso: text (nullable)
 // Table: empresas
 //   id: uuid (not null, default: gen_random_uuid())
 //   cnpj: text (not null)
