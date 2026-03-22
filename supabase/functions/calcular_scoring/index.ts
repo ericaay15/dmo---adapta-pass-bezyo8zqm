@@ -68,11 +68,106 @@ Deno.serve(async (req: Request) => {
       return priority[b.id as keyof typeof priority] - priority[a.id as keyof typeof priority]
     })
 
-    const top_3_oportunidades = sortedBlocos.map((b) => ({
-      bloco: b.id,
-      nome: b.nome,
-      nota: b.nota,
-      classificacao: getClassificacao(b.nota),
+    const questionMap = [
+      {
+        id: 'A1',
+        val: A1,
+        bloco: 'Amplificar',
+        rec: 'Trazer mais pessoas do time para usar a IA no trabalho diário.',
+      },
+      {
+        id: 'A2',
+        val: A2,
+        bloco: 'Amplificar',
+        rec: 'Aprofundar o uso de IA além de tarefas básicas, explorando simulações e decisões estratégicas.',
+      },
+      {
+        id: 'A3',
+        val: A3,
+        bloco: 'Amplificar',
+        rec: 'Engajar a liderança no uso ativo de IA para o pensamento e planejamento do negócio.',
+      },
+      {
+        id: 'A4',
+        val: A4,
+        bloco: 'Amplificar',
+        rec: 'Estruturar um programa de capacitação formal em IA para nivelar o conhecimento da equipe.',
+      },
+      {
+        id: 'A5',
+        val: A5,
+        bloco: 'Amplificar',
+        rec: 'Focar em projetos e rotinas de IA que gerem resultados tangíveis e mensuráveis rapidamente.',
+      },
+      {
+        id: 'S1',
+        val: S1,
+        bloco: 'Sistematizar',
+        rec: 'Mapear e documentar os processos críticos da empresa para que fiquem claros e acessíveis a todos.',
+      },
+      {
+        id: 'S2',
+        val: S2,
+        bloco: 'Sistematizar',
+        rec: 'Criar um sistema completo de onboarding estruturado para facilitar a entrada de novos colaboradores.',
+      },
+      {
+        id: 'S3',
+        val: S3,
+        bloco: 'Sistematizar',
+        rec: 'Sistematizar o conhecimento crítico da empresa para reduzir drasticamente a dependência de pessoas-chave.',
+      },
+      {
+        id: 'S4',
+        val: S4,
+        bloco: 'Sistematizar',
+        rec: 'Adotar sistemas integrados (CRM, ERPs) para substituir controles dispersos em planilhas e WhatsApp.',
+      },
+      {
+        id: 'S5',
+        val: S5,
+        bloco: 'Sistematizar',
+        rec: 'Criar e alimentar uma base de conhecimento interna para que o time tenha onde consultar informações rapidamente.',
+      },
+      {
+        id: 'Au1',
+        val: Au1,
+        bloco: 'Automatizar',
+        rec: 'Identificar e aplicar automações nas tarefas mais repetitivas que sobrecarregam o dia a dia da equipe.',
+      },
+      {
+        id: 'Au2',
+        val: Au2,
+        bloco: 'Automatizar',
+        rec: 'Implementar automações ativas para fluxos constantes como follow-ups, agendamentos e emissões de relatórios.',
+      },
+      {
+        id: 'Au3',
+        val: Au3,
+        bloco: 'Automatizar',
+        rec: 'Mapear todos os processos operacionais ainda manuais e arquitetar fluxos de automação para eles.',
+      },
+      {
+        id: 'Au4',
+        val: Au4,
+        bloco: 'Automatizar',
+        rec: 'Recuperar horas da equipe automatizando processos para que foquem em trabalho mais estratégico.',
+      },
+      {
+        id: 'Au5',
+        val: Au5,
+        bloco: 'Automatizar',
+        rec: 'Implementar a coleta de dados e criação de dashboards automáticos para o acompanhamento de KPIs.',
+      },
+    ]
+
+    questionMap.sort((a, b) => a.val - b.val)
+
+    const top_3_oportunidades = questionMap.slice(0, 3).map((q) => ({
+      bloco: q.bloco,
+      nome: q.rec,
+      nota: q.val,
+      classificacao: q.val <= 2 ? 'Crítico' : q.val <= 3 ? 'Atenção' : 'Oportunidade de Melhoria',
     }))
 
     const pessoasImpactadasSum = A1 + A4 + A5
@@ -137,20 +232,20 @@ Deno.serve(async (req: Request) => {
 
     if (T4 && typeof T4 === 'string' && T4.trim() !== '') {
       acao = 'Foco no Desafio Estratégico de 90 Dias'
-      descricao = `Resolver: ${T4.trim()}. Paralelamente, estruturar a adoção de IA para toda a equipe.`
+      descricao = `Resolver: ${T4.trim()}. Paralelamente, trazer adoção de IA para toda a equipe.`
     } else {
       if (firstImpactBloco.id === 'A') {
         acao = 'Otimizar Atração'
         descricao =
-          'Foque em estruturar seus canais de aquisição e melhorar as taxas de conversão de leads. Além disso, focar em trazer adoção de IA para toda a equipe.'
+          'Foque em estruturar seus canais de aquisição e melhorar as taxas de conversão de leads. Além disso, trazer adoção de IA para toda a equipe.'
       } else if (firstImpactBloco.id === 'S') {
         acao = 'Implementar Sistemas'
         descricao =
-          'Comece padronizando os processos críticos e centralizando as informações do negócio. Além disso, focar em trazer adoção de IA para toda a equipe.'
+          'Comece padronizando os processos críticos e centralizando as informações do negócio. Além disso, trazer adoção de IA para toda a equipe.'
       } else {
         acao = 'Criar Automações'
         descricao =
-          'Identifique a tarefa manual mais repetitiva e implemente uma automação simples para ela. Além disso, focar em trazer adoção de IA para toda a equipe.'
+          'Identifique a tarefa manual mais repetitiva e implemente uma automação simples para ela. Além disso, trazer adoção de IA para toda a equipe.'
       }
     }
 

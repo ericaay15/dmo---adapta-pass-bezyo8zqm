@@ -65,7 +65,7 @@ Deno.serve(async (req: Request) => {
 
     const top3Array = (diagnostico.top_3_oportunidades_json || []) as any[]
     const top3Texto = top3Array
-      .map((o: any, i: number) => `${i + 1}. ${o.nome} (${o.classificacao} - Nota ${o.nota})`)
+      .map((o: any, i: number) => `${i + 1}. ${o.nome} (Dimensão: ${o.bloco} - Nota ${o.nota})`)
       .join('\n')
 
     const metricas = (diagnostico.metricas_json as any) || {}

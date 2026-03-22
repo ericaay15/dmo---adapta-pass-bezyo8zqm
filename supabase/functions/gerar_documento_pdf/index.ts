@@ -176,15 +176,15 @@ Deno.serve(async (req: Request) => {
     y -= 25
     const top3 = (diagnostico.top_3_oportunidades_json || []) as any[]
     top3.forEach((op, i) => {
-      page.drawText(`${i + 1}. ${op.nome} (Nota: ${op.nota} - ${op.classificacao})`, {
-        x: 50,
-        y,
-        size: 12,
-        font,
+      const text = `${i + 1}. ${op.nome} (Dimensão: ${op.bloco} - Nota: ${op.nota})`
+      const lines = wrapText(text, 490, font, 12)
+      lines.forEach((l) => {
+        checkPageBreak(15)
+        page.drawText(l, { x: 50, y, size: 12, font })
+        y -= 15
       })
-      y -= 20
+      y -= 10
     })
-    y -= 10
 
     // First Impact
     checkPageBreak(150)
@@ -196,10 +196,17 @@ Deno.serve(async (req: Request) => {
     })
     y -= 25
     const fi = (diagnostico.first_impact_json || {}) as any
-    page.drawText(`Ação: ${fi.acao || ''}`, { x: 50, y, size: 12, font: boldFont })
-    y -= 20
+
+    const fiTitleLines = wrapText(`Ação: ${fi.acao || ''}`, 490, boldFont, 12)
+    fiTitleLines.forEach((l) => {
+      checkPageBreak(15)
+      page.drawText(l, { x: 50, y, size: 12, font: boldFont })
+      y -= 15
+    })
+    y -= 5
     const fiDesc = wrapText(fi.descricao || '', 490, font, 12)
     fiDesc.forEach((l) => {
+      checkPageBreak(15)
       page.drawText(l, { x: 50, y, size: 12, font })
       y -= 15
     })

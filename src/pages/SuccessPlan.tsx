@@ -68,10 +68,11 @@ export default function SuccessPlan() {
               Aqui começa sua jornada de implementação de IA com quem realmente entende.
             </p>
             <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-3xl mx-auto">
-              Este diagnóstico revela a maturidade da sua operação nas três frentes vitais da IA:
-              Pessoas (Amplificar), Processos (Sistematizar) e Eficiência (Automatizar). Os
-              resultados mapeiam suas maiores alavancas de crescimento e as ações prioritárias para
-              os próximos 60 dias.
+              Este diagnóstico revela a maturidade atual da sua empresa nas três dimensões
+              estratégicas de transformação com IA: Amplificar (pessoas e capacidades), Sistematizar
+              (processos e conhecimento) e Automatizar (eficiência operacional). Os resultados
+              abaixo refletem a realidade do seu negócio hoje e apontam as oportunidades mais
+              impactantes para os próximos 60 dias.
             </p>
           </div>
 
@@ -173,16 +174,22 @@ export default function SuccessPlan() {
               </div>
               <ul className="space-y-4">
                 {scoringData.top_3_oportunidades.map((op: any, i: number) => (
-                  <li key={i} className="flex gap-3 items-start">
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#2dd4bf]/20 text-[#2dd4bf] flex items-center justify-center text-sm font-bold mt-0.5">
+                  <li
+                    key={i}
+                    className="flex gap-4 items-start bg-black/20 p-4 rounded-lg border border-white/5"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2dd4bf]/20 text-[#2dd4bf] flex items-center justify-center text-sm font-bold mt-0.5">
                       {i + 1}
                     </div>
                     <div>
-                      <div className="font-semibold text-slate-200">
-                        {op.nome} ({op.bloco})
-                      </div>
-                      <div className="text-sm text-slate-400">
-                        Classificação: {op.classificacao} (Nota: {op.nota})
+                      <div className="font-semibold text-slate-200 leading-snug">{op.nome}</div>
+                      <div className="text-xs text-slate-400 mt-2 flex flex-wrap items-center gap-2">
+                        <span className="bg-white/10 px-2 py-0.5 rounded text-slate-300">
+                          Dimensão: {op.bloco}
+                        </span>
+                        <span className="bg-white/10 px-2 py-0.5 rounded text-slate-300">
+                          Nota: {op.nota}/5
+                        </span>
                       </div>
                     </div>
                   </li>
@@ -202,7 +209,7 @@ export default function SuccessPlan() {
                 <div className="text-sm font-semibold text-[#2dd4bf] uppercase tracking-wider mb-1">
                   Meta dos Primeiros 60 Dias
                 </div>
-                <div className="text-2xl font-bold text-white mb-3">
+                <div className="text-2xl font-bold text-white mb-3 leading-tight">
                   {scoringData.first_impact.acao}
                 </div>
                 <p className="text-slate-300 leading-relaxed">
