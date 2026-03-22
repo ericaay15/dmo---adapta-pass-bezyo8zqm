@@ -30,23 +30,33 @@ const formSchema = z.object({
 const scaleQuestions = [
   {
     id: 'a1' as const,
-    text: 'A1. A inovação e a Inteligência Artificial estão alinhadas aos objetivos de negócio?',
+    text: 'A1. Quantas pessoas do time usam IA no trabalho diário?',
+    minLabel: '1 = ninguém',
+    maxLabel: '5 = todos',
   },
   {
     id: 'a2' as const,
-    text: 'A2. A liderança promove e patrocina ativamente a adoção de novas tecnologias?',
+    text: 'A2. Qual a profundidade do uso de IA?',
+    minLabel: '1 = corrigir texto',
+    maxLabel: '5 = simular cenários, tomar decisões estratégicas',
   },
   {
     id: 'a3' as const,
-    text: 'A3. Existe orçamento dedicado para iniciativas de inovação e IA?',
+    text: 'A3. A liderança usa IA ativamente para pensar o negócio?',
+    minLabel: '1 = nunca',
+    maxLabel: '5 = diariamente',
   },
   {
     id: 'a4' as const,
-    text: 'A4. A empresa possui métricas claras para medir o retorno (ROI) de iniciativas de IA?',
+    text: 'A4. O time recebeu capacitação formal em IA nos últimos 6 meses?',
+    minLabel: '1 = nenhuma',
+    maxLabel: '5 = programa estruturado',
   },
   {
     id: 'a5' as const,
-    text: 'A5. Os colaboradores são incentivados e capacitados para propor soluções inovadoras?',
+    text: 'A5. A IA já gerou um resultado tangível e mensurável no negócio?',
+    minLabel: '1 = nenhum',
+    maxLabel: '5 = vários comprováveis',
   },
 ]
 
@@ -94,15 +104,20 @@ export default function BlockA() {
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
           <div className="mb-8">
             <h2 className="text-sm font-semibold text-[#8b5cf6] uppercase tracking-wider mb-2">
-              Bloco A
+              Sessão: AMPLIFICAR
             </h2>
             <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-              Estratégia e Liderança
+              Uso e Conhecimento de IA
             </h3>
             <p className="text-slate-400 mt-2 text-sm md:text-base">
-              Avalie como a inovação e a Inteligência Artificial estão alinhadas aos objetivos de
-              negócio.
+              Nesse bloco avaliamos como está o uso e conhecimento de IA na sua empresa.
             </p>
+            <div className="mt-5 p-3.5 bg-white/5 border border-white/10 rounded-lg">
+              <p className="text-xs text-slate-300">
+                <span className="font-semibold text-[#2dd4bf]">Escala:</span> 1 = Não fazemos isso /
+                5 = Fazemos de forma avançada e recorrente
+              </p>
+            </div>
           </div>
 
           <Form {...form}>
@@ -136,9 +151,9 @@ export default function BlockA() {
                             ))}
                           </ToggleGroup>
                         </FormControl>
-                        <div className="flex justify-between text-xs text-slate-400 pt-1 sm:max-w-[280px]">
-                          <span>1 = Não fazemos isso</span>
-                          <span>5 = Forma avançada</span>
+                        <div className="flex justify-between text-xs text-slate-400 pt-1 w-full gap-4">
+                          <span className="text-left max-w-[45%] leading-tight">{q.minLabel}</span>
+                          <span className="text-right max-w-[45%] leading-tight">{q.maxLabel}</span>
                         </div>
                         <FormMessage className="text-rose-400" />
                       </FormItem>
@@ -152,11 +167,11 @@ export default function BlockA() {
                   render={({ field }) => (
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                        A6. Qual é o maior desafio estratégico da sua empresa em relação à IA?
+                        A6. Algo mais a acrescentar sobre o uso de IA na sua empresa?
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Descreva brevemente (opcional)"
+                          placeholder="Descreva brevemente sua situação atual (opcional)"
                           className="bg-black/40 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[120px] resize-y"
                           {...field}
                         />

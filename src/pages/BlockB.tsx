@@ -47,28 +47,28 @@ export default function BlockB() {
             </div>
             <dl className="grid grid-cols-1 gap-4 text-sm">
               <div className="grid grid-cols-2">
-                <dt className="text-slate-500">A1. Estratégia</dt>
+                <dt className="text-slate-500">A1. Pessoas usando IA</dt>
                 <dd className="text-slate-200 font-medium">Nota: {data.a1 || 'Não respondido'}</dd>
               </div>
               <div className="grid grid-cols-2">
-                <dt className="text-slate-500">A2. Liderança</dt>
+                <dt className="text-slate-500">A2. Profundidade</dt>
                 <dd className="text-slate-200 font-medium">Nota: {data.a2 || 'Não respondido'}</dd>
               </div>
               <div className="grid grid-cols-2">
-                <dt className="text-slate-500">A3. Orçamento</dt>
+                <dt className="text-slate-500">A3. Liderança e IA</dt>
                 <dd className="text-slate-200 font-medium">Nota: {data.a3 || 'Não respondido'}</dd>
               </div>
               <div className="grid grid-cols-2">
-                <dt className="text-slate-500">A4. Métricas/ROI</dt>
+                <dt className="text-slate-500">A4. Capacitação</dt>
                 <dd className="text-slate-200 font-medium">Nota: {data.a4 || 'Não respondido'}</dd>
               </div>
               <div className="grid grid-cols-2">
-                <dt className="text-slate-500">A5. Cultura</dt>
+                <dt className="text-slate-500">A5. Resultados tangíveis</dt>
                 <dd className="text-slate-200 font-medium">Nota: {data.a5 || 'Não respondido'}</dd>
               </div>
               {data.a6 && (
                 <div className="mt-2 pt-4 border-t border-white/10">
-                  <dt className="text-slate-500 mb-1">A6. Desafio Estratégico</dt>
+                  <dt className="text-slate-500 mb-1">A6. Resposta aberta</dt>
                   <dd className="text-slate-200 italic">"{data.a6}"</dd>
                 </div>
               )}
