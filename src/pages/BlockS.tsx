@@ -31,31 +31,31 @@ const formSchema = z.object({
 const scaleQuestions = [
   {
     id: 's1' as const,
-    text: 'S1. Os processos críticos da empresa estão documentados? (1=na cabeça, 5=todos mapeados e acessíveis)',
+    text: 'S1. Os processos críticos da empresa estão documentados?',
     minLabel: '1 = na cabeça',
     maxLabel: '5 = todos mapeados e acessíveis',
   },
   {
     id: 's2' as const,
-    text: 'S2. Quando alguém novo entra, existe um sistema de onboarding estruturado? (1=cada um se vira, 5=processo completo)',
+    text: 'S2. Quando alguém novo entra, existe um sistema de onboarding estruturado?',
     minLabel: '1 = cada um se vira',
     maxLabel: '5 = processo completo',
   },
   {
     id: 's3' as const,
-    text: 'S3. Se uma pessoa-chave saísse hoje, quanto conhecimento crítico se perderia? (1=tudo, 5=nada, está em sistema)',
+    text: 'S3. Se uma pessoa-chave saísse hoje, quanto conhecimento crítico se perderia?',
     minLabel: '1 = tudo',
     maxLabel: '5 = nada, está em sistema',
   },
   {
     id: 's4' as const,
-    text: 'S4. A empresa usa ferramentas integradas (CRM, controles, fluxos) ou planilhas/WhatsApp? (1=só planilha/WhatsApp, 5=sistemas integrados)',
+    text: 'S4. A empresa usa ferramentas integradas (CRM, controles, fluxos) ou planilhas/WhatsApp?',
     minLabel: '1 = só planilha/WhatsApp',
     maxLabel: '5 = sistemas integrados',
   },
   {
     id: 's5' as const,
-    text: 'S5. Existe uma base de conhecimento interna que o time consulta? (1=não existe, 5=completa e atualizada)',
+    text: 'S5. Existe uma base de conhecimento interna que o time consulta?',
     minLabel: '1 = não existe',
     maxLabel: '5 = completa e atualizada',
   },
