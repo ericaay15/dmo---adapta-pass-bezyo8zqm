@@ -14,12 +14,12 @@ const Index = () => {
       {/* Hero Content */}
       <div className="space-y-8 md:space-y-10 w-full">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mx-auto max-w-4xl">
-          Diagnóstico de Maturidade Organizacional
+          Diagnóstico de Maturidade e Oportunidade
         </h1>
 
         <p className="text-lg md:text-xl lg:text-2xl text-slate-300 leading-relaxed max-w-4xl mx-auto font-medium">
-          O primeiro passo para o sucesso é preencher nosso Diagnóstico para receber um plano de
-          sucesso personalizado e conectar seu gerente de negócios.
+          Preencha o Diagnóstico para receber um plano de sucesso personalizado e conectar seu
+          gerente de negócios.
         </p>
 
         <p className="text-base md:text-lg text-[#2dd4bf] font-semibold max-w-2xl mx-auto animate-fade-in-up-delayed drop-shadow-[0_0_10px_rgba(45,212,191,0.2)]">
