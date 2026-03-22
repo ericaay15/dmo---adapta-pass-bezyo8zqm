@@ -12,6 +12,12 @@ export type DiagnosisState = {
   a4: string
   a5: string
   a6: string
+  s1: string
+  s2: string
+  s3: string
+  s4: string
+  s5: string
+  s6: string
 }
 
 let store: DiagnosisState = {
@@ -26,6 +32,12 @@ let store: DiagnosisState = {
   a4: '',
   a5: '',
   a6: '',
+  s1: '',
+  s2: '',
+  s3: '',
+  s4: '',
+  s5: '',
+  s6: '',
 }
 
 const listeners = new Set<() => void>()
@@ -62,6 +74,12 @@ const useDiagnosisStore = () => {
       a4: '',
       a5: '',
       a6: '',
+      s1: '',
+      s2: '',
+      s3: '',
+      s4: '',
+      s5: '',
+      s6: '',
     }
     listeners.forEach((listener) => listener())
   }

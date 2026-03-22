@@ -20,48 +20,48 @@ import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
 const formSchema = z.object({
-  a1: z.string().min(1, { message: 'Selecione uma opção.' }),
-  a2: z.string().min(1, { message: 'Selecione uma opção.' }),
-  a3: z.string().min(1, { message: 'Selecione uma opção.' }),
-  a4: z.string().min(1, { message: 'Selecione uma opção.' }),
-  a5: z.string().min(1, { message: 'Selecione uma opção.' }),
-  a6: z.string().optional(),
+  s1: z.string().min(1, { message: 'Selecione uma opção.' }),
+  s2: z.string().min(1, { message: 'Selecione uma opção.' }),
+  s3: z.string().min(1, { message: 'Selecione uma opção.' }),
+  s4: z.string().min(1, { message: 'Selecione uma opção.' }),
+  s5: z.string().min(1, { message: 'Selecione uma opção.' }),
+  s6: z.string().optional(),
 })
 
 const scaleQuestions = [
   {
-    id: 'a1' as const,
-    text: 'A1. Quantas pessoas do time usam IA no trabalho diário?',
-    minLabel: '1 = ninguém',
-    maxLabel: '5 = todos',
+    id: 's1' as const,
+    text: 'S1. Os processos críticos da empresa estão documentados? (1=na cabeça, 5=todos mapeados e acessíveis)',
+    minLabel: '1 = na cabeça',
+    maxLabel: '5 = todos mapeados e acessíveis',
   },
   {
-    id: 'a2' as const,
-    text: 'A2. Qual a profundidade do uso de IA?',
-    minLabel: '1 = corrigir texto',
-    maxLabel: '5 = simular cenários, tomar decisões estratégicas',
+    id: 's2' as const,
+    text: 'S2. Quando alguém novo entra, existe um sistema de onboarding estruturado? (1=cada um se vira, 5=processo completo)',
+    minLabel: '1 = cada um se vira',
+    maxLabel: '5 = processo completo',
   },
   {
-    id: 'a3' as const,
-    text: 'A3. A liderança usa IA ativamente para pensar o negócio?',
-    minLabel: '1 = nunca',
-    maxLabel: '5 = diariamente',
+    id: 's3' as const,
+    text: 'S3. Se uma pessoa-chave saísse hoje, quanto conhecimento crítico se perderia? (1=tudo, 5=nada, está em sistema)',
+    minLabel: '1 = tudo',
+    maxLabel: '5 = nada, está em sistema',
   },
   {
-    id: 'a4' as const,
-    text: 'A4. O time recebeu capacitação formal em IA nos últimos 6 meses?',
-    minLabel: '1 = nenhuma',
-    maxLabel: '5 = programa estruturado',
+    id: 's4' as const,
+    text: 'S4. A empresa usa ferramentas integradas (CRM, controles, fluxos) ou planilhas/WhatsApp? (1=só planilha/WhatsApp, 5=sistemas integrados)',
+    minLabel: '1 = só planilha/WhatsApp',
+    maxLabel: '5 = sistemas integrados',
   },
   {
-    id: 'a5' as const,
-    text: 'A5. A IA já gerou um resultado tangível e mensurável no negócio?',
-    minLabel: '1 = nenhum',
-    maxLabel: '5 = vários comprováveis',
+    id: 's5' as const,
+    text: 'S5. Existe uma base de conhecimento interna que o time consulta? (1=não existe, 5=completa e atualizada)',
+    minLabel: '1 = não existe',
+    maxLabel: '5 = completa e atualizada',
   },
 ]
 
-export default function BlockA() {
+export default function BlockS() {
   const navigate = useNavigate()
   const { data: storeData, updateData } = useDiagnosisStore()
 
@@ -69,18 +69,18 @@ export default function BlockA() {
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: {
-      a1: storeData.a1 || '',
-      a2: storeData.a2 || '',
-      a3: storeData.a3 || '',
-      a4: storeData.a4 || '',
-      a5: storeData.a5 || '',
-      a6: storeData.a6 || '',
+      s1: storeData.s1 || '',
+      s2: storeData.s2 || '',
+      s3: storeData.s3 || '',
+      s4: storeData.s4 || '',
+      s5: storeData.s5 || '',
+      s6: storeData.s6 || '',
     },
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     updateData(values)
-    navigate('/bloco-s')
+    navigate('/bloco-au')
   }
 
   return (
@@ -91,7 +91,7 @@ export default function BlockA() {
           asChild
           className="text-slate-400 hover:text-white hover:bg-white/5 -ml-4"
         >
-          <Link to="/diagnostico">
+          <Link to="/bloco-a">
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
           </Link>
         </Button>
@@ -100,25 +100,17 @@ export default function BlockA() {
       </div>
 
       <div className="w-full max-w-2xl relative">
-        <div className="absolute -inset-1 bg-gradient-to-r from-[#8b5cf6]/20 to-[#2dd4bf]/20 rounded-3xl blur-xl opacity-50 z-0"></div>
+        <div className="absolute -inset-1 bg-gradient-to-r from-[#2dd4bf]/20 to-[#0d9488]/20 rounded-3xl blur-xl opacity-50 z-0"></div>
 
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
           <div className="mb-10">
             <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-3">
-              Sessão:{' '}
-              <span className="bg-gradient-to-r from-[#4bb7a5] via-[#957588] to-[#f45961] bg-clip-text text-transparent font-extrabold">
-                AMPLIFICAR
-              </span>
+              Sessão: <span className="text-[#2dd4bf] font-extrabold">SISTEMATIZAR</span>
             </h2>
             <p className="text-slate-400 text-sm md:text-base font-normal leading-relaxed">
-              Nesse bloco avaliamos como está o uso e conhecimento de IA na sua empresa.
+              Nesse bloco avaliamos como está a documentação, onboarding e gestão de conhecimento na
+              sua empresa.
             </p>
-            <div className="mt-5 p-3.5 bg-white/5 border border-white/10 rounded-lg inline-block">
-              <p className="text-xs text-slate-300">
-                <span className="font-semibold text-[#2dd4bf]">Escala:</span> 1 = Não fazemos isso /
-                5 = Fazemos de forma avançada e recorrente
-              </p>
-            </div>
           </div>
 
           <Form {...form}>
@@ -139,7 +131,7 @@ export default function BlockA() {
                             variant="outline"
                             className="w-fit text-xs text-[#2dd4bf] border-[#2dd4bf]/30 bg-[#2dd4bf]/10 shrink-0 uppercase tracking-wide font-semibold"
                           >
-                            Amplificar
+                            Sistematizar
                           </Badge>
                         </div>
                         <FormControl>
@@ -172,16 +164,16 @@ export default function BlockA() {
 
                 <FormField
                   control={form.control}
-                  name="a6"
+                  name="s6"
                   render={({ field }) => (
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                        A6. Qual foi o melhor resultado que você já teve usando IA? Se não teve, o
-                        que esperaria conseguir?
+                        S6. Qual é o processo mais crítico da empresa que ainda mora na cabeça de
+                        alguém?
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Sua resposta (opcional)"
+                          placeholder="Sua resposta..."
                           className="bg-black/40 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[120px] resize-y"
                           {...field}
                         />
@@ -199,7 +191,7 @@ export default function BlockA() {
                   asChild
                   className="w-full sm:w-1/3 border-white/10 text-white hover:bg-white/5 hover:text-white h-14 text-lg rounded-xl"
                 >
-                  <Link to="/diagnostico">Voltar</Link>
+                  <Link to="/bloco-a">Voltar</Link>
                 </Button>
                 <Button
                   type="submit"

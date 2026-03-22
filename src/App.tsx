@@ -6,6 +6,8 @@ import Index from './pages/Index'
 import Diagnosis from './pages/Diagnosis'
 import BlockA from './pages/BlockA'
 import BlockB from './pages/BlockB'
+import BlockS from './pages/BlockS'
+import BlockAu from './pages/BlockAu'
 import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 
@@ -20,6 +22,8 @@ const App = () => (
           <Route path="/diagnostico" element={<Diagnosis />} />
           <Route path="/bloco-a" element={<BlockA />} />
           <Route path="/bloco-b" element={<BlockB />} />
+          <Route path="/bloco-s" element={<BlockS />} />
+          <Route path="/bloco-au" element={<BlockAu />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
