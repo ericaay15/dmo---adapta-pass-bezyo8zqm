@@ -1,128 +1,142 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-import { createClient } from 'npm:@supabase/supabase-js@2.45.6'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 import { corsHeaders } from '../_shared/cors.ts'
 
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const googleServiceAccount = Deno.env.get('GOOGLE_SERVICE_ACCOUNT')!
+const spreadsheetId = '1RLEBIWiwhnAvCHCJFQ6hHSpH_q9Q-eYSPR8c97f3-lk'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+function base64url(str: string) {
+  return btoa(str).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_')
+}
+
+function base64urlBytes(bytes: Uint8Array) {
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/=+$/, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+}
+
+async function getGoogleAccessToken() {
+  const serviceAccount = JSON.parse(googleServiceAccount)
+
+  const header = {
+    alg: 'RS256',
+    typ: 'JWT',
+  }
+
+  const now = Math.floor(Date.now() / 1000)
+  const payload = {
+    iss: serviceAccount.client_email,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    aud: 'https://oauth2.googleapis.com/token',
+    exp: now + 3600,
+    iat: now,
+  }
+
+  const headerEncoded = base64url(JSON.stringify(header))
+  const payloadEncoded = base64url(JSON.stringify(payload))
+  const signatureInput = `${headerEncoded}.${payloadEncoded}`
+
+  const privateKey = serviceAccount.private_key
+  const encoder = new TextEncoder()
+  const data = encoder.encode(signatureInput)
+
+  const pemHeader = '-----BEGIN PRIVATE KEY-----'
+  const pemFooter = '-----END PRIVATE KEY-----'
+  const pemContents = privateKey
+    .substring(privateKey.indexOf(pemHeader) + pemHeader.length, privateKey.indexOf(pemFooter))
+    .replace(/\s/g, '')
+
+  const binaryDerString = atob(pemContents)
+  const binaryDer = new Uint8Array(binaryDerString.length)
+  for (let i = 0; i < binaryDerString.length; i++) {
+    binaryDer[i] = binaryDerString.charCodeAt(i)
+  }
+
+  const keyData = await crypto.subtle.importKey(
+    'pkcs8',
+    binaryDer.buffer,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+
+  const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', keyData, data)
+  const signatureEncoded = base64urlBytes(new Uint8Array(signature))
+
+  const jwt = `${signatureInput}.${signatureEncoded}`
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
+  })
+
+  const data_response = await response.json()
+  return data_response.access_token
+}
+
+async function addRowToGoogleSheets(values: string[], accessToken: string) {
+  const range = 'Sheet1!A:P'
+
+  const response = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}:append?valueInputOption=USER_ENTERED`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        values: [values],
+      }),
+    },
+  )
+
+  return await response.json()
+}
+
 Deno.serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
     const body = await req.json()
-    const { diagnostico_id } = body
 
-    if (!diagnostico_id) {
-      throw new Error('diagnostico_id é obrigatório')
-    }
+    const values = [
+      body.cnpj,
+      body.email_admin,
+      body.responsavel,
+      body.data,
+      body.nota_a,
+      body.nota_s,
+      body.nota_au,
+      body.nota_geral,
+      body.classificacao_a,
+      body.classificacao_s,
+      body.classificacao_au,
+      body.top_3_oportunidades,
+      body.metricas,
+      body.first_impact,
+      body.complemento_plano,
+      body.link_documento_pdf,
+    ]
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-    const supabaseKey =
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY') || ''
-
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Variáveis de ambiente do Supabase ausentes')
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey)
-
-    // 1. Fetch Diagnostic and Empresa Data
-    const { data: diagnostico, error: diagError } = await supabase
-      .from('diagnosticos')
-      .select(`
-        *,
-        empresas (
-          cnpj,
-          email_admin,
-          responsavel_nome
-        )
-      `)
-      .eq('id', diagnostico_id)
-      .single()
-
-    if (diagError || !diagnostico) {
-      throw new Error(`Erro ao buscar diagnóstico: ${diagError?.message}`)
-    }
-
-    // 2. Fetch Open Answers (Respostas Abertas)
-    const { data: respostas, error: respError } = await supabase
-      .from('respostas_abertas')
-      .select('*')
-      .eq('diagnostico_id', diagnostico_id)
-
-    if (respError) {
-      throw new Error(`Erro ao buscar respostas abertas: ${respError.message}`)
-    }
-
-    // Extract specifically P1 for "Complemento do Plano"
-    const p1Resposta =
-      respostas?.find((r) => r.tipo_bloco === 'P' && r.numero_pergunta === 1)?.resposta || ''
-
-    // 3. Format Data for Google Sheets
-    const empresas = Array.isArray(diagnostico.empresas)
-      ? diagnostico.empresas[0]
-      : diagnostico.empresas
-
-    const top3Array = (diagnostico.top_3_oportunidades_json || []) as any[]
-    const top3Texto = top3Array
-      .map((o: any, i: number) => `${i + 1}. ${o.nome} (Dimensão: ${o.bloco} - Nota ${o.nota})`)
-      .join('\n')
-
-    const metricas = (diagnostico.metricas_json as any) || {}
-    const metricasTexto = `Pessoas Impactadas: ${metricas.pessoas_impactadas?.nivel || 'N/A'} | Horas Recuperadas: ${metricas.horas_recuperadas?.nivel || 'N/A'} | Dependência do Dono: ${metricas.dependencia_do_dono?.nivel || 'N/A'}`
-
-    const firstImpact = (diagnostico.first_impact_json as any) || {}
-    let descTexto = ''
-    if (Array.isArray(firstImpact.descricao)) {
-      descTexto = firstImpact.descricao.join(' | ')
-    } else {
-      descTexto = firstImpact.descricao || 'N/A'
-    }
-    const firstImpactTexto = `Meta dos primeiros 90 dias: ${descTexto}`
-
-    const payload = {
-      cnpj: empresas?.cnpj || 'N/A',
-      email_admin: empresas?.email_admin || 'N/A',
-      responsavel: empresas?.responsavel_nome || diagnostico.quem_preencheu || 'N/A',
-      data: new Date(diagnostico.data_preenchimento).toLocaleString('pt-BR'),
-      nota_a: diagnostico.nota_a,
-      nota_s: diagnostico.nota_s,
-      nota_au: diagnostico.nota_au,
-      nota_geral: diagnostico.nota_geral,
-      classificacoes: `A: ${diagnostico.classificacao_a} | S: ${diagnostico.classificacao_s} | Au: ${diagnostico.classificacao_au}`,
-      top_3_oportunidades: top3Texto,
-      metricas: metricasTexto,
-      first_impact: firstImpactTexto,
-      complemento_plano: p1Resposta,
-      link_pdf: (diagnostico as any).pdf_url || '',
-    }
-
-    // 4. Send to Google Apps Script
-    const appsScriptUrl =
-      Deno.env.get('GOOGLE_APPS_SCRIPT_URL') ||
-      'https://script.google.com/a/macros/adapta.org/s/AKfycbyND2KvIWJUGUbD64luFdwjdH8KyxLsZwxJ4I7OLFj2nxtww4jTRwZz2I8fooi4_DA/exec'
-
-    const response = await fetch(appsScriptUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (!response.ok) {
-      throw new Error(`Google Apps Script retornou erro: ${response.status} ${response.statusText}`)
-    }
+    const accessToken = await getGoogleAccessToken()
+    const result = await addRowToGoogleSheets(values, accessToken)
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Exportado para o Sheets com sucesso' }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      },
+      JSON.stringify({ success: true, message: 'Dados adicionados ao Sheets', result }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 },
     )
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), {
+  } catch (error: any) {
+    console.error('Erro:', error)
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     })
