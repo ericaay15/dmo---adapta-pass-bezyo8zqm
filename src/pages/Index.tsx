@@ -13,25 +13,17 @@ const Index = () => {
 
       {/* Hero Content */}
       <div className="space-y-8 md:space-y-10 w-full">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mx-auto max-w-4xl">
-          Para empresários que entenderam o mapa. <br className="hidden md:block" />
-          <span className="text-[#2dd4bf] drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">
-            E agora querem o guia.
-          </span>
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mx-auto max-w-4xl">
+          Diagnóstico de Maturidade Organizacional
         </h1>
 
         <p className="text-lg md:text-xl lg:text-2xl text-slate-300 leading-relaxed max-w-4xl mx-auto font-medium">
-          Um gerente dedicado faz o diagnóstico da sua empresa, treina sua equipe, entrega as
-          ferramentas e acompanha os resultados trimestre a trimestre.{' '}
-          <br className="hidden lg:block" />
-          <span className="text-[#2dd4bf] font-semibold mt-2 inline-block">
-            Adapta Pass é implementação de IA com quem já fez isso milhares de vezes.
-          </span>
+          O primeiro passo para o sucesso é preencher nosso Diagnóstico para receber um plano de
+          sucesso personalizado e conectar seu gerente de negócios.
         </p>
 
-        <p className="text-sm md:text-base text-slate-400 max-w-2xl mx-auto animate-fade-in-up-delayed">
-          O primeiro passo para o sucesso é preencher nosso Diagnóstico de Maturidade Organizacional
-          para receber um plano personalizado.
+        <p className="text-base md:text-lg text-[#2dd4bf] font-semibold max-w-2xl mx-auto animate-fade-in-up-delayed drop-shadow-[0_0_10px_rgba(45,212,191,0.2)]">
+          Implementação de IA com quem já fez isso milhares de vezes.
         </p>
 
         {/* Call to Action */}
