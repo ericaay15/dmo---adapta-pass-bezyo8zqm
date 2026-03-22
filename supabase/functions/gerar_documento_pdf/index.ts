@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-import { createClient } from '@supabase/supabase-js'
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import { createClient } from 'npm:@supabase/supabase-js@2.45.6'
+import { PDFDocument, rgb, StandardFonts } from 'npm:pdf-lib@1.17.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
 Deno.serve(async (req: Request) => {
