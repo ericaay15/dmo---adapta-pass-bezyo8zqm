@@ -24,6 +24,7 @@ export type Database = {
           nota_geral: number | null
           nota_s: number | null
           nota_t: number | null
+          pdf_url: string | null
           quem_preencheu: string | null
           respostas_json: Json | null
           top_3_oportunidades_json: Json | null
@@ -42,6 +43,7 @@ export type Database = {
           nota_geral?: number | null
           nota_s?: number | null
           nota_t?: number | null
+          pdf_url?: string | null
           quem_preencheu?: string | null
           respostas_json?: Json | null
           top_3_oportunidades_json?: Json | null
@@ -60,6 +62,7 @@ export type Database = {
           nota_geral?: number | null
           nota_s?: number | null
           nota_t?: number | null
+          pdf_url?: string | null
           quem_preencheu?: string | null
           respostas_json?: Json | null
           top_3_oportunidades_json?: Json | null
@@ -297,6 +300,7 @@ export const Constants = {
 //   metricas_json: jsonb (nullable)
 //   first_impact_json: jsonb (nullable)
 //   data_preenchimento: timestamp with time zone (not null, default: now())
+//   pdf_url: text (nullable)
 // Table: empresas
 //   id: uuid (not null, default: gen_random_uuid())
 //   cnpj: text (not null)

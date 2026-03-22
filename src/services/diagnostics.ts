@@ -160,13 +160,27 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     if (abertasError) throw new Error(`Erro ao salvar respostas abertas: ${abertasError.message}`)
   }
 
-  // Generate PDF Document Synchronously to get the URL
+  return { scoringData, diagnosticoId: diagnostico.id }
+}
+
+export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: string) => {
+  if (complemento && complemento.trim() !== '') {
+    const { error: abertasError } = await supabase.from('respostas_abertas').insert({
+      diagnostico_id: diagnosticoId,
+      tipo_bloco: 'P',
+      numero_pergunta: 1,
+      resposta: complemento.trim(),
+    })
+
+    if (abertasError) throw new Error(`Erro ao salvar complemento: ${abertasError.message}`)
+  }
+
   let pdfUrl = ''
   try {
     const { data: pdfData, error: pdfError } = await supabase.functions.invoke(
       'gerar_documento_pdf',
       {
-        body: { diagnostico_id: diagnostico.id },
+        body: { diagnostico_id: diagnosticoId },
       },
     )
 
@@ -175,7 +189,7 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
       await supabase
         .from('diagnosticos')
         .update({ pdf_url: pdfUrl } as any)
-        .eq('id', diagnostico.id)
+        .eq('id', diagnosticoId)
     } else if (pdfError) {
       console.error('Erro retornado pela Edge Function gerar_documento_pdf:', pdfError)
     }
@@ -183,19 +197,13 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     console.error('Falha ao invocar gerar_documento_pdf:', err)
   }
 
-  // Aciona a exportação para o Google Sheets de forma assíncrona
   supabase.functions
     .invoke('exportar_para_sheets', {
-      body: { diagnostico_id: diagnostico.id },
-    })
-    .then(({ error }) => {
-      if (error) {
-        console.error('Erro retornado pela Edge Function exportar_para_sheets:', error)
-      }
+      body: { diagnostico_id: diagnosticoId },
     })
     .catch((err) => {
       console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
     })
 
-  return { scoringData, diagnosticoId: diagnostico.id, pdfUrl }
+  return { pdfUrl }
 }

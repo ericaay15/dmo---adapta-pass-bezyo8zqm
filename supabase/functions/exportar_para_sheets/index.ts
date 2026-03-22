@@ -54,9 +54,9 @@ Deno.serve(async (req: Request) => {
       throw new Error(`Erro ao buscar respostas abertas: ${respError.message}`)
     }
 
-    // Extract specifically T4 for "Complemento do Plano"
-    const t4Resposta =
-      respostas?.find((r) => r.tipo_bloco === 'T' && r.numero_pergunta === 4)?.resposta || ''
+    // Extract specifically P1 for "Complemento do Plano"
+    const p1Resposta =
+      respostas?.find((r) => r.tipo_bloco === 'P' && r.numero_pergunta === 1)?.resposta || ''
 
     // 3. Format Data for Google Sheets
     const empresas = Array.isArray(diagnostico.empresas)
@@ -87,7 +87,7 @@ Deno.serve(async (req: Request) => {
       top_3_oportunidades: top3Texto,
       metricas: metricasTexto,
       first_impact: firstImpactTexto,
-      complemento_plano: t4Resposta,
+      complemento_plano: p1Resposta,
       link_pdf: (diagnostico as any).pdf_url || '',
     }
 

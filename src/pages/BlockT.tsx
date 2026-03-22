@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { ArrowLeft, Send, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -81,14 +81,14 @@ export default function BlockT() {
 
     try {
       const res = await submitDiagnosis(finalData)
-      if (res.pdfUrl) {
-        updateData({ pdfUrl: res.pdfUrl })
-      }
-      toast.success('Diagnóstico processado com sucesso!')
-      navigate('/resultados')
+      updateData({
+        scoringData: res.scoringData,
+        diagnosticoId: res.diagnosticoId,
+      })
+      navigate('/plano-de-sucesso')
     } catch (error: any) {
       console.error(error)
-      toast.error('Erro ao enviar diagnóstico', {
+      toast.error('Erro ao processar diagnóstico', {
         description: error.message || 'Tente novamente mais tarde.',
       })
       setIsSubmitting(false)
@@ -131,7 +131,7 @@ export default function BlockT() {
               <AlertCircle className="w-5 h-5 text-rose-400 mt-0.5 shrink-0" />
               <p className="text-sm text-rose-200 leading-relaxed">
                 Atenção: Você possui perguntas obrigatórias pendentes nos blocos anteriores. Por
-                favor, retorne e preencha todos os campos para habilitar o envio do diagnóstico.
+                favor, retorne e preencha todos os campos para habilitar a geração do plano.
               </p>
             </div>
           )}
@@ -295,12 +295,12 @@ export default function BlockT() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                      Processando seu diagnóstico...
+                      Gerando Plano de Sucesso...
                     </>
                   ) : (
                     <>
-                      Enviar Diagnóstico
-                      <Send className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                      Ver Meu Plano de Sucesso
+                      <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
                     </>
                   )}
                 </Button>

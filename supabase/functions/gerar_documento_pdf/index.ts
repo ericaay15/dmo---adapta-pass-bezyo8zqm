@@ -206,14 +206,14 @@ Deno.serve(async (req: Request) => {
     y -= 15
 
     // Complemento do Plano
-    const t4 =
-      respostas.find((r: any) => r.tipo_bloco === 'T' && r.numero_pergunta === 4)?.resposta || ''
-    if (t4) {
+    const p1 =
+      respostas.find((r: any) => r.tipo_bloco === 'P' && r.numero_pergunta === 1)?.resposta || ''
+    if (p1) {
       checkPageBreak(100)
       page.drawText('Complemento do Plano (Sua Visão):', { x: 50, y, size: 14, font: boldFont })
       y -= 20
-      const t4Lines = wrapText(t4, 490, font, 10)
-      t4Lines.forEach((l) => {
+      const p1Lines = wrapText(p1, 490, font, 10)
+      p1Lines.forEach((l) => {
         checkPageBreak(20)
         page.drawText(l, { x: 50, y, size: 10, font, color: rgb(0.2, 0.2, 0.2) })
         y -= 15
