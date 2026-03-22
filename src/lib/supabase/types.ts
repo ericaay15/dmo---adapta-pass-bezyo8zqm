@@ -117,6 +117,156 @@ export type Database = {
         }
         Relationships: []
       }
+      relatorio_diagnosticos_completos: {
+        Row: {
+          atualizado_em: string | null
+          classificacao_a: string | null
+          classificacao_au: string | null
+          classificacao_s: string | null
+          cnpj: string | null
+          data_preenchimento: string | null
+          diagnostico_id: string
+          email_admin: string | null
+          empresa_id: string | null
+          nome_empresa: string | null
+          nota_a: number | null
+          nota_au: number | null
+          nota_geral: number | null
+          nota_s: number | null
+          nota_t: number | null
+          pdf_url: string | null
+          quem_preencheu: string | null
+          responsavel_email: string | null
+          responsavel_nome: string | null
+          resposta_a1: number | null
+          resposta_a2: number | null
+          resposta_a3: number | null
+          resposta_a4: number | null
+          resposta_a5: number | null
+          resposta_aberta_a6: string | null
+          resposta_aberta_au6: string | null
+          resposta_aberta_s6: string | null
+          resposta_aberta_t4: string | null
+          resposta_au1: number | null
+          resposta_au2: number | null
+          resposta_au3: number | null
+          resposta_au4: number | null
+          resposta_au5: number | null
+          resposta_plano_sucesso: string | null
+          resposta_s1: number | null
+          resposta_s2: number | null
+          resposta_s3: number | null
+          resposta_s4: number | null
+          resposta_s5: number | null
+          resposta_t1: number | null
+          resposta_t2: number | null
+          resposta_t3: number | null
+        }
+        Insert: {
+          atualizado_em?: string | null
+          classificacao_a?: string | null
+          classificacao_au?: string | null
+          classificacao_s?: string | null
+          cnpj?: string | null
+          data_preenchimento?: string | null
+          diagnostico_id: string
+          email_admin?: string | null
+          empresa_id?: string | null
+          nome_empresa?: string | null
+          nota_a?: number | null
+          nota_au?: number | null
+          nota_geral?: number | null
+          nota_s?: number | null
+          nota_t?: number | null
+          pdf_url?: string | null
+          quem_preencheu?: string | null
+          responsavel_email?: string | null
+          responsavel_nome?: string | null
+          resposta_a1?: number | null
+          resposta_a2?: number | null
+          resposta_a3?: number | null
+          resposta_a4?: number | null
+          resposta_a5?: number | null
+          resposta_aberta_a6?: string | null
+          resposta_aberta_au6?: string | null
+          resposta_aberta_s6?: string | null
+          resposta_aberta_t4?: string | null
+          resposta_au1?: number | null
+          resposta_au2?: number | null
+          resposta_au3?: number | null
+          resposta_au4?: number | null
+          resposta_au5?: number | null
+          resposta_plano_sucesso?: string | null
+          resposta_s1?: number | null
+          resposta_s2?: number | null
+          resposta_s3?: number | null
+          resposta_s4?: number | null
+          resposta_s5?: number | null
+          resposta_t1?: number | null
+          resposta_t2?: number | null
+          resposta_t3?: number | null
+        }
+        Update: {
+          atualizado_em?: string | null
+          classificacao_a?: string | null
+          classificacao_au?: string | null
+          classificacao_s?: string | null
+          cnpj?: string | null
+          data_preenchimento?: string | null
+          diagnostico_id?: string
+          email_admin?: string | null
+          empresa_id?: string | null
+          nome_empresa?: string | null
+          nota_a?: number | null
+          nota_au?: number | null
+          nota_geral?: number | null
+          nota_s?: number | null
+          nota_t?: number | null
+          pdf_url?: string | null
+          quem_preencheu?: string | null
+          responsavel_email?: string | null
+          responsavel_nome?: string | null
+          resposta_a1?: number | null
+          resposta_a2?: number | null
+          resposta_a3?: number | null
+          resposta_a4?: number | null
+          resposta_a5?: number | null
+          resposta_aberta_a6?: string | null
+          resposta_aberta_au6?: string | null
+          resposta_aberta_s6?: string | null
+          resposta_aberta_t4?: string | null
+          resposta_au1?: number | null
+          resposta_au2?: number | null
+          resposta_au3?: number | null
+          resposta_au4?: number | null
+          resposta_au5?: number | null
+          resposta_plano_sucesso?: string | null
+          resposta_s1?: number | null
+          resposta_s2?: number | null
+          resposta_s3?: number | null
+          resposta_s4?: number | null
+          resposta_s5?: number | null
+          resposta_t1?: number | null
+          resposta_t2?: number | null
+          resposta_t3?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'relatorio_diagnosticos_completos_diagnostico_id_fkey'
+            columns: ['diagnostico_id']
+            isOneToOne: true
+            referencedRelation: 'diagnosticos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'relatorio_diagnosticos_completos_diagnostico_id_fkey'
+            columns: ['diagnostico_id']
+            isOneToOne: true
+            referencedRelation: 'vw_diagnosticos_completos'
+            referencedColumns: ['diagnostico_id']
+          },
+        ]
+      }
       respostas_abertas: {
         Row: {
           diagnostico_id: string
@@ -206,7 +356,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      sync_relatorio_diagnostico: {
+        Args: { p_diagnostico_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
@@ -375,6 +528,49 @@ export const Constants = {
 //   responsavel_email: text (nullable)
 //   data_criacao: timestamp with time zone (not null, default: now())
 //   nome: text (nullable)
+// Table: relatorio_diagnosticos_completos
+//   diagnostico_id: uuid (not null)
+//   data_preenchimento: timestamp with time zone (nullable)
+//   empresa_id: uuid (nullable)
+//   nome_empresa: text (nullable)
+//   cnpj: text (nullable)
+//   email_admin: text (nullable)
+//   responsavel_nome: text (nullable)
+//   responsavel_email: text (nullable)
+//   quem_preencheu: text (nullable)
+//   resposta_a1: integer (nullable)
+//   resposta_a2: integer (nullable)
+//   resposta_a3: integer (nullable)
+//   resposta_a4: integer (nullable)
+//   resposta_a5: integer (nullable)
+//   resposta_aberta_a6: text (nullable)
+//   nota_a: numeric (nullable)
+//   classificacao_a: text (nullable)
+//   resposta_s1: integer (nullable)
+//   resposta_s2: integer (nullable)
+//   resposta_s3: integer (nullable)
+//   resposta_s4: integer (nullable)
+//   resposta_s5: integer (nullable)
+//   resposta_aberta_s6: text (nullable)
+//   nota_s: numeric (nullable)
+//   classificacao_s: text (nullable)
+//   resposta_au1: integer (nullable)
+//   resposta_au2: integer (nullable)
+//   resposta_au3: integer (nullable)
+//   resposta_au4: integer (nullable)
+//   resposta_au5: integer (nullable)
+//   resposta_aberta_au6: text (nullable)
+//   nota_au: numeric (nullable)
+//   classificacao_au: text (nullable)
+//   resposta_t1: integer (nullable)
+//   resposta_t2: integer (nullable)
+//   resposta_t3: integer (nullable)
+//   resposta_aberta_t4: text (nullable)
+//   nota_t: numeric (nullable)
+//   nota_geral: numeric (nullable)
+//   resposta_plano_sucesso: text (nullable)
+//   pdf_url: text (nullable)
+//   atualizado_em: timestamp with time zone (nullable, default: now())
 // Table: respostas_abertas
 //   id: uuid (not null, default: gen_random_uuid())
 //   diagnostico_id: uuid (not null)
@@ -430,6 +626,9 @@ export const Constants = {
 //   PRIMARY KEY diagnosticos_pkey: PRIMARY KEY (id)
 // Table: empresas
 //   PRIMARY KEY empresas_pkey: PRIMARY KEY (id)
+// Table: relatorio_diagnosticos_completos
+//   FOREIGN KEY relatorio_diagnosticos_completos_diagnostico_id_fkey: FOREIGN KEY (diagnostico_id) REFERENCES diagnosticos(id) ON DELETE CASCADE
+//   PRIMARY KEY relatorio_diagnosticos_completos_pkey: PRIMARY KEY (diagnostico_id)
 // Table: respostas_abertas
 //   FOREIGN KEY respostas_abertas_diagnostico_id_fkey: FOREIGN KEY (diagnostico_id) REFERENCES diagnosticos(id) ON DELETE CASCADE
 //   PRIMARY KEY respostas_abertas_pkey: PRIMARY KEY (id)
@@ -445,11 +644,142 @@ export const Constants = {
 //     WITH CHECK: true
 //   Policy "Allow public selects on empresas" (SELECT, PERMISSIVE) roles={public}
 //     USING: true
+// Table: relatorio_diagnosticos_completos
+//   Policy "Allow public selects on relatorio_diagnosticos_completos" (SELECT, PERMISSIVE) roles={public}
+//     USING: true
 // Table: respostas_abertas
 //   Policy "Allow public inserts on respostas_abertas" (INSERT, PERMISSIVE) roles={public}
 //     WITH CHECK: true
 //   Policy "Allow public selects on respostas_abertas" (SELECT, PERMISSIVE) roles={public}
 //     USING: true
+
+// --- DATABASE FUNCTIONS ---
+// FUNCTION sync_relatorio_diagnostico(uuid)
+//   CREATE OR REPLACE FUNCTION public.sync_relatorio_diagnostico(p_diagnostico_id uuid)
+//    RETURNS void
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//   BEGIN
+//       INSERT INTO public.relatorio_diagnosticos_completos (
+//           diagnostico_id, data_preenchimento, empresa_id, nome_empresa, cnpj, email_admin, responsavel_nome, responsavel_email, quem_preencheu,
+//           resposta_a1, resposta_a2, resposta_a3, resposta_a4, resposta_a5, resposta_aberta_a6, nota_a, classificacao_a,
+//           resposta_s1, resposta_s2, resposta_s3, resposta_s4, resposta_s5, resposta_aberta_s6, nota_s, classificacao_s,
+//           resposta_au1, resposta_au2, resposta_au3, resposta_au4, resposta_au5, resposta_aberta_au6, nota_au, classificacao_au,
+//           resposta_t1, resposta_t2, resposta_t3, resposta_aberta_t4, nota_t,
+//           nota_geral, resposta_plano_sucesso, pdf_url
+//       )
+//       SELECT
+//           diagnostico_id, data_preenchimento, empresa_id, nome_empresa, cnpj, email_admin, responsavel_nome, responsavel_email, quem_preencheu,
+//           resposta_a1, resposta_a2, resposta_a3, resposta_a4, resposta_a5, resposta_aberta_a6, nota_a, classificacao_a,
+//           resposta_s1, resposta_s2, resposta_s3, resposta_s4, resposta_s5, resposta_aberta_s6, nota_s, classificacao_s,
+//           resposta_au1, resposta_au2, resposta_au3, resposta_au4, resposta_au5, resposta_aberta_au6, nota_au, classificacao_au,
+//           resposta_t1, resposta_t2, resposta_t3, resposta_aberta_t4, nota_t,
+//           nota_geral, resposta_plano_sucesso, pdf_url
+//       FROM public.vw_diagnosticos_completos
+//       WHERE diagnostico_id = p_diagnostico_id
+//       ON CONFLICT (diagnostico_id)
+//       DO UPDATE SET
+//           data_preenchimento = EXCLUDED.data_preenchimento,
+//           empresa_id = EXCLUDED.empresa_id,
+//           nome_empresa = EXCLUDED.nome_empresa,
+//           cnpj = EXCLUDED.cnpj,
+//           email_admin = EXCLUDED.email_admin,
+//           responsavel_nome = EXCLUDED.responsavel_nome,
+//           responsavel_email = EXCLUDED.responsavel_email,
+//           quem_preencheu = EXCLUDED.quem_preencheu,
+//           resposta_a1 = EXCLUDED.resposta_a1,
+//           resposta_a2 = EXCLUDED.resposta_a2,
+//           resposta_a3 = EXCLUDED.resposta_a3,
+//           resposta_a4 = EXCLUDED.resposta_a4,
+//           resposta_a5 = EXCLUDED.resposta_a5,
+//           resposta_aberta_a6 = EXCLUDED.resposta_aberta_a6,
+//           nota_a = EXCLUDED.nota_a,
+//           classificacao_a = EXCLUDED.classificacao_a,
+//           resposta_s1 = EXCLUDED.resposta_s1,
+//           resposta_s2 = EXCLUDED.resposta_s2,
+//           resposta_s3 = EXCLUDED.resposta_s3,
+//           resposta_s4 = EXCLUDED.resposta_s4,
+//           resposta_s5 = EXCLUDED.resposta_s5,
+//           resposta_aberta_s6 = EXCLUDED.resposta_aberta_s6,
+//           nota_s = EXCLUDED.nota_s,
+//           classificacao_s = EXCLUDED.classificacao_s,
+//           resposta_au1 = EXCLUDED.resposta_au1,
+//           resposta_au2 = EXCLUDED.resposta_au2,
+//           resposta_au3 = EXCLUDED.resposta_au3,
+//           resposta_au4 = EXCLUDED.resposta_au4,
+//           resposta_au5 = EXCLUDED.resposta_au5,
+//           resposta_aberta_au6 = EXCLUDED.resposta_aberta_au6,
+//           nota_au = EXCLUDED.nota_au,
+//           classificacao_au = EXCLUDED.classificacao_au,
+//           resposta_t1 = EXCLUDED.resposta_t1,
+//           resposta_t2 = EXCLUDED.resposta_t2,
+//           resposta_t3 = EXCLUDED.resposta_t3,
+//           resposta_aberta_t4 = EXCLUDED.resposta_aberta_t4,
+//           nota_t = EXCLUDED.nota_t,
+//           nota_geral = EXCLUDED.nota_geral,
+//           resposta_plano_sucesso = EXCLUDED.resposta_plano_sucesso,
+//           pdf_url = EXCLUDED.pdf_url,
+//           atualizado_em = NOW();
+//   END;
+//   $function$
+//
+// FUNCTION trg_sync_relatorio_diagnosticos()
+//   CREATE OR REPLACE FUNCTION public.trg_sync_relatorio_diagnosticos()
+//    RETURNS trigger
+//    LANGUAGE plpgsql
+//   AS $function$
+//   BEGIN
+//       IF TG_OP = 'DELETE' THEN
+//           DELETE FROM public.relatorio_diagnosticos_completos WHERE diagnostico_id = OLD.id;
+//           RETURN OLD;
+//       END IF;
+//
+//       PERFORM public.sync_relatorio_diagnostico(NEW.id);
+//       RETURN NEW;
+//   END;
+//   $function$
+//
+// FUNCTION trg_sync_relatorio_empresas()
+//   CREATE OR REPLACE FUNCTION public.trg_sync_relatorio_empresas()
+//    RETURNS trigger
+//    LANGUAGE plpgsql
+//   AS $function$
+//   DECLARE
+//       d_id UUID;
+//   BEGIN
+//       FOR d_id IN SELECT id FROM public.diagnosticos WHERE empresa_id = NEW.id
+//       LOOP
+//           PERFORM public.sync_relatorio_diagnostico(d_id);
+//       END LOOP;
+//       RETURN NEW;
+//   END;
+//   $function$
+//
+// FUNCTION trg_sync_relatorio_respostas()
+//   CREATE OR REPLACE FUNCTION public.trg_sync_relatorio_respostas()
+//    RETURNS trigger
+//    LANGUAGE plpgsql
+//   AS $function$
+//   BEGIN
+//       IF TG_OP = 'DELETE' THEN
+//           PERFORM public.sync_relatorio_diagnostico(OLD.diagnostico_id);
+//           RETURN OLD;
+//       END IF;
+//
+//       PERFORM public.sync_relatorio_diagnostico(NEW.diagnostico_id);
+//       RETURN NEW;
+//   END;
+//   $function$
+//
+
+// --- TRIGGERS ---
+// Table: diagnosticos
+//   on_diagnostico_change: CREATE TRIGGER on_diagnostico_change AFTER INSERT OR UPDATE ON public.diagnosticos FOR EACH ROW EXECUTE FUNCTION trg_sync_relatorio_diagnosticos()
+// Table: empresas
+//   on_empresas_change: CREATE TRIGGER on_empresas_change AFTER UPDATE ON public.empresas FOR EACH ROW EXECUTE FUNCTION trg_sync_relatorio_empresas()
+// Table: respostas_abertas
+//   on_respostas_change: CREATE TRIGGER on_respostas_change AFTER INSERT OR DELETE OR UPDATE ON public.respostas_abertas FOR EACH ROW EXECUTE FUNCTION trg_sync_relatorio_respostas()
 
 // --- INDEXES ---
 // Table: diagnosticos
