@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/form'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
@@ -102,17 +103,14 @@ export default function BlockA() {
         <div className="absolute -inset-1 bg-gradient-to-r from-[#8b5cf6]/20 to-[#2dd4bf]/20 rounded-3xl blur-xl opacity-50 z-0"></div>
 
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-[#8b5cf6] uppercase tracking-wider mb-2">
+          <div className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-3">
               Sessão: AMPLIFICAR
             </h2>
-            <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-              Uso e Conhecimento de IA
-            </h3>
-            <p className="text-slate-400 mt-2 text-sm md:text-base">
+            <p className="text-slate-400 text-sm md:text-base font-normal leading-relaxed">
               Nesse bloco avaliamos como está o uso e conhecimento de IA na sua empresa.
             </p>
-            <div className="mt-5 p-3.5 bg-white/5 border border-white/10 rounded-lg">
+            <div className="mt-5 p-3.5 bg-white/5 border border-white/10 rounded-lg inline-block">
               <p className="text-xs text-slate-300">
                 <span className="font-semibold text-[#2dd4bf]">Escala:</span> 1 = Não fazemos isso /
                 5 = Fazemos de forma avançada e recorrente
@@ -130,9 +128,17 @@ export default function BlockA() {
                     name={q.id}
                     render={({ field }) => (
                       <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
-                        <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                          {q.text}
-                        </FormLabel>
+                        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                          <FormLabel className="text-base text-slate-200 font-medium leading-relaxed md:max-w-[80%]">
+                            {q.text}
+                          </FormLabel>
+                          <Badge
+                            variant="outline"
+                            className="w-fit text-xs text-[#2dd4bf] border-[#2dd4bf]/30 bg-[#2dd4bf]/10 shrink-0 uppercase tracking-wide font-semibold"
+                          >
+                            Amplificar
+                          </Badge>
+                        </div>
                         <FormControl>
                           <ToggleGroup
                             type="single"
