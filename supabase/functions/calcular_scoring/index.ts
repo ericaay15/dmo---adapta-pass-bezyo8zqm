@@ -226,26 +226,46 @@ Deno.serve(async (req: Request) => {
       depDonoTexto = 'Negócio independente e escalável.'
     }
 
+    const isT4Invalid = (text: any) => {
+      if (!text || typeof text !== 'string') return true
+      const t = text.trim().toLowerCase()
+      if (t.length < 3) return true
+      const invalidList = [
+        'não sei',
+        'nao sei',
+        'nenhum',
+        'nenhuma',
+        'nada',
+        'sei la',
+        'sei lá',
+        'não tenho',
+        'nao tenho',
+        'nao pensei',
+        'não pensei',
+      ]
+      return invalidList.some((invalid) => t.includes(invalid)) && t.length < 15
+    }
+
     const firstImpactBloco = sortedBlocos[0]
     let acao = ''
     let descricao = ''
 
-    if (T4 && typeof T4 === 'string' && T4.trim() !== '') {
+    if (!isT4Invalid(T4)) {
       acao = 'Foco no Desafio Estratégico de 90 Dias'
-      descricao = `Resolver: ${T4.trim()}. Paralelamente, trazer adoção de IA para toda a equipe.`
+      descricao = `Resolver: ${T4.trim()}. Paralelamente, trazer adoção de IA para toda a equipe, criar o primeiro sistema para tarefa repetitiva do dia a dia e automatizar os primeiros fluxos de rotina.`
     } else {
       if (firstImpactBloco.id === 'A') {
-        acao = 'Otimizar Atração'
+        acao = 'Otimizar Atração e Capacitação'
         descricao =
-          'Foque em estruturar seus canais de aquisição e melhorar as taxas de conversão de leads. Além disso, trazer adoção de IA para toda a equipe.'
+          'Foque em estruturar a adoção de IA para toda a equipe e melhorar as taxas de conversão de leads. Paralelamente, comece a criar o primeiro sistema para tarefas repetitivas do dia a dia e automatizar os fluxos de rotina.'
       } else if (firstImpactBloco.id === 'S') {
-        acao = 'Implementar Sistemas'
+        acao = 'Implementar Sistemas e Processos'
         descricao =
-          'Comece padronizando os processos críticos e centralizando as informações do negócio. Além disso, trazer adoção de IA para toda a equipe.'
+          'Comece criando o primeiro sistema para as tarefas repetitivas do dia a dia e centralizando as informações do negócio. Paralelamente, traga a adoção de IA para toda a equipe e automatize os primeiros fluxos de rotina.'
       } else {
-        acao = 'Criar Automações'
+        acao = 'Criar Automações Iniciais'
         descricao =
-          'Identifique a tarefa manual mais repetitiva e implemente uma automação simples para ela. Além disso, trazer adoção de IA para toda a equipe.'
+          'Identifique a tarefa manual mais repetitiva e foque em automatizar os primeiros fluxos de rotina. Paralelamente, traga a adoção de IA para toda a equipe e crie o primeiro sistema para tarefas repetitivas do dia a dia.'
       }
     }
 
