@@ -188,7 +188,7 @@ Deno.serve(async (req: Request) => {
 
     // First Impact
     checkPageBreak(150)
-    page.drawText('First Impact (Ação para os próximos 60 dias)', {
+    page.drawText('First Impact (Meta para os próximos 90 dias)', {
       x: 50,
       y,
       size: 16,
@@ -197,19 +197,24 @@ Deno.serve(async (req: Request) => {
     y -= 25
     const fi = (diagnostico.first_impact_json || {}) as any
 
-    const fiTitleLines = wrapText(`Ação: ${fi.acao || ''}`, 490, boldFont, 12)
-    fiTitleLines.forEach((l) => {
-      checkPageBreak(15)
-      page.drawText(l, { x: 50, y, size: 12, font: boldFont })
-      y -= 15
-    })
-    y -= 5
-    const fiDesc = wrapText(fi.descricao || '', 490, font, 12)
-    fiDesc.forEach((l) => {
-      checkPageBreak(15)
-      page.drawText(l, { x: 50, y, size: 12, font })
-      y -= 15
-    })
+    if (Array.isArray(fi.descricao)) {
+      fi.descricao.forEach((item: string) => {
+        const itemLines = wrapText(`• ${item}`, 490, font, 12)
+        itemLines.forEach((l) => {
+          checkPageBreak(15)
+          page.drawText(l, { x: 50, y, size: 12, font })
+          y -= 15
+        })
+        y -= 5
+      })
+    } else {
+      const fiDesc = wrapText(fi.descricao || '', 490, font, 12)
+      fiDesc.forEach((l) => {
+        checkPageBreak(15)
+        page.drawText(l, { x: 50, y, size: 12, font })
+        y -= 15
+      })
+    }
     y -= 15
 
     // Complemento do Plano

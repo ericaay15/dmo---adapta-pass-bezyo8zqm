@@ -1,6 +1,15 @@
 import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
-import { Loader2, ArrowRight, TrendingUp, Users, Clock, AlertTriangle, Target } from 'lucide-react'
+import {
+  Loader2,
+  ArrowRight,
+  TrendingUp,
+  Users,
+  Clock,
+  AlertTriangle,
+  Target,
+  Check,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Logo } from '@/components/Logo'
@@ -206,15 +215,38 @@ export default function SuccessPlan() {
                   <Target className="w-6 h-6 text-[#2dd4bf]" />
                   <h3 className="text-xl font-bold text-white">First Impact</h3>
                 </div>
-                <div className="text-sm font-semibold text-[#2dd4bf] uppercase tracking-wider mb-1">
-                  Meta dos Primeiros 60 Dias
+
+                <div className="text-xl md:text-2xl font-bold text-white mb-6 leading-tight">
+                  Meta dos primeiros 90 dias
                 </div>
-                <div className="text-2xl font-bold text-white mb-3 leading-tight">
-                  {scoringData.first_impact.acao}
-                </div>
-                <p className="text-slate-300 leading-relaxed mb-6">
-                  {scoringData.first_impact.descricao}
-                </p>
+
+                <ul className="space-y-4 mb-8">
+                  {Array.isArray(scoringData.first_impact.descricao)
+                    ? scoringData.first_impact.descricao.map((item: string, i: number) => (
+                        <li key={i} className="flex gap-4 items-start">
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#2dd4bf]/20 text-[#2dd4bf] flex items-center justify-center mt-0.5">
+                            <Check className="w-4 h-4" />
+                          </div>
+                          <span className="text-slate-300 leading-relaxed text-sm md:text-base">
+                            {item}
+                          </span>
+                        </li>
+                      ))
+                    : typeof scoringData.first_impact.descricao === 'string' &&
+                      scoringData.first_impact.descricao
+                        .split('. ')
+                        .filter(Boolean)
+                        .map((item: string, i: number) => (
+                          <li key={i} className="flex gap-4 items-start">
+                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#2dd4bf]/20 text-[#2dd4bf] flex items-center justify-center mt-0.5">
+                              <Check className="w-4 h-4" />
+                            </div>
+                            <span className="text-slate-300 leading-relaxed text-sm md:text-base">
+                              {item.replace(/\.$/, '')}
+                            </span>
+                          </li>
+                        ))}
+                </ul>
 
                 <div className="mt-auto pt-6 border-t border-[#2dd4bf]/20">
                   <label className="block text-base font-semibold text-white mb-3">

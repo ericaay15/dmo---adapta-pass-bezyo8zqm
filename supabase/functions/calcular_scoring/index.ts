@@ -246,24 +246,38 @@ Deno.serve(async (req: Request) => {
 
     const firstImpactBloco = sortedBlocos[0]
     let acao = ''
-    let descricao = ''
+    let descricao: string[] = []
 
     if (!isT4Invalid(T4)) {
       acao = 'Foco no Desafio Estratégico de 90 Dias'
-      descricao = `Resolver: ${T4.trim()}. Paralelamente, trazer adoção de IA para toda a equipe, criar o primeiro sistema para tarefa repetitiva do dia a dia e automatizar os primeiros fluxos de rotina.`
+      descricao = [
+        `Resolver o desafio principal: ${T4.trim()}`,
+        'Trazer adoção de IA para toda a equipe',
+        'Criar o primeiro sistema para tarefa repetitiva do dia a dia',
+        'Automatizar os primeiros fluxos de rotina',
+      ]
     } else {
       if (firstImpactBloco.id === 'A') {
         acao = 'Otimizar Atração e Capacitação'
-        descricao =
-          'Foque em estruturar a adoção de IA para toda a equipe e melhorar as taxas de conversão de leads. Paralelamente, comece a criar o primeiro sistema para tarefas repetitivas do dia a dia e automatizar os fluxos de rotina.'
+        descricao = [
+          'Estruturar a adoção de IA para toda a equipe e melhorar as taxas de conversão de leads',
+          'Criar o primeiro sistema para tarefas repetitivas do dia a dia',
+          'Automatizar os fluxos de rotina',
+        ]
       } else if (firstImpactBloco.id === 'S') {
         acao = 'Implementar Sistemas e Processos'
-        descricao =
-          'Comece criando o primeiro sistema para as tarefas repetitivas do dia a dia e centralizando as informações do negócio. Paralelamente, traga a adoção de IA para toda a equipe e automatize os primeiros fluxos de rotina.'
+        descricao = [
+          'Criar o primeiro sistema para as tarefas repetitivas do dia a dia e centralizar as informações do negócio',
+          'Trazer a adoção de IA para toda a equipe',
+          'Automatizar os primeiros fluxos de rotina',
+        ]
       } else {
         acao = 'Criar Automações Iniciais'
-        descricao =
-          'Identifique a tarefa manual mais repetitiva e foque em automatizar os primeiros fluxos de rotina. Paralelamente, traga a adoção de IA para toda a equipe e crie o primeiro sistema para tarefas repetitivas do dia a dia.'
+        descricao = [
+          'Identificar a tarefa manual mais repetitiva e focar em automatizar os primeiros fluxos de rotina',
+          'Trazer a adoção de IA para toda a equipe',
+          'Criar o primeiro sistema para tarefas repetitivas do dia a dia',
+        ]
       }
     }
 
@@ -300,7 +314,7 @@ Deno.serve(async (req: Request) => {
       first_impact: {
         acao: acao,
         descricao: descricao,
-        prazo: '60 dias',
+        prazo: '90 dias',
         bloco: firstImpactBloco.id,
       },
     }

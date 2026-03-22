@@ -72,7 +72,13 @@ Deno.serve(async (req: Request) => {
     const metricasTexto = `Pessoas Impactadas: ${metricas.pessoas_impactadas?.nivel || 'N/A'} | Horas Recuperadas: ${metricas.horas_recuperadas?.nivel || 'N/A'} | Dependência do Dono: ${metricas.dependencia_do_dono?.nivel || 'N/A'}`
 
     const firstImpact = (diagnostico.first_impact_json as any) || {}
-    const firstImpactTexto = `Ação: ${firstImpact.acao || 'N/A'} - Descrição: ${firstImpact.descricao || 'N/A'}`
+    let descTexto = ''
+    if (Array.isArray(firstImpact.descricao)) {
+      descTexto = firstImpact.descricao.join(' | ')
+    } else {
+      descTexto = firstImpact.descricao || 'N/A'
+    }
+    const firstImpactTexto = `Meta dos primeiros 90 dias: ${descTexto}`
 
     const payload = {
       cnpj: empresas?.cnpj || 'N/A',
