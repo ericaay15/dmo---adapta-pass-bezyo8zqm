@@ -15,7 +15,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json()
-    const { A1, A2, A3, A4, A5, S1, S2, S3, S4, S5, Au1, Au2, Au3, Au4, Au5, T1, T2, T3 } = body
+    const { A1, A2, A3, A4, A5, S1, S2, S3, S4, S5, Au1, Au2, Au3, Au4, Au5, T1, T2, T3, T4 } = body
 
     const validate1to5 = (val: any, name: string) => {
       if (!Number.isInteger(val) || val < 1 || val > 5) {
@@ -134,18 +134,24 @@ Deno.serve(async (req: Request) => {
     const firstImpactBloco = sortedBlocos[0]
     let acao = ''
     let descricao = ''
-    if (firstImpactBloco.id === 'A') {
-      acao = 'Otimizar Atração'
-      descricao =
-        'Foque em estruturar seus canais de aquisição e melhorar as taxas de conversão de leads.'
-    } else if (firstImpactBloco.id === 'S') {
-      acao = 'Implementar Sistemas'
-      descricao =
-        'Comece padronizando os processos críticos e centralizando as informações do negócio.'
+
+    if (T4 && typeof T4 === 'string' && T4.trim() !== '') {
+      acao = 'Foco no Desafio Estratégico de 90 Dias'
+      descricao = `Resolver: ${T4.trim()}. Paralelamente, estruturar a adoção de IA para toda a equipe.`
     } else {
-      acao = 'Criar Automações'
-      descricao =
-        'Identifique a tarefa manual mais repetitiva e implemente uma automação simples para ela.'
+      if (firstImpactBloco.id === 'A') {
+        acao = 'Otimizar Atração'
+        descricao =
+          'Foque em estruturar seus canais de aquisição e melhorar as taxas de conversão de leads. Além disso, focar em trazer adoção de IA para toda a equipe.'
+      } else if (firstImpactBloco.id === 'S') {
+        acao = 'Implementar Sistemas'
+        descricao =
+          'Comece padronizando os processos críticos e centralizando as informações do negócio. Além disso, focar em trazer adoção de IA para toda a equipe.'
+      } else {
+        acao = 'Criar Automações'
+        descricao =
+          'Identifique a tarefa manual mais repetitiva e implemente uma automação simples para ela. Além disso, focar em trazer adoção de IA para toda a equipe.'
+      }
     }
 
     const responseData = {

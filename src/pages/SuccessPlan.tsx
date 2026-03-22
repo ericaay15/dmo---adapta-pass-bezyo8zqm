@@ -68,11 +68,10 @@ export default function SuccessPlan() {
               Aqui começa sua jornada de implementação de IA com quem realmente entende.
             </p>
             <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-3xl mx-auto">
-              Este diagnóstico revela a maturidade atual da sua empresa nas três dimensões
-              estratégicas de transformação com IA: Amplificar (pessoas e capacidades), Sistematizar
-              (processos e conhecimento) e Automatizar (eficiência operacional). Os resultados
-              abaixo refletem a realidade do seu negócio hoje e apontam as oportunidades mais
-              impactantes para os próximos 60 dias.
+              Este diagnóstico revela a maturidade da sua operação nas três frentes vitais da IA:
+              Pessoas (Amplificar), Processos (Sistematizar) e Eficiência (Automatizar). Os
+              resultados mapeiam suas maiores alavancas de crescimento e as ações prioritárias para
+              os próximos 60 dias.
             </p>
           </div>
 
@@ -216,8 +215,8 @@ export default function SuccessPlan() {
           <div className="bg-black/40 border border-white/10 rounded-xl p-6 md:p-8 mb-10">
             <h3 className="text-lg font-bold text-white mb-2">Complementar Plano de Sucesso</h3>
             <p className="text-sm text-slate-400 mb-4">
-              Gostaria de adicionar algum comentário, expectativa ou meta específica para os
-              próximos passos? (Opcional)
+              Gostaria de complementar com alguma informação mais especifica para seu Gerente de
+              Negócios adaptar seu plano?
             </p>
             <Textarea
               placeholder="Digite aqui suas considerações..."
