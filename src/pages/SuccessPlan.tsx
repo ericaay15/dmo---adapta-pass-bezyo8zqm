@@ -167,7 +167,7 @@ export default function SuccessPlan() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white/5 border border-white/10 rounded-xl p-6 md:p-8">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-6 md:p-8 flex flex-col">
               <div className="flex items-center gap-3 mb-6">
                 <TrendingUp className="w-6 h-6 text-[#2dd4bf]" />
                 <h3 className="text-xl font-bold text-white">Top 3 Oportunidades</h3>
@@ -197,11 +197,11 @@ export default function SuccessPlan() {
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-[#2dd4bf]/10 to-transparent border border-[#2dd4bf]/30 rounded-xl p-6 md:p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
+            <div className="bg-gradient-to-br from-[#2dd4bf]/10 to-transparent border border-[#2dd4bf]/30 rounded-xl p-6 md:p-8 relative overflow-hidden flex flex-col">
+              <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                 <Target className="w-24 h-24" />
               </div>
-              <div className="relative z-10">
+              <div className="relative z-10 flex-1 flex flex-col">
                 <div className="flex items-center gap-3 mb-6">
                   <Target className="w-6 h-6 text-[#2dd4bf]" />
                   <h3 className="text-xl font-bold text-white">First Impact</h3>
@@ -212,29 +212,27 @@ export default function SuccessPlan() {
                 <div className="text-2xl font-bold text-white mb-3 leading-tight">
                   {scoringData.first_impact.acao}
                 </div>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-300 leading-relaxed mb-6">
                   {scoringData.first_impact.descricao}
                 </p>
+
+                <div className="mt-auto pt-6 border-t border-[#2dd4bf]/20">
+                  <label className="block text-base font-semibold text-white mb-3">
+                    O que mais seria sucesso pra você em 90 dias?
+                  </label>
+                  <Textarea
+                    placeholder="Descreva suas expectativas..."
+                    className="bg-black/40 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[100px] resize-y relative z-20"
+                    value={complemento}
+                    onChange={(e) => setComplemento(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-black/40 border border-white/10 rounded-xl p-6 md:p-8 mb-10">
-            <h3 className="text-lg font-bold text-white mb-2">Complementar Plano de Sucesso</h3>
-            <p className="text-sm text-slate-400 mb-4">
-              Gostaria de complementar com alguma informação mais especifica para seu Gerente de
-              Negócios adaptar seu plano?
-            </p>
-            <Textarea
-              placeholder="Digite aqui suas considerações..."
-              className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[120px] resize-y"
-              value={complemento}
-              onChange={(e) => setComplemento(e.target.value)}
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="text-center">
+          <div className="text-center mt-10">
             <Button
               size="lg"
               disabled={isSubmitting}
