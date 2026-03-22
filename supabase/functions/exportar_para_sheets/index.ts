@@ -21,6 +21,7 @@ function base64urlBytes(bytes: Uint8Array) {
 }
 
 async function getGoogleAccessToken() {
+  console.log('Iniciando geração de token do Google...')
   const serviceAccount = JSON.parse(googleServiceAccount)
 
   const header = {
@@ -37,6 +38,7 @@ async function getGoogleAccessToken() {
     iat: now,
   }
 
+  console.log('Criando payload e header JWT...')
   const headerEncoded = base64url(JSON.stringify(header))
   const payloadEncoded = base64url(JSON.stringify(payload))
   const signatureInput = `${headerEncoded}.${payloadEncoded}`
@@ -45,6 +47,7 @@ async function getGoogleAccessToken() {
   const encoder = new TextEncoder()
   const data = encoder.encode(signatureInput)
 
+  console.log('Lendo private key...')
   const pemHeader = '-----BEGIN PRIVATE KEY-----'
   const pemFooter = '-----END PRIVATE KEY-----'
   const pemContents = privateKey
@@ -57,6 +60,7 @@ async function getGoogleAccessToken() {
     binaryDer[i] = binaryDerString.charCodeAt(i)
   }
 
+  console.log('Importando chave criptográfica...')
   const keyData = await crypto.subtle.importKey(
     'pkcs8',
     binaryDer.buffer,
@@ -65,11 +69,13 @@ async function getGoogleAccessToken() {
     ['sign'],
   )
 
+  console.log('Assinando JWT...')
   const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', keyData, data)
   const signatureEncoded = base64urlBytes(new Uint8Array(signature))
 
   const jwt = `${signatureInput}.${signatureEncoded}`
 
+  console.log('Fazendo fetch para https://oauth2.googleapis.com/token...')
   const response = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -77,12 +83,20 @@ async function getGoogleAccessToken() {
   })
 
   const data_response = await response.json()
+  console.log(
+    'Token gerado com sucesso:',
+    data_response.access_token ? 'Sim (Token Oculto)' : `Não: ${JSON.stringify(data_response)}`,
+  )
   return data_response.access_token
 }
 
 async function addRowToGoogleSheets(values: string[], accessToken: string) {
+  console.log('Iniciando adição de linha no Google Sheets com valores:', values)
   const range = 'Sheet1!A:P'
 
+  console.log(
+    `Fazendo requisição para a API do Google Sheets (Spreadsheet ID: ${spreadsheetId})...`,
+  )
   const response = await fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}:append?valueInputOption=USER_ENTERED`,
     {
@@ -97,16 +111,22 @@ async function addRowToGoogleSheets(values: string[], accessToken: string) {
     },
   )
 
-  return await response.json()
+  const jsonResponse = await response.json()
+  console.log('Resposta da API do Google Sheets:', jsonResponse)
+  return jsonResponse
 }
 
 Deno.serve(async (req: Request) => {
+  console.log(`Recebendo nova requisição HTTP: ${req.method}`)
+
   if (req.method === 'OPTIONS') {
+    console.log('Respondendo requisição OPTIONS com headers de CORS')
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
     const body = await req.json()
+    console.log('Body recebido:', body)
 
     const values = [
       body.cnpj,
@@ -126,16 +146,20 @@ Deno.serve(async (req: Request) => {
       body.complemento_plano,
       body.link_documento_pdf,
     ]
+    console.log('Valores mapeados para o Sheets:', values)
 
     const accessToken = await getGoogleAccessToken()
+    console.log('Google Access Token recuperado com sucesso.')
+
     const result = await addRowToGoogleSheets(values, accessToken)
+    console.log('Operação no Google Sheets finalizada.')
 
     return new Response(
       JSON.stringify({ success: true, message: 'Dados adicionados ao Sheets', result }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 },
     )
   } catch (error: any) {
-    console.error('Erro:', error)
+    console.error('Erro capturado no fluxo principal da função:', error)
     return new Response(JSON.stringify({ success: false, error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
