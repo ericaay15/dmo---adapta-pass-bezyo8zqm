@@ -168,7 +168,6 @@ export type Database = {
           diagnostico_id: string | null
           email_admin: string | null
           empresa_id: string | null
-          integer: number | null
           nome_empresa: string | null
           nota_a: number | null
           nota_au: number | null
@@ -180,6 +179,7 @@ export type Database = {
           responsavel_email: string | null
           responsavel_nome: string | null
           resposta_a1: number | null
+          resposta_a2: number | null
           resposta_a3: number | null
           resposta_a4: number | null
           resposta_a5: number | null
@@ -392,7 +392,7 @@ export const Constants = {
 //   responsavel_email: text (nullable)
 //   quem_preencheu: text (nullable)
 //   resposta_a1: integer (nullable)
-//   integer: integer (nullable)
+//   resposta_a2: integer (nullable)
 //   resposta_a3: integer (nullable)
 //   resposta_a4: integer (nullable)
 //   resposta_a5: integer (nullable)
