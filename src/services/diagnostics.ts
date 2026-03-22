@@ -165,6 +165,17 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
 
 export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: string) => {
   if (complemento && complemento.trim() !== '') {
+    // Salva na nova coluna da tabela
+    const { error: updateDiagError } = await supabase
+      .from('diagnosticos')
+      .update({ complemento_sucesso: complemento.trim() } as any)
+      .eq('id', diagnosticoId)
+
+    if (updateDiagError) {
+      console.error('Erro ao atualizar complemento_sucesso no banco:', updateDiagError.message)
+    }
+
+    // Mantém compatibilidade salvando também nas respostas abertas
     const { error: abertasError } = await supabase.from('respostas_abertas').insert({
       diagnostico_id: diagnosticoId,
       tipo_bloco: 'P',
@@ -172,7 +183,8 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
       resposta: complemento.trim(),
     })
 
-    if (abertasError) throw new Error(`Erro ao salvar complemento: ${abertasError.message}`)
+    if (abertasError)
+      throw new Error(`Erro ao salvar complemento em respostas: ${abertasError.message}`)
   }
 
   let pdfUrl = ''
@@ -197,6 +209,7 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
     console.error('Falha ao invocar gerar_documento_pdf:', err)
   }
 
+  // Aciona exportação para o Sheets enviando o ID do diagnóstico para que ele busque do banco
   supabase.functions
     .invoke('exportar_para_sheets', {
       body: { diagnostico_id: diagnosticoId },
