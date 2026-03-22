@@ -21,7 +21,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: diagnostico, error: diagError } = await supabase
       .from('diagnosticos')
-      .select('*, empresas(cnpj, responsavel_nome)')
+      .select('*, empresas(nome, cnpj, responsavel_nome, responsavel_email)')
       .eq('id', diagnostico_id)
       .single()
 
@@ -83,7 +83,49 @@ Deno.serve(async (req: Request) => {
       font,
       color: rgb(0.4, 0.4, 0.4),
     })
-    y -= 70
+    y -= 50
+
+    // Company Data
+    const empresa = diagnostico.empresas || {}
+    page.drawText('Dados da Empresa:', { x: 50, y, size: 12, font: boldFont })
+    y -= 20
+
+    page.drawText(`Empresa: ${empresa.nome || 'Não informado'}`, { x: 50, y, size: 10, font })
+    page.drawText(`CNPJ: ${empresa.cnpj || 'Não informado'}`, { x: 300, y, size: 10, font })
+    y -= 15
+
+    page.drawText(`Responsável: ${empresa.responsavel_nome || 'Não informado'}`, {
+      x: 50,
+      y,
+      size: 10,
+      font,
+    })
+    page.drawText(`E-mail: ${empresa.responsavel_email || 'Não informado'}`, {
+      x: 300,
+      y,
+      size: 10,
+      font,
+    })
+    y -= 15
+
+    page.drawText(`Preenchido por: ${diagnostico.quem_preencheu || 'Não informado'}`, {
+      x: 50,
+      y,
+      size: 10,
+      font,
+    })
+    const rawDate = diagnostico.data_preenchimento
+    let dataPreenchimento = ''
+    if (rawDate) {
+      try {
+        const d = new Date(rawDate)
+        dataPreenchimento = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
+      } catch (e) {}
+    }
+    if (dataPreenchimento) {
+      page.drawText(`Data: ${dataPreenchimento}`, { x: 300, y, size: 10, font })
+    }
+    y -= 40
 
     // Nota Geral
     page.drawText(`Nota Geral: ${diagnostico.nota_geral}`, { x: 50, y, size: 20, font: boldFont })
@@ -220,11 +262,12 @@ Deno.serve(async (req: Request) => {
     // Complemento do Plano
     const p1 =
       respostas.find((r: any) => r.tipo_bloco === 'P' && r.numero_pergunta === 1)?.resposta || ''
-    if (p1) {
+    const compText = diagnostico.complemento_sucesso || p1
+    if (compText) {
       checkPageBreak(100)
       page.drawText('Complemento do Plano (Sua Visão):', { x: 50, y, size: 14, font: boldFont })
       y -= 20
-      const p1Lines = wrapText(p1, 490, font, 10)
+      const p1Lines = wrapText(compText, 490, font, 10)
       p1Lines.forEach((l) => {
         checkPageBreak(20)
         page.drawText(l, { x: 50, y, size: 10, font, color: rgb(0.2, 0.2, 0.2) })

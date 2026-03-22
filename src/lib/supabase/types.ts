@@ -639,11 +639,17 @@ export const Constants = {
 //     WITH CHECK: true
 //   Policy "Allow public selects on diagnosticos" (SELECT, PERMISSIVE) roles={public}
 //     USING: true
+//   Policy "Allow public updates on diagnosticos" (UPDATE, PERMISSIVE) roles={public}
+//     USING: true
+//     WITH CHECK: true
 // Table: empresas
 //   Policy "Allow public inserts on empresas" (INSERT, PERMISSIVE) roles={public}
 //     WITH CHECK: true
 //   Policy "Allow public selects on empresas" (SELECT, PERMISSIVE) roles={public}
 //     USING: true
+//   Policy "Allow public updates on empresas" (UPDATE, PERMISSIVE) roles={public}
+//     USING: true
+//     WITH CHECK: true
 // Table: relatorio_diagnosticos_completos
 //   Policy "Allow public selects on relatorio_diagnosticos_completos" (SELECT, PERMISSIVE) roles={public}
 //     USING: true

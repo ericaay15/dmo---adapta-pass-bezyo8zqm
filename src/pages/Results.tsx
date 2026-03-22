@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom'
-import { CheckCircle2, Rocket, Users, Smartphone } from 'lucide-react'
+import { CheckCircle2, FileText, Download } from 'lucide-react'
 import { Logo } from '@/components/Logo'
+import { Button } from '@/components/ui/button'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
 export default function Results() {
@@ -20,9 +21,29 @@ export default function Results() {
         <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
           Obrigado!
         </h1>
-        <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-10 max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto">
           Seu plano de sucesso foi enviado. Veja o que acontece agora para iniciarmos a sua jornada:
         </p>
+
+        {data.pdfUrl && (
+          <div className="mb-12 w-full flex justify-center animate-fade-in-up">
+            <a
+              href={data.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block w-full md:w-auto"
+            >
+              <Button
+                size="lg"
+                className="w-full md:w-auto min-w-[300px] bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-16 px-8 text-lg rounded-xl shadow-[0_0_20px_rgba(45,212,191,0.2)] hover:shadow-[0_0_30px_rgba(45,212,191,0.4)] transition-all duration-300 group"
+              >
+                <FileText className="mr-3 w-6 h-6" />
+                Baixar Resumo em PDF
+                <Download className="ml-3 w-5 h-5 opacity-70 group-hover:translate-y-1 transition-transform duration-300" />
+              </Button>
+            </a>
+          </div>
+        )}
 
         {/* Próximos Passos */}
         <div className="bg-black/40 border border-white/10 rounded-2xl p-6 md:p-8 mb-10 text-left w-full mx-auto shadow-xl">
