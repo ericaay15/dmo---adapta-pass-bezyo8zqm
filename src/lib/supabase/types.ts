@@ -164,11 +164,11 @@ export type Database = {
           classificacao_au: string | null
           classificacao_s: string | null
           cnpj: string | null
-          complemento_sucesso: string | null
           data_preenchimento: string | null
           diagnostico_id: string | null
           email_admin: string | null
           empresa_id: string | null
+          integer: number | null
           nome_empresa: string | null
           nota_a: number | null
           nota_au: number | null
@@ -179,6 +179,28 @@ export type Database = {
           quem_preencheu: string | null
           responsavel_email: string | null
           responsavel_nome: string | null
+          resposta_a1: number | null
+          resposta_a3: number | null
+          resposta_a4: number | null
+          resposta_a5: number | null
+          resposta_aberta_a6: string | null
+          resposta_aberta_au6: string | null
+          resposta_aberta_s6: string | null
+          resposta_aberta_t4: string | null
+          resposta_au1: number | null
+          resposta_au2: number | null
+          resposta_au3: number | null
+          resposta_au4: number | null
+          resposta_au5: number | null
+          resposta_plano_sucesso: string | null
+          resposta_s1: number | null
+          resposta_s2: number | null
+          resposta_s3: number | null
+          resposta_s4: number | null
+          resposta_s5: number | null
+          resposta_t1: number | null
+          resposta_t2: number | null
+          resposta_t3: number | null
         }
         Relationships: []
       }
@@ -369,15 +391,37 @@ export const Constants = {
 //   responsavel_nome: text (nullable)
 //   responsavel_email: text (nullable)
 //   quem_preencheu: text (nullable)
-//   nota_geral: numeric (nullable)
+//   resposta_a1: integer (nullable)
+//   integer: integer (nullable)
+//   resposta_a3: integer (nullable)
+//   resposta_a4: integer (nullable)
+//   resposta_a5: integer (nullable)
+//   resposta_aberta_a6: text (nullable)
 //   nota_a: numeric (nullable)
-//   nota_s: numeric (nullable)
-//   nota_au: numeric (nullable)
-//   nota_t: numeric (nullable)
 //   classificacao_a: text (nullable)
+//   resposta_s1: integer (nullable)
+//   resposta_s2: integer (nullable)
+//   resposta_s3: integer (nullable)
+//   resposta_s4: integer (nullable)
+//   resposta_s5: integer (nullable)
+//   resposta_aberta_s6: text (nullable)
+//   nota_s: numeric (nullable)
 //   classificacao_s: text (nullable)
+//   resposta_au1: integer (nullable)
+//   resposta_au2: integer (nullable)
+//   resposta_au3: integer (nullable)
+//   resposta_au4: integer (nullable)
+//   resposta_au5: integer (nullable)
+//   resposta_aberta_au6: text (nullable)
+//   nota_au: numeric (nullable)
 //   classificacao_au: text (nullable)
-//   complemento_sucesso: text (nullable)
+//   resposta_t1: integer (nullable)
+//   resposta_t2: integer (nullable)
+//   resposta_t3: integer (nullable)
+//   resposta_aberta_t4: text (nullable)
+//   nota_t: numeric (nullable)
+//   nota_geral: numeric (nullable)
+//   resposta_plano_sucesso: text (nullable)
 //   pdf_url: text (nullable)
 
 // --- CONSTRAINTS ---
