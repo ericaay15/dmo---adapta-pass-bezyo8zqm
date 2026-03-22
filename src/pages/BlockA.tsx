@@ -1,12 +1,76 @@
-import { Link } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { useNavigate, Link } from 'react-router-dom'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { ArrowRight, ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Textarea } from '@/components/ui/textarea'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
+const formSchema = z.object({
+  a1: z.string().min(1, { message: 'Selecione uma opção.' }),
+  a2: z.string().min(1, { message: 'Selecione uma opção.' }),
+  a3: z.string().min(1, { message: 'Selecione uma opção.' }),
+  a4: z.string().min(1, { message: 'Selecione uma opção.' }),
+  a5: z.string().min(1, { message: 'Selecione uma opção.' }),
+  a6: z.string().optional(),
+})
+
+const scaleQuestions = [
+  {
+    id: 'a1' as const,
+    text: 'A1. A inovação e a Inteligência Artificial estão alinhadas aos objetivos de negócio?',
+  },
+  {
+    id: 'a2' as const,
+    text: 'A2. A liderança promove e patrocina ativamente a adoção de novas tecnologias?',
+  },
+  {
+    id: 'a3' as const,
+    text: 'A3. Existe orçamento dedicado para iniciativas de inovação e IA?',
+  },
+  {
+    id: 'a4' as const,
+    text: 'A4. A empresa possui métricas claras para medir o retorno (ROI) de iniciativas de IA?',
+  },
+  {
+    id: 'a5' as const,
+    text: 'A5. Os colaboradores são incentivados e capacitados para propor soluções inovadoras?',
+  },
+]
+
 export default function BlockA() {
-  const { data } = useDiagnosisStore()
+  const navigate = useNavigate()
+  const { data: storeData, updateData } = useDiagnosisStore()
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    mode: 'onChange',
+    defaultValues: {
+      a1: storeData.a1 || '',
+      a2: storeData.a2 || '',
+      a3: storeData.a3 || '',
+      a4: storeData.a4 || '',
+      a5: storeData.a5 || '',
+      a6: storeData.a6 || '',
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    updateData(values)
+    navigate('/bloco-b')
+  }
 
   return (
     <div className="flex-1 flex flex-col items-center py-10 md:py-20 animate-fade-in-up">
@@ -25,10 +89,8 @@ export default function BlockA() {
       </div>
 
       <div className="w-full max-w-2xl relative">
-        {/* Card Glow Effect */}
         <div className="absolute -inset-1 bg-gradient-to-r from-[#8b5cf6]/20 to-[#2dd4bf]/20 rounded-3xl blur-xl opacity-50 z-0"></div>
 
-        {/* Main Content */}
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
           <div className="mb-8">
             <h2 className="text-sm font-semibold text-[#8b5cf6] uppercase tracking-wider mb-2">
@@ -43,54 +105,88 @@ export default function BlockA() {
             </p>
           </div>
 
-          {/* Dummy State Display to confirm persistence */}
-          {data.cnpj ? (
-            <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <CheckCircle2 className="text-[#2dd4bf] w-6 h-6" />
-                <h4 className="text-lg font-medium text-white">Dados da Empresa Salvos</h4>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+              <div className="space-y-8">
+                {scaleQuestions.map((q) => (
+                  <FormField
+                    key={q.id}
+                    control={form.control}
+                    name={q.id}
+                    render={({ field }) => (
+                      <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
+                        <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
+                          {q.text}
+                        </FormLabel>
+                        <FormControl>
+                          <ToggleGroup
+                            type="single"
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            className="justify-between sm:justify-start gap-2 sm:gap-4 pt-2"
+                          >
+                            {['1', '2', '3', '4', '5'].map((val) => (
+                              <ToggleGroupItem
+                                key={val}
+                                value={val}
+                                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full data-[state=on]:bg-[#2dd4bf] data-[state=on]:text-black text-slate-300 bg-black/40 border border-white/10 hover:bg-white/10 hover:text-white transition-all font-semibold text-lg"
+                              >
+                                {val}
+                              </ToggleGroupItem>
+                            ))}
+                          </ToggleGroup>
+                        </FormControl>
+                        <div className="flex justify-between text-xs text-slate-400 pt-1 sm:max-w-[280px]">
+                          <span>1 = Não fazemos isso</span>
+                          <span>5 = Forma avançada</span>
+                        </div>
+                        <FormMessage className="text-rose-400" />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+
+                <FormField
+                  control={form.control}
+                  name="a6"
+                  render={({ field }) => (
+                    <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
+                      <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
+                        A6. Qual é o maior desafio estratégico da sua empresa em relação à IA?
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Descreva brevemente (opcional)"
+                          className="bg-black/40 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[120px] resize-y"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
               </div>
-              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <dt className="text-slate-500 mb-1">CNPJ</dt>
-                  <dd className="text-slate-200 font-medium">{data.cnpj}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500 mb-1">Preenchido por</dt>
-                  <dd className="text-slate-200 font-medium">{data.userName}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500 mb-1">Líder de IA</dt>
-                  <dd className="text-slate-200 font-medium">{data.leadName}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500 mb-1">E-mail do Líder</dt>
-                  <dd className="text-slate-200 font-medium">{data.leadEmail}</dd>
-                </div>
-              </dl>
-            </div>
-          ) : (
-            <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-6 mb-8 text-rose-200 text-sm">
-              Nenhum dado encontrado no estado da aplicação. Por favor, preencha o formulário
-              inicial.
-            </div>
-          )}
 
-          {/* Placeholder for actual form block A */}
-          <div className="space-y-6">
-            <div className="h-24 rounded-xl border border-dashed border-white/20 bg-white/5 flex items-center justify-center text-slate-500">
-              [Perguntas do Bloco A virão aqui]
-            </div>
-
-            <div className="pt-6">
-              <Button
-                disabled
-                className="w-full bg-slate-800 text-slate-400 font-bold h-14 text-lg rounded-xl"
-              >
-                Próximo Bloco
-              </Button>
-            </div>
-          </div>
+              <div className="pt-2 flex flex-col sm:flex-row gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  asChild
+                  className="w-full sm:w-1/3 border-white/10 text-white hover:bg-white/5 hover:text-white h-14 text-lg rounded-xl"
+                >
+                  <Link to="/diagnostico">Voltar</Link>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!form.formState.isValid}
+                  className="w-full sm:w-2/3 bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] disabled:opacity-50 disabled:hover:shadow-none group"
+                >
+                  Próximo
+                  <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
     </div>

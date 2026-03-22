@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import Index from './pages/Index'
 import Diagnosis from './pages/Diagnosis'
 import BlockA from './pages/BlockA'
+import BlockB from './pages/BlockB'
 import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 
@@ -18,6 +19,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/diagnostico" element={<Diagnosis />} />
           <Route path="/bloco-a" element={<BlockA />} />
+          <Route path="/bloco-b" element={<BlockB />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
