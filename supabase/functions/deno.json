@@ -1,7 +1,7 @@
 {
   "_versions": {
     "calcular_scoring": 10,
-    "exportar_para_sheets": 5,
-    "gerar_documento_pdf": 5
+    "exportar_para_sheets": 6,
+    "gerar_documento_pdf": 6
   }
 }
