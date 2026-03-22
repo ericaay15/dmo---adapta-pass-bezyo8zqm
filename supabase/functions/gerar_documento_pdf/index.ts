@@ -275,6 +275,110 @@ Deno.serve(async (req: Request) => {
       })
     }
 
+    // Detalhamento por Sessão
+    checkPageBreak(150)
+    y -= 30
+    page.drawText('Detalhamento por Sessão (Auditoria Técnica)', {
+      x: 50,
+      y,
+      size: 16,
+      font: boldFont,
+      color: rgb(0.1, 0.1, 0.1),
+    })
+    y -= 30
+
+    const dict: Record<string, string> = {
+      A1: 'Qual o percentual do time que usa IA regularmente no dia a dia?',
+      A2: 'Como a IA é utilizada hoje pela equipe?',
+      A3: 'Qual o nível de engajamento da liderança com o uso de IA?',
+      A4: 'Como é feita a capacitação do time para o uso de IA?',
+      A5: 'Qual o foco atual das iniciativas de IA na empresa?',
+      A6: 'Observações adicionais sobre Amplificar (pessoas)',
+      S1: 'Como os processos críticos da empresa estão documentados hoje?',
+      S2: 'Como é o processo de onboarding de novos colaboradores?',
+      S3: 'Onde o conhecimento da empresa está centralizado?',
+      S4: 'Como as informações e fluxos da empresa estão integrados?',
+      S5: 'Como o time acessa informações para resolver problemas diários?',
+      S6: 'Observações adicionais sobre Sistematizar (processos)',
+      Au1: 'Como são executadas as tarefas repetitivas do dia a dia?',
+      Au2: 'Como funcionam os fluxos constantes (follow-ups, agendamentos)?',
+      Au3: 'Qual o nível de automação dos processos operacionais?',
+      Au4: 'Quanto tempo o time gasta com tarefas operacionais manuais?',
+      Au5: 'Como são gerados e acompanhados os KPIs da empresa?',
+      Au6: 'Observações adicionais sobre Automatizar',
+      T1: 'Como você avalia a atual dependência do negócio em relação aos donos? (1-10)',
+      T2: 'Quão claro é o principal gargalo atual da empresa? (1-10)',
+      T3: 'O quão bem definida está a visão de futuro da empresa? (1-10)',
+      T4: 'Qual é o principal desafio estratégico para os próximos 90 dias?',
+    }
+
+    const blockSpecs = [
+      { id: 'A', title: 'Amplificar (Pessoas)', keys: ['A1', 'A2', 'A3', 'A4', 'A5', 'A6'] },
+      { id: 'S', title: 'Sistematizar (Processos)', keys: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'] },
+      {
+        id: 'Au',
+        title: 'Automatizar (Tecnologia)',
+        keys: ['Au1', 'Au2', 'Au3', 'Au4', 'Au5', 'Au6'],
+      },
+      { id: 'T', title: 'Transformação & Visão', keys: ['T1', 'T2', 'T3', 'T4'] },
+    ]
+
+    const respostasJson = diagnostico.respostas_json || {}
+
+    blockSpecs.forEach((block) => {
+      checkPageBreak(60)
+      page.drawText(block.title, {
+        x: 50,
+        y,
+        size: 14,
+        font: boldFont,
+        color: rgb(0.18, 0.5, 0.92),
+      })
+      y -= 25
+
+      block.keys.forEach((key) => {
+        const qText = dict[key] || `Pergunta ${key}`
+        let ans = respostasJson[key]
+
+        // Check in respostas_abertas se ausente ou em branco no json
+        if (ans === undefined || ans === null || (typeof ans === 'string' && ans.trim() === '')) {
+          const blockTypeMatch = key.replace(/[0-9]/g, '')
+          const numMatch = parseInt(key.replace(/\D/g, ''))
+          const aberta = respostas.find(
+            (r: any) => r.tipo_bloco === blockTypeMatch && r.numero_pergunta === numMatch,
+          )
+          if (aberta && aberta.resposta) {
+            ans = aberta.resposta
+          }
+        }
+
+        if (ans !== undefined && ans !== null && ans !== '') {
+          const qLines = wrapText(`${key}. ${qText}`, 490, boldFont, 10)
+
+          checkPageBreak(qLines.length * 15 + 40)
+
+          qLines.forEach((l) => {
+            page.drawText(l, { x: 50, y, size: 10, font: boldFont, color: rgb(0.2, 0.2, 0.2) })
+            y -= 14
+          })
+
+          const isText = typeof ans === 'string'
+          const ansText = isText ? ans : `Nota registrada: ${ans}`
+
+          const aLines = wrapText(ansText, 470, font, 10)
+          aLines.forEach((l) => {
+            checkPageBreak(20)
+            page.drawText(l, { x: 65, y, size: 10, font, color: rgb(0.4, 0.4, 0.4) })
+            y -= 14
+          })
+
+          y -= 10
+        }
+      })
+
+      y -= 15
+    })
+
     const pdfBytes = await pdfDoc.save()
 
     // Upload to Supabase Storage
