@@ -27,7 +27,28 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     T4: data.t4,
   }
 
-  if (Object.values(payload).some((val) => typeof val === 'number' && Number.isNaN(val))) {
+  const numericFields = [
+    payload.A1,
+    payload.A2,
+    payload.A3,
+    payload.A4,
+    payload.A5,
+    payload.S1,
+    payload.S2,
+    payload.S3,
+    payload.S4,
+    payload.S5,
+    payload.Au1,
+    payload.Au2,
+    payload.Au3,
+    payload.Au4,
+    payload.Au5,
+    payload.T1,
+    payload.T2,
+    payload.T3,
+  ]
+
+  if (numericFields.some((val) => typeof val === 'number' && Number.isNaN(val))) {
     throw new Error('Algumas respostas numéricas estão inválidas. Por favor, revise o formulário.')
   }
 
@@ -41,23 +62,52 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
   if (scoringError) throw new Error(`Erro ao calcular scoring: ${scoringError.message}`)
   if (scoringData?.error) throw new Error(`Erro de validação do servidor: ${scoringData.error}`)
 
-  const { data: empresa, error: empresaError } = await supabase
-    .from('empresas')
-    .insert({
-      cnpj: data.cnpj || 'Não informado',
-      email_admin: data.adminEmail || 'nao_informado@email.com',
-      responsavel_nome: data.leadName,
-      responsavel_email: data.leadEmail,
-    })
-    .select('id')
-    .single()
+  let empresaId: string
+  const cnpjValue = data.cnpj || 'Não informado'
 
-  if (empresaError) throw new Error(`Erro ao salvar empresa: ${empresaError.message}`)
+  const { data: existingEmpresa, error: findEmpresaError } = await supabase
+    .from('empresas')
+    .select('id')
+    .eq('cnpj', cnpjValue)
+    .limit(1)
+    .maybeSingle()
+
+  if (findEmpresaError) {
+    throw new Error(`Erro ao verificar empresa: ${findEmpresaError.message}`)
+  }
+
+  if (existingEmpresa) {
+    empresaId = existingEmpresa.id
+    const { error: updateError } = await supabase
+      .from('empresas')
+      .update({
+        email_admin: data.adminEmail || 'nao_informado@email.com',
+        responsavel_nome: data.leadName,
+        responsavel_email: data.leadEmail,
+      })
+      .eq('id', empresaId)
+
+    if (updateError) throw new Error(`Erro ao atualizar empresa: ${updateError.message}`)
+  } else {
+    const { data: newEmpresa, error: empresaError } = await supabase
+      .from('empresas')
+      .insert({
+        cnpj: cnpjValue,
+        email_admin: data.adminEmail || 'nao_informado@email.com',
+        responsavel_nome: data.leadName,
+        responsavel_email: data.leadEmail,
+      })
+      .select('id')
+      .single()
+
+    if (empresaError) throw new Error(`Erro ao salvar empresa: ${empresaError.message}`)
+    empresaId = newEmpresa.id
+  }
 
   const { data: diagnostico, error: diagnosticoError } = await supabase
     .from('diagnosticos')
     .insert({
-      empresa_id: empresa.id,
+      empresa_id: empresaId,
       quem_preencheu: data.userName,
       respostas_json: payload as any,
       nota_a: scoringData.blocos.A.nota,
