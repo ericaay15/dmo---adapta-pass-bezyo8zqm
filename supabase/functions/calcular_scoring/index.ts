@@ -191,22 +191,20 @@ Deno.serve(async (req: Request) => {
     let horasRecuperadasNivel = ''
     let horasRecuperadasTexto = ''
     let horasRecuperadasEstimativa = ''
+
     if (horasRecuperadasSum <= 5) {
       horasRecuperadasNivel = 'Crítico'
-      horasRecuperadasEstimativa = '15h+'
-      horasRecuperadasTexto = 'Muitas horas perdidas em tarefas manuais.'
-    } else if (horasRecuperadasSum <= 9) {
+      horasRecuperadasEstimativa = '15h+ por colaborador'
+      horasRecuperadasTexto = 'Alto potencial de ganho em processos manuais.'
+    } else if (horasRecuperadasSum <= 10) {
       horasRecuperadasNivel = 'Moderado'
-      horasRecuperadasEstimativa = '8–15h'
-      horasRecuperadasTexto = 'Oportunidade considerável de ganho de tempo.'
-    } else if (horasRecuperadasSum <= 12) {
-      horasRecuperadasNivel = 'Em progresso'
-      horasRecuperadasEstimativa = '2–8h'
-      horasRecuperadasTexto = 'Boas automações em vigor, mas com espaço para otimização.'
+      horasRecuperadasEstimativa = '8h+ por colaborador'
+      horasRecuperadasTexto = 'Otimização de gargalos operacionais.'
     } else {
       horasRecuperadasNivel = 'Avançado'
-      horasRecuperadasEstimativa = '<2h'
-      horasRecuperadasTexto = 'Alta eficiência em automação, equipe focada no estratégico.'
+      horasRecuperadasEstimativa = '5h+ por colaborador'
+      horasRecuperadasTexto =
+        'Manutenção da eficiência com ganho incremental, garantindo o patamar mínimo dos estudos de mercado.'
     }
 
     const depDonoPercent = Math.max(0, Math.min(100, Math.round(100 - notaT * 10)))

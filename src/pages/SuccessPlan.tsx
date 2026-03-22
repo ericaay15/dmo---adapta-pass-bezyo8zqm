@@ -146,7 +146,7 @@ export default function SuccessPlan() {
               <div className="text-sm text-slate-400 font-medium mb-1">
                 Horas Recuperadas / Semana
               </div>
-              <div className="text-2xl font-bold text-white mb-2">
+              <div className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
                 {scoringData.metricas_chave.horas_recuperadas.estimativa}
               </div>
               <p className="text-xs text-slate-400 mt-auto leading-relaxed">
