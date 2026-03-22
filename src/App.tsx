@@ -8,6 +8,7 @@ import BlockA from './pages/BlockA'
 import BlockB from './pages/BlockB'
 import BlockS from './pages/BlockS'
 import BlockAu from './pages/BlockAu'
+import BlockT from './pages/BlockT'
 import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/bloco-b" element={<BlockB />} />
           <Route path="/bloco-s" element={<BlockS />} />
           <Route path="/bloco-au" element={<BlockAu />} />
+          <Route path="/bloco-t" element={<BlockT />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
