@@ -160,5 +160,19 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     if (abertasError) throw new Error(`Erro ao salvar respostas abertas: ${abertasError.message}`)
   }
 
+  // Aciona a exportação para o Google Sheets de forma assíncrona, não bloqueando a UI do usuário
+  supabase.functions
+    .invoke('exportar_para_sheets', {
+      body: { diagnostico_id: diagnostico.id },
+    })
+    .then(({ error }) => {
+      if (error) {
+        console.error('Erro retornado pela Edge Function exportar_para_sheets:', error)
+      }
+    })
+    .catch((err) => {
+      console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
+    })
+
   return { scoringData, diagnosticoId: diagnostico.id }
 }

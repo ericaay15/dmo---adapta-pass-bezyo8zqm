@@ -1,5 +1,6 @@
 {
   "_versions": {
-    "calcular_scoring": 2
+    "calcular_scoring": 3,
+    "exportar_para_sheets": 1
   }
 }
