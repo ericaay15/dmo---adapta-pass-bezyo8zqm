@@ -40,7 +40,7 @@ const Index = () => {
       </div>
 
       {/* Hero Content */}
-      <div className="space-y-6 md:space-y-8 w-full mb-16">
+      <div className="space-y-6 md:space-y-8 w-full mb-14">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mx-auto max-w-4xl">
           Diagnóstico de Maturidade e Oportunidade
         </h1>
@@ -49,31 +49,11 @@ const Index = () => {
           Preencha o Diagnóstico para receber um plano de sucesso personalizado e conectar seu
           gerente de negócios.
         </p>
-
-        {/* Call to Action */}
-        <div className="pt-4 animate-fade-in-up-delayed flex flex-col items-center justify-center w-full gap-5">
-          <Button
-            asChild
-            size="lg"
-            className="w-full sm:w-auto rounded-full bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold text-lg px-8 py-7 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(45,212,191,0.4)] group"
-          >
-            <Link to="/diagnostico" className="flex items-center justify-center w-full">
-              Preencher e Desbloquear Jornada
-              <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5" />
-            </Link>
-          </Button>
-          <p
-            className="text-sm md:text-base text-[#2dd4bf] font-semibold animate-fade-in-up-delayed drop-shadow-[0_0_10px_rgba(45,212,191,0.2)]"
-            style={{ animationDelay: '0.3s' }}
-          >
-            Implementação de IA com quem já fez isso milhares de vezes.
-          </p>
-        </div>
       </div>
 
       {/* Journey Map Section */}
-      <div className="w-full mt-4 animate-fade-in-up-delayed" style={{ animationDelay: '0.4s' }}>
-        <h2 className="text-xl md:text-2xl font-bold text-white mb-12 text-center opacity-90">
+      <div className="w-full mb-16 animate-fade-in-up-delayed" style={{ animationDelay: '0.2s' }}>
+        <h2 className="text-sm md:text-base font-semibold text-slate-400 mb-10 text-center uppercase tracking-widest opacity-80">
           Sua Jornada no Adapta Pass
         </h2>
 
@@ -126,6 +106,29 @@ const Index = () => {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Call to Action */}
+      <div
+        className="animate-fade-in-up-delayed flex flex-col items-center justify-center w-full gap-5"
+        style={{ animationDelay: '0.4s' }}
+      >
+        <Button
+          asChild
+          size="lg"
+          className="w-full sm:w-auto rounded-full bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold text-lg px-8 py-7 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(45,212,191,0.4)] group"
+        >
+          <Link to="/diagnostico" className="flex items-center justify-center w-full">
+            Preencher e Desbloquear Jornada
+            <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5" />
+          </Link>
+        </Button>
+        <p
+          className="text-sm md:text-base text-[#2dd4bf] font-semibold animate-fade-in-up-delayed drop-shadow-[0_0_10px_rgba(45,212,191,0.2)]"
+          style={{ animationDelay: '0.5s' }}
+        >
+          Implementação de IA com quem já fez isso milhares de vezes.
+        </p>
       </div>
     </div>
   )
