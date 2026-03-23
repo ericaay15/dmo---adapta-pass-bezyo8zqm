@@ -12,6 +12,7 @@ import BlockT from './pages/BlockT'
 import SuccessPlan from './pages/SuccessPlan'
 import Results from './pages/Results'
 import NotFound from './pages/NotFound'
+import Report from './pages/Report'
 import Layout from './components/Layout'
 
 const App = () => (
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/plano-de-sucesso" element={<SuccessPlan />} />
           <Route path="/resultados" element={<Results />} />
         </Route>
+        <Route path="/relatorio/:id" element={<Report />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>

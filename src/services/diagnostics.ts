@@ -189,30 +189,17 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
     }
   }
 
-  let pdfUrl = ''
-  try {
-    const { data: pdfData, error: pdfError } = await supabase.functions.invoke(
-      'gerar_documento_pdf',
-      {
-        body: { diagnostico_id: diagnosticoId },
-      },
-    )
+  // Define a URL da página de relatório do frontend
+  const pdfUrl = `${window.location.origin}/relatorio/${diagnosticoId}`
 
-    if (!pdfError && pdfData?.url) {
-      pdfUrl = pdfData.url
-      const { error: updatePdfError } = await supabase
-        .from('diagnosticos')
-        .update({ pdf_url: pdfUrl } as any)
-        .eq('id', diagnosticoId)
+  // Atualiza no banco para ficar registrado na tabela e triggar a exportação para o Sheets
+  const { error: updatePdfError } = await supabase
+    .from('diagnosticos')
+    .update({ pdf_url: pdfUrl } as any)
+    .eq('id', diagnosticoId)
 
-      if (updatePdfError) {
-        console.error('Erro ao atualizar pdf_url no banco:', updatePdfError.message)
-      }
-    } else if (pdfError) {
-      console.error('Erro retornado pela Edge Function gerar_documento_pdf:', pdfError)
-    }
-  } catch (err) {
-    console.error('Falha ao invocar gerar_documento_pdf:', err)
+  if (updatePdfError) {
+    console.error('Erro ao atualizar pdf_url no banco:', updatePdfError.message)
   }
 
   supabase.functions

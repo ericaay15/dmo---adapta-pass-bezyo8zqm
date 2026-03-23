@@ -22,7 +22,7 @@ export default function Results() {
           Parabéns por esse passo!
         </h1>
         <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto">
-          Seu plano de sucesso foi enviado. Veja o que acontece agora para iniciarmos a sua jornada:
+          Seu plano de sucesso foi gerado. Veja o que acontece agora para iniciarmos a sua jornada:
         </p>
 
         {data.pdfUrl && (
@@ -38,7 +38,7 @@ export default function Results() {
                 className="w-full md:w-auto min-w-[300px] bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-16 px-8 text-lg rounded-xl shadow-[0_0_20px_rgba(45,212,191,0.2)] hover:shadow-[0_0_30px_rgba(45,212,191,0.4)] transition-all duration-300 group"
               >
                 <FileText className="mr-3 w-6 h-6" />
-                Baixar Resumo em PDF
+                Acessar Relatório Completo
                 <Download className="ml-3 w-5 h-5 opacity-70 group-hover:translate-y-1 transition-transform duration-300" />
               </Button>
             </a>
