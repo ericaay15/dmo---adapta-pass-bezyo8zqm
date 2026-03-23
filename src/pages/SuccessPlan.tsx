@@ -76,12 +76,16 @@ export default function SuccessPlan() {
             <p className="text-lg md:text-xl text-[#2dd4bf] font-medium mb-6">
               Aqui começa sua jornada de implementação de IA com quem realmente entende.
             </p>
-            <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-3xl mx-auto">
+            <p className="text-sm text-slate-400 font-light leading-relaxed max-w-3xl mx-auto">
               Este diagnóstico revela a maturidade atual da sua empresa nas três dimensões
-              estratégicas de transformação com IA: Amplificar (pessoas e capacidades), Sistematizar
-              (processos e conhecimento) e Automatizar (eficiência operacional). Os resultados
-              abaixo refletem a realidade do seu negócio hoje e apontam as oportunidades mais
-              impactantes para os próximos 60 dias.
+              estratégicas de transformação com IA:{' '}
+              <strong className="text-slate-300 font-medium">Amplificar</strong> (pessoas e
+              capacidades), <strong className="text-slate-300 font-medium">Sistematizar</strong>{' '}
+              (processos e conhecimento) e{' '}
+              <strong className="text-slate-300 font-medium">Automatizar</strong> (eficiência
+              operacional). Os resultados abaixo refletem a realidade do seu negócio hoje e apontam
+              as oportunidades mais impactantes para os próximos{' '}
+              <strong className="text-[#2dd4bf] font-medium">90 dias</strong>.
             </p>
           </div>
 
