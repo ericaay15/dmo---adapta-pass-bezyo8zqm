@@ -44,11 +44,6 @@ const Index = () => {
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mx-auto max-w-4xl">
           Diagnóstico de Maturidade e Oportunidade
         </h1>
-
-        <p className="text-lg md:text-xl lg:text-2xl text-slate-300 leading-relaxed max-w-4xl mx-auto font-medium">
-          Preencha o Diagnóstico para receber um plano de sucesso personalizado e conectar seu
-          gerente de negócios.
-        </p>
       </div>
 
       {/* Journey Map Section */}
