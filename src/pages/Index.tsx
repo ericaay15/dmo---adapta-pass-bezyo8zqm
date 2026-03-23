@@ -18,7 +18,7 @@ const journeySteps = [
     status: 'locked',
   },
   {
-    title: 'Onboarding para equipe',
+    title: 'Onboarding p/ equipe',
     description: 'Reunião ao vivo explicando tudo sobre a plataforma',
     icon: Rocket,
     status: 'locked',
