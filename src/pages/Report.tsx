@@ -89,17 +89,40 @@ const SectionResponses = ({ title, prefix, data }: any) => {
               key={k}
               className="bg-[#171717] border border-[#262626] p-5 rounded-xl print-exact break-inside-avoid"
             >
-              <div className="text-sm font-semibold text-slate-400 mb-2">{questionsMap[k]}</div>
+              <div className="text-sm font-semibold text-slate-400 mb-3">{questionsMap[k]}</div>
               <div className="text-sm text-slate-200">
                 {isAberta ? (
                   <span className="whitespace-pre-wrap leading-relaxed">{resposta}</span>
                 ) : (
-                  <span>
-                    <strong className="text-[#2dd4bf] text-base">{resposta}</strong>{' '}
-                    <span className="text-slate-500">
-                      / {k.startsWith('T') && k !== 'T4' ? 10 : 5}
-                    </span>
-                  </span>
+                  (() => {
+                    const maxScore = k.startsWith('T') && k !== 'T4' ? 10 : 5
+                    const numResp = Number(resposta)
+                    const color = getScoreColor(numResp, maxScore)
+                    return (
+                      <div className="mt-2">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                            Pontuação
+                          </span>
+                          <span className="text-sm font-bold" style={{ color }}>
+                            {resposta}{' '}
+                            <span className="text-slate-500 text-xs font-medium">/ {maxScore}</span>
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-[#262626] rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-1000 print-exact"
+                            style={{
+                              width: `${(numResp / maxScore) * 100}%`,
+                              backgroundColor: color,
+                              printColorAdjust: 'exact',
+                              WebkitPrintColorAdjust: 'exact',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })()
                 )}
               </div>
             </div>
@@ -252,10 +275,12 @@ export default function Report() {
                   </div>
                   <div className="h-2.5 bg-[#262626] rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all duration-1000"
+                      className="h-full rounded-full transition-all duration-1000 print-exact"
                       style={{
                         width: `${((item.nota || 0) / 10) * 100}%`,
                         backgroundColor: getScoreColor(item.nota || 0, 10),
+                        printColorAdjust: 'exact',
+                        WebkitPrintColorAdjust: 'exact',
                       }}
                     />
                   </div>

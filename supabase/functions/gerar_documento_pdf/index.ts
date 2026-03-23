@@ -150,13 +150,31 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
           if (resposta === undefined || resposta === null) return ''
 
+          let maxScore = k.startsWith('T') && k !== 'T4' ? 10 : 5
+          let scoreHtml = ''
+          if (!isAberta) {
+            let val = Number(resposta)
+            let percent = (val / maxScore) * 100
+            let color = getScoreColor(val, maxScore)
+
+            scoreHtml = `
+          <div style="margin-top: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Pontuação</span>
+              <span style="color: ${color}; font-weight: 800; font-size: 14px;">${val} <span style="color: #64748b; font-weight: 500; font-size: 12px;">/ ${maxScore}</span></span>
+            </div>
+            <div style="height: 6px; background: #262626; border-radius: 4px; overflow: hidden; width: 100%;">
+              <div style="height: 100%; background: ${color}; border-radius: 4px; width: ${percent}%;"></div>
+            </div>
+          </div>
+        `
+          }
+
           return `
         <div class="history-item">
           <div class="history-q">${questionsMap[k]}</div>
           <div class="history-a">${
-            isAberta
-              ? String(resposta).replace(/\n/g, '<br/>')
-              : `<strong>${resposta}</strong> <span style="color: #64748b">/ ${k.startsWith('T') && k !== 'T4' ? 10 : 5}</span>`
+            isAberta ? String(resposta).replace(/\n/g, '<br/>') : scoreHtml
           }</div>
         </div>
       `
@@ -353,16 +371,12 @@ function generatePdfHtml(diag: any, logoUrl: string) {
       font-size: 14px;
       font-weight: 600;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     .history-a {
       font-size: 14px;
       color: #e2e8f0;
       line-height: 1.6;
-    }
-    .history-a strong {
-      color: var(--primary);
-      font-size: 16px;
     }
 
     .list-item {
