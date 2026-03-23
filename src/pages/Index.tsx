@@ -118,12 +118,6 @@ const Index = () => {
             <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5" />
           </Link>
         </Button>
-        <p
-          className="text-sm md:text-base text-[#2dd4bf] font-semibold animate-fade-in-up-delayed drop-shadow-[0_0_10px_rgba(45,212,191,0.2)]"
-          style={{ animationDelay: '0.5s' }}
-        >
-          Implementação de IA com quem já fez isso milhares de vezes.
-        </p>
       </div>
     </div>
   )
