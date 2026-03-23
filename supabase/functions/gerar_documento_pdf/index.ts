@@ -14,9 +14,9 @@ Deno.serve(async (req: Request) => {
     const body = await req.json()
     let diagnosis = body.diagnosis
 
-    // Fallback logo in case no URL is passed
+    // Fallback logo in case no URL is passed - Dark text for light background
     const defaultLogo =
-      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMjUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMCA0MEw0MCAxMEw2MCA0MEgyMFoiIGZpbGw9IiMxMGI5ODEiLz48dGV4dCB4PSI3NSIgeT0iMzgiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iSW50ZXIsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjgiIGZvbnQtd2VpZ2h0PSJib2xkIj5BZGFwdGEgUGFzczwvdGV4dD48L3N2Zz4='
+      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMjUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMCA0MEw0MCAxMEw2MCA0MEgyMFoiIGZpbGw9IiMwZDk0ODgiLz48dGV4dCB4PSI3NSIgeT0iMzgiIGZpbGw9IiMwZjE3MmEiIGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFkYXB0YSBQYXNzPC90ZXh0Pjwvc3ZnPg=='
     const logoUrl = body.logoUrl || defaultLogo
 
     let diagId = body.diagnostico_id
@@ -49,7 +49,9 @@ Deno.serve(async (req: Request) => {
         const fi = diag.first_impact_json as any
         diagnosis.action_plan.phases.push({
           title: fi.acao || 'Primeiros 90 Dias',
-          details: Array.isArray(fi.descricao) ? fi.descricao.join('\n') : fi.descricao || '',
+          details: Array.isArray(fi.descricao)
+            ? fi.descricao.map((item: string) => `• ${item}`).join('\n')
+            : fi.descricao || '',
         })
       }
 
@@ -131,12 +133,13 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     
     :root {
-      --bg-gradient: linear-gradient(135deg, #020617 0%, #064E3B 100%);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --card-bg: #1e293b;
-      --card-border: #10b981;
-      --primary: #10b981;
+      --bg-main: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --card-bg: #f8fafc;
+      --card-border: #e2e8f0;
+      --primary: #0d9488;
+      --primary-light: #ccfbf1;
     }
 
     * {
@@ -147,7 +150,7 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg-gradient);
+      background: var(--bg-main);
       color: var(--text-main);
       line-height: 1.6;
       -webkit-print-color-adjust: exact !important;
@@ -169,7 +172,7 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
       text-align: center;
       margin-bottom: 40px;
       padding-bottom: 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 2px solid var(--card-border);
     }
 
     .logo {
@@ -184,9 +187,9 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
 
     .title {
       font-size: 32px;
-      font-weight: 700;
+      font-weight: 800;
       margin-bottom: 8px;
-      color: #ffffff;
+      color: var(--text-main);
       letter-spacing: -0.02em;
     }
 
@@ -202,36 +205,37 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
 
     .section-title {
       font-size: 22px;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 24px;
       color: var(--primary);
       display: inline-block;
-      border-bottom: 2px solid var(--primary);
+      border-bottom: 3px solid var(--primary);
       padding-bottom: 8px;
     }
 
     .card {
       background: var(--card-bg);
-      border-left: 4px solid var(--card-border);
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--primary);
       border-radius: 8px;
       padding: 24px;
       margin-bottom: 20px;
       page-break-inside: avoid;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
       width: 100%;
       overflow: hidden;
     }
 
     .card-title {
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 12px;
-      color: #ffffff;
+      color: var(--text-main);
     }
 
     .card-content {
       font-size: 15px;
-      color: #e2e8f0;
+      color: var(--text-main);
       white-space: pre-wrap;
       word-wrap: break-word;
       overflow-wrap: break-word;
@@ -248,8 +252,8 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
     }
 
     .response-item {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--bg-main);
+      border: 1px solid var(--card-border);
       padding: 20px;
       border-radius: 8px;
       page-break-inside: avoid;
@@ -261,15 +265,15 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
       font-size: 14px;
       color: var(--primary);
       margin-bottom: 8px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
     .response-a {
       font-size: 16px;
-      font-weight: 400;
-      color: #ffffff;
+      font-weight: 500;
+      color: var(--text-main);
       word-wrap: break-word;
       overflow-wrap: break-word;
       word-break: break-word;
@@ -280,7 +284,7 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
       text-align: center;
       margin-top: 60px;
       padding-top: 24px;
-      border-top: 1px solid rgba(255,255,255,0.1);
+      border-top: 1px solid var(--card-border);
       font-size: 13px;
       color: var(--text-muted);
       page-break-inside: avoid;
@@ -295,13 +299,13 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
         color: #000000 !important;
       }
       .card {
-        background: #f8fafc !important;
+        background: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
         border-left: 4px solid var(--primary) !important;
         box-shadow: none !important;
       }
       .response-item {
-        background: #f8fafc !important;
+        background: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
       }
       .container {
@@ -318,9 +322,9 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
 <body>
   <div class="container">
     <div class="header">
-      ${logoUrl ? `<img src="${logoUrl}" alt="Adapta" class="logo" />` : `<h1 class="title">Adapta Pass</h1>`}
+      ${logoUrl ? `<img src="${logoUrl}" alt="Adapta" class="logo" />` : `<h1 class="title" style="color: var(--primary)">Adapta Pass</h1>`}
       <h1 class="title">Plano de Sucesso</h1>
-      <p class="subtitle">Preparado exclusivamente para <strong style="color: #fff">${companyName}</strong></p>
+      <p class="subtitle">Preparado exclusivamente para <strong style="color: var(--text-main)">${companyName}</strong></p>
     </div>
 
     ${
@@ -364,7 +368,13 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
             ([key, value]) => `
           <div class="response-item">
             <div class="response-q">${formatQuestionKey(key)}</div>
-            <div class="response-a">${typeof value === 'object' ? JSON.stringify(value) : value}</div>
+            <div class="response-a">${
+              typeof value === 'object' && value !== null
+                ? Object.entries(value)
+                    .map(([k, v]) => `- ${formatQuestionKey(k)}: ${v}`)
+                    .join('\\n')
+                : value
+            }</div>
           </div>
         `,
           )
