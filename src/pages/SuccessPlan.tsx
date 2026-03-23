@@ -275,9 +275,8 @@ export default function SuccessPlan() {
             </Button>
 
             <p className="text-sm text-slate-500 mt-6 max-w-2xl mx-auto">
-              Seu Gerente de Negócios Adapta entrará em contato nos próximos 3 dias úteis para
-              alinhar a execução deste plano, validar prioridades e estruturar a implementação com
-              segurança e resultado.
+              Seu Gerente de Negócios Adapta entrará em contato para alinhar a execução deste plano,
+              validar prioridades e estruturar a implementação com segurança e resultado.
             </p>
           </div>
         </div>
