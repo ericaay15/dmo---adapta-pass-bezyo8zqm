@@ -1,4 +1,5 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 import { corsHeaders } from '../_shared/cors.ts'
 
 function base64url(str: string) {
@@ -109,6 +110,38 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Nao foi possivel sincronizar com Google Sheets. Tente novamente.',
+        }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+    const token = authHeader.replace('Bearer ', '')
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token)
+
+    if (authError || !user) {
+      console.error('Auth error:', authError?.message)
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Nao foi possivel sincronizar com Google Sheets. Tente novamente.',
+        }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
+    }
+
     let body
     try {
       body = await req.json()

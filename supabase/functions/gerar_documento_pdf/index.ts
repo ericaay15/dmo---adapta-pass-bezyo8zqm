@@ -14,18 +14,20 @@ Deno.serve(async (req: Request) => {
     const body = await req.json()
     let diagnosis = body.diagnosis
 
-    // Fallback logo in case no URL is passed, structured as a clean Data URI SVG to ensure it always loads
+    // Fallback logo in case no URL is passed
     const defaultLogo =
       'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMjUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMCA0MEw0MCAxMEw2MCA0MEgyMFoiIGZpbGw9IiMxMGI5ODEiLz48dGV4dCB4PSI3NSIgeT0iMzgiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iSW50ZXIsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjgiIGZvbnQtd2VpZ2h0PSJib2xkIj5BZGFwdGEgUGFzczwvdGV4dD48L3N2Zz4='
     const logoUrl = body.logoUrl || defaultLogo
 
+    let diagId = body.diagnostico_id
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
     // Fetch complete data if diagnostico_id is provided
-    if (!diagnosis && body.diagnostico_id) {
-      const supabase = createClient(supabaseUrl, supabaseKey)
+    if (!diagnosis && diagId) {
       const { data: diag, error } = await supabase
         .from('diagnosticos')
         .select('*, empresas(*)')
-        .eq('id', body.diagnostico_id)
+        .eq('id', diagId)
         .single()
 
       if (error || !diag) {
@@ -80,7 +82,30 @@ Deno.serve(async (req: Request) => {
 
     const html = generatePdfHtml(diagnosis, logoUrl)
 
-    return new Response(JSON.stringify({ html }), {
+    // Save HTML as a document to Storage for robust printing and viewing
+    const fileName = `plano-de-sucesso-${diagId || crypto.randomUUID()}.html`
+
+    const { error: uploadError } = await supabase.storage
+      .from('documentos')
+      .upload(fileName, html, {
+        contentType: 'text/html; charset=utf-8',
+        upsert: true,
+      })
+
+    if (uploadError) {
+      throw new Error(`Erro ao fazer upload do documento: ${uploadError.message}`)
+    }
+
+    const { data: publicUrlData } = supabase.storage.from('documentos').getPublicUrl(fileName)
+
+    const publicUrl = publicUrlData.publicUrl
+
+    if (diagId) {
+      // Sync URL in database
+      await supabase.from('diagnosticos').update({ pdf_url: publicUrl }).eq('id', diagId)
+    }
+
+    return new Response(JSON.stringify({ url: publicUrl }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error: any) {
@@ -352,6 +377,15 @@ function generatePdfHtml(diagnosis: any, logoUrl: string) {
       <p>© ${new Date().getFullYear()} Adapta. Todos os direitos reservados.</p>
     </div>
   </div>
+
+  <script>
+    window.onload = function() {
+      // Auto trigger print dialog on load for seamless PDF generation experience
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    };
+  </script>
 </body>
 </html>
   `
