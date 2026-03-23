@@ -18,8 +18,8 @@ const journeySteps = [
     status: 'locked',
   },
   {
-    title: 'Onboarding',
-    description: 'Integração estruturada na plataforma e processos',
+    title: 'Onboarding ao vivo para a Equipe',
+    description: 'Realizaremos uma live de onboarding te explicando tudo sobre a plataforma',
     icon: Rocket,
     status: 'locked',
   },
