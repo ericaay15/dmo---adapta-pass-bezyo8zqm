@@ -77,8 +77,7 @@ export default function Results() {
                   2. Onboarding com sua Equipe
                 </strong>
                 <span className="text-slate-400 text-sm md:text-base leading-relaxed block">
-                  Realizaremos a integração completa com todo o seu time para garantir a melhor
-                  adoção da plataforma.
+                  Reunião ao vivo explicando tudo sobre a plataforma e garantindo melhor uso
                 </span>
               </div>
             </li>
