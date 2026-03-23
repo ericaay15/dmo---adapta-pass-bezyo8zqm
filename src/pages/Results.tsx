@@ -19,7 +19,7 @@ export default function Results() {
           <CheckCircle2 className="w-10 h-10 text-[#2dd4bf]" />
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
-          Obrigado!
+          Parabéns por esse passo!
         </h1>
         <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto">
           Seu plano de sucesso foi enviado. Veja o que acontece agora para iniciarmos a sua jornada:
