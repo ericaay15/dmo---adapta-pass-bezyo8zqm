@@ -35,15 +35,36 @@ Deno.serve(async (req: Request) => {
     if (respError) throw new Error('Erro ao buscar respostas abertas')
 
     const pdfDoc = await PDFDocument.create()
-    let page = pdfDoc.addPage([595.28, 841.89]) // A4 Size
+
+    // Theme Colors
+    const darkBg = rgb(0.04, 0.04, 0.04) // Almost black background
+    const cardBg = rgb(0.08, 0.08, 0.08) // Dark gray for cards
+    const cardBorder = rgb(0.15, 0.15, 0.15) // Lighter border
+    const textWhite = rgb(0.95, 0.95, 0.95) // Main text
+    const textGray = rgb(0.65, 0.65, 0.65) // Muted text
+    const teal = rgb(0.176, 0.831, 0.749) // #2dd4bf Primary Accent
+    const pink = rgb(0.957, 0.447, 0.71) // #f472b6 Secondary Accent
+    const amber = rgb(0.961, 0.62, 0.043) // #f59e0b Warning/Alert
+
+    // Score Colors
+    const scoreRose = rgb(0.957, 0.247, 0.365) // #f43f5e (0-3)
+    const scoreAmber = rgb(0.961, 0.62, 0.043) // #f59e0b (4-6)
+    const scoreEmerald = rgb(0.063, 0.725, 0.506) // #10b981 (7-8)
+    const scoreBlue = rgb(0.231, 0.51, 0.965) // #3b82f6 (9-10)
+
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+
+    let page = pdfDoc.addPage([595.28, 841.89]) // A4 Size
+    // Fill first page background
+    page.drawRectangle({ x: 0, y: 0, width: 595.28, height: 841.89, color: darkBg })
 
     let y = 780
 
     const checkPageBreak = (needed: number) => {
       if (y - needed < 50) {
         page = pdfDoc.addPage([595.28, 841.89])
+        page.drawRectangle({ x: 0, y: 0, width: 595.28, height: 841.89, color: darkBg })
         y = 780
       }
     }
@@ -75,216 +96,327 @@ Deno.serve(async (req: Request) => {
     }
 
     // Header
-    page.drawText('ADAPTA PASS', { x: 50, y, size: 24, font: boldFont, color: rgb(0.1, 0.1, 0.1) })
-    page.drawText('Plano de Ação e Diagnóstico', {
-      x: 50,
-      y: y - 20,
-      size: 14,
+    page.drawText('ADAPTA', { x: 40, y, size: 28, font: boldFont, color: textWhite })
+    page.drawText('PASS', { x: 160, y, size: 28, font: boldFont, color: teal })
+    page.drawText('Plano de Sucesso e Diagnóstico de IA', {
+      x: 40,
+      y: y - 22,
+      size: 12,
       font,
-      color: rgb(0.4, 0.4, 0.4),
+      color: textGray,
     })
-    y -= 50
+    y -= 60
 
-    // Company Data
+    // Company Data Card
     const empresa = diagnostico.empresas || {}
-    page.drawText('Dados da Empresa:', { x: 50, y, size: 12, font: boldFont })
-    y -= 20
-
-    page.drawText(`Empresa: ${empresa.nome || 'Não informado'}`, { x: 50, y, size: 10, font })
-    page.drawText(`CNPJ: ${empresa.cnpj || 'Não informado'}`, { x: 300, y, size: 10, font })
-    y -= 15
-
-    page.drawText(`Responsável: ${empresa.responsavel_nome || 'Não informado'}`, {
-      x: 50,
-      y,
-      size: 10,
-      font,
+    checkPageBreak(90)
+    page.drawRectangle({
+      x: 40,
+      y: y - 75,
+      width: 515,
+      height: 75,
+      color: cardBg,
+      borderColor: cardBorder,
+      borderWidth: 1,
     })
-    page.drawText(`E-mail: ${empresa.responsavel_email || 'Não informado'}`, {
-      x: 300,
-      y,
-      size: 10,
-      font,
-    })
-    y -= 15
 
-    page.drawText(`Preenchido por: ${diagnostico.quem_preencheu || 'Não informado'}`, {
-      x: 50,
-      y,
-      size: 10,
-      font,
+    page.drawText('Dados da Empresa', {
+      x: 55,
+      y: y - 20,
+      size: 12,
+      font: boldFont,
+      color: textWhite,
     })
-    const rawDate = diagnostico.data_preenchimento
-    let dataPreenchimento = ''
-    if (rawDate) {
-      try {
-        const d = new Date(rawDate)
-        dataPreenchimento = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
-      } catch (e) {}
+
+    page.drawText(`Empresa:`, { x: 55, y: y - 40, size: 9, font: boldFont, color: textGray })
+    page.drawText(`${empresa.nome || 'Não informado'}`, {
+      x: 110,
+      y: y - 40,
+      size: 9,
+      font,
+      color: textWhite,
+    })
+
+    page.drawText(`CNPJ:`, { x: 300, y: y - 40, size: 9, font: boldFont, color: textGray })
+    page.drawText(`${empresa.cnpj || 'Não informado'}`, {
+      x: 335,
+      y: y - 40,
+      size: 9,
+      font,
+      color: textWhite,
+    })
+
+    page.drawText(`Responsável:`, { x: 55, y: y - 58, size: 9, font: boldFont, color: textGray })
+    page.drawText(`${empresa.responsavel_nome || 'Não informado'}`, {
+      x: 125,
+      y: y - 58,
+      size: 9,
+      font,
+      color: textWhite,
+    })
+
+    page.drawText(`E-mail:`, { x: 300, y: y - 58, size: 9, font: boldFont, color: textGray })
+    page.drawText(`${empresa.responsavel_email || 'Não informado'}`, {
+      x: 335,
+      y: y - 58,
+      size: 9,
+      font,
+      color: textWhite,
+    })
+    y -= 100
+
+    // Nota Geral & Bars section
+    checkPageBreak(120)
+
+    // Nota Geral Card
+    page.drawRectangle({
+      x: 40,
+      y: y - 100,
+      width: 140,
+      height: 100,
+      color: cardBg,
+      borderColor: cardBorder,
+      borderWidth: 1,
+    })
+    page.drawText('Nota Geral', { x: 55, y: y - 25, size: 10, font: boldFont, color: textGray })
+
+    const nGeral = diagnostico.nota_geral || 0
+    const getScoreColor = (score: number) => {
+      if (score <= 3) return scoreRose
+      if (score <= 6) return scoreAmber
+      if (score <= 8) return scoreEmerald
+      return scoreBlue
     }
-    if (dataPreenchimento) {
-      page.drawText(`Data: ${dataPreenchimento}`, { x: 300, y, size: 10, font })
-    }
-    y -= 40
 
-    // Nota Geral
-    page.drawText(`Nota Geral: ${diagnostico.nota_geral}`, { x: 50, y, size: 20, font: boldFont })
+    page.drawText(`${nGeral}`, { x: 55, y: y - 65, size: 36, font: boldFont, color: textWhite })
+
     const getClas = (n: number) =>
       n <= 3 ? 'Inicial' : n <= 6 ? 'Em progresso' : n <= 8 ? 'Avançado' : 'Excelente'
-    page.drawText(`Classificação: ${getClas(diagnostico.nota_geral)}`, {
-      x: 250,
-      y,
-      size: 14,
-      font,
-      color: rgb(0.4, 0.4, 0.4),
+    page.drawText(`${getClas(nGeral)}`, {
+      x: 55,
+      y: y - 85,
+      size: 11,
+      font: boldFont,
+      color: getScoreColor(nGeral),
     })
-    y -= 50
 
-    // Barras ASA
-    const drawBar = (label: string, score: number) => {
-      page.drawText(label, { x: 50, y, size: 12, font: boldFont })
-      page.drawText(score.toString(), { x: 150, y, size: 12, font: boldFont })
+    // Bars
+    page.drawRectangle({
+      x: 195,
+      y: y - 100,
+      width: 360,
+      height: 100,
+      color: cardBg,
+      borderColor: cardBorder,
+      borderWidth: 1,
+    })
+    page.drawText('Maturidade por Dimensão', {
+      x: 210,
+      y: y - 25,
+      size: 10,
+      font: boldFont,
+      color: textGray,
+    })
 
-      page.drawRectangle({ x: 200, y: y - 2, width: 300, height: 12, color: rgb(0.9, 0.9, 0.9) })
+    const drawBar = (label: string, score: number, by: number) => {
+      page.drawText(label, { x: 210, y: by, size: 9, font: boldFont, color: textWhite })
+      page.drawText(`${score}/10`, {
+        x: 520,
+        y: by,
+        size: 9,
+        font: boldFont,
+        color: getScoreColor(score),
+      })
 
-      const barW = (score / 10) * 300
-      let c = rgb(0.9, 0.2, 0.2) // Vermelho 0-3
-      if (score > 3 && score <= 6)
-        c = rgb(0.94, 0.76, 0.05) // Amarelo 4-6
-      else if (score > 6 && score <= 8)
-        c = rgb(0.13, 0.77, 0.36) // Verde 7-8
-      else if (score > 8) c = rgb(0.18, 0.5, 0.92) // Azul 9-10
+      // Track
+      page.drawRectangle({ x: 210, y: by - 12, width: 330, height: 6, color: rgb(0.2, 0.2, 0.2) })
 
-      page.drawRectangle({ x: 200, y: y - 2, width: barW, height: 12, color: c })
-      y -= 30
+      // Fill
+      const barW = (score / 10) * 330
+      page.drawRectangle({
+        x: 210,
+        y: by - 12,
+        width: barW,
+        height: 6,
+        color: getScoreColor(score),
+      })
     }
 
-    drawBar('Atrair (A)', diagnostico.nota_a)
-    drawBar('Sistematizar (S)', diagnostico.nota_s)
-    drawBar('Automatizar (Au)', diagnostico.nota_au)
-    y -= 30
+    drawBar('Amplificar (A)', diagnostico.nota_a || 0, y - 45)
+    drawBar('Sistematizar (S)', diagnostico.nota_s || 0, y - 68)
+    drawBar('Automatizar (Au)', diagnostico.nota_au || 0, y - 91)
 
-    // Cards de Métricas
-    page.drawText('Métricas de Impacto', { x: 50, y, size: 16, font: boldFont })
-    y -= 30
+    y -= 125
 
+    // Metrics Cards
+    checkPageBreak(120)
     const metricas = (diagnostico.metricas_json || {}) as any
-    const drawCard = (x: number, title: string, val: string, desc: string) => {
+
+    const drawMetricCard = (
+      x: number,
+      title: string,
+      val: string,
+      desc: string,
+      iconColor: any,
+    ) => {
       page.drawRectangle({
         x,
-        y: y - 70,
-        width: 150,
-        height: 70,
-        color: rgb(0.97, 0.97, 0.97),
-        borderColor: rgb(0.8, 0.8, 0.8),
+        y: y - 100,
+        width: 161,
+        height: 100,
+        color: cardBg,
+        borderColor: cardBorder,
         borderWidth: 1,
       })
-      page.drawText(title, { x: x + 10, y: y - 20, size: 10, font: boldFont })
-      page.drawText(val, {
-        x: x + 10,
-        y: y - 40,
-        size: 14,
-        font: boldFont,
-        color: rgb(0.1, 0.5, 0.8),
-      })
-      const dLines = wrapText(desc, 130, font, 8)
+      page.drawText(title, { x: x + 15, y: y - 20, size: 10, font: boldFont, color: textGray })
+      page.drawText(val, { x: x + 15, y: y - 45, size: 16, font: boldFont, color: iconColor })
+      const dLines = wrapText(desc, 131, font, 8)
       dLines.forEach((l, i) => {
-        page.drawText(l, { x: x + 10, y: y - 55 - i * 10, size: 8, font })
+        if (i < 4)
+          page.drawText(l, { x: x + 15, y: y - 62 - i * 11, size: 8, font, color: textGray })
       })
     }
 
-    drawCard(
-      50,
+    drawMetricCard(
+      40,
       'Pessoas Impactadas',
       metricas.pessoas_impactadas?.nivel || 'N/A',
       metricas.pessoas_impactadas?.descricao || '',
+      teal,
     )
-    drawCard(
-      220,
+    drawMetricCard(
+      217,
       'Horas Recuperadas',
       metricas.horas_recuperadas?.estimativa || 'N/A',
       metricas.horas_recuperadas?.descricao || '',
+      pink,
     )
-    drawCard(
-      390,
+    drawMetricCard(
+      394,
       'Dependência do Dono',
       `${metricas.dependencia_do_dono?.percentual || 0}%`,
       metricas.dependencia_do_dono?.descricao || '',
+      amber,
     )
-    y -= 110
+
+    y -= 125
 
     // Top 3 Oportunidades
-    page.drawText('Top 3 Oportunidades', { x: 50, y, size: 16, font: boldFont })
+    checkPageBreak(150)
+    page.drawText('Top 3 Oportunidades', { x: 40, y, size: 14, font: boldFont, color: textWhite })
     y -= 25
+
     const top3 = (diagnostico.top_3_oportunidades_json || []) as any[]
     top3.forEach((op, i) => {
-      const text = `${i + 1}. ${op.nome} (Dimensão: ${op.bloco} - Nota: ${op.nota})`
-      const lines = wrapText(text, 490, font, 12)
-      lines.forEach((l) => {
-        checkPageBreak(15)
-        page.drawText(l, { x: 50, y, size: 12, font })
-        y -= 15
+      const text = `${op.nome}`
+      const lines = wrapText(text, 440, font, 10)
+      const cardH = lines.length * 14 + 35
+      checkPageBreak(cardH + 15)
+
+      page.drawRectangle({
+        x: 40,
+        y: y - cardH,
+        width: 515,
+        height: cardH,
+        color: cardBg,
+        borderColor: cardBorder,
+        borderWidth: 1,
       })
-      y -= 10
+
+      // Number badge
+      page.drawRectangle({ x: 55, y: y - 28, width: 22, height: 22, color: rgb(0.05, 0.2, 0.2) })
+      page.drawText(`${i + 1}`, { x: 63, y: y - 21, size: 11, font: boldFont, color: teal })
+
+      lines.forEach((l, li) => {
+        page.drawText(l, { x: 95, y: y - 21 - li * 14, size: 10, font: boldFont, color: textWhite })
+      })
+
+      page.drawText(`Dimensão: ${op.bloco}   |   Nota: ${op.nota}/5`, {
+        x: 95,
+        y: y - cardH + 12,
+        size: 8,
+        font,
+        color: textGray,
+      })
+
+      y -= cardH + 10
     })
 
-    // First Impact
-    checkPageBreak(150)
-    page.drawText('First Impact (Meta para os próximos 90 dias)', {
-      x: 50,
-      y,
-      size: 16,
-      font: boldFont,
-    })
-    y -= 25
+    y -= 10
+
+    // First Impact Card
+    let fiLines: string[] = []
     const fi = (diagnostico.first_impact_json || {}) as any
-
     if (Array.isArray(fi.descricao)) {
       fi.descricao.forEach((item: string) => {
-        const itemLines = wrapText(`• ${item}`, 490, font, 12)
-        itemLines.forEach((l) => {
-          checkPageBreak(15)
-          page.drawText(l, { x: 50, y, size: 12, font })
-          y -= 15
-        })
-        y -= 5
+        fiLines.push(...wrapText(`• ${item}`, 470, font, 11))
       })
     } else {
-      const fiDesc = wrapText(fi.descricao || '', 490, font, 12)
-      fiDesc.forEach((l) => {
-        checkPageBreak(15)
-        page.drawText(l, { x: 50, y, size: 12, font })
-        y -= 15
-      })
+      fiLines = wrapText(fi.descricao || '', 470, font, 11)
     }
-    y -= 15
+
+    const fiHeight = 70 + fiLines.length * 16
+    checkPageBreak(fiHeight + 30)
+
+    // Gradient-like subtle background for First Impact
+    page.drawRectangle({
+      x: 40,
+      y: y - fiHeight,
+      width: 515,
+      height: fiHeight,
+      color: rgb(0.04, 0.12, 0.11),
+      borderColor: rgb(0.1, 0.3, 0.3),
+      borderWidth: 1,
+    })
+    page.drawText('First Impact', { x: 60, y: y - 30, size: 16, font: boldFont, color: textWhite })
+    page.drawText('Meta dos primeiros 90 dias', { x: 60, y: y - 50, size: 12, font, color: teal })
+
+    let fiY = y - 75
+    fiLines.forEach((l) => {
+      page.drawText(l, { x: 60, y: fiY, size: 11, font, color: textWhite })
+      fiY -= 16
+    })
+
+    y -= fiHeight + 30
 
     // Complemento do Plano
     const p1 =
       respostas.find((r: any) => r.tipo_bloco === 'P' && r.numero_pergunta === 1)?.resposta || ''
     const compText = diagnostico.complemento_sucesso || p1
     if (compText) {
-      checkPageBreak(100)
-      page.drawText('Complemento do Plano (Sua Visão):', { x: 50, y, size: 14, font: boldFont })
-      y -= 20
-      const p1Lines = wrapText(compText, 490, font, 10)
-      p1Lines.forEach((l) => {
-        checkPageBreak(20)
-        page.drawText(l, { x: 50, y, size: 10, font, color: rgb(0.2, 0.2, 0.2) })
-        y -= 15
+      const compLines = wrapText(compText, 475, font, 10)
+      const compH = 45 + compLines.length * 14
+      checkPageBreak(compH + 20)
+
+      page.drawRectangle({
+        x: 40,
+        y: y - compH,
+        width: 515,
+        height: compH,
+        color: cardBg,
+        borderColor: cardBorder,
+        borderWidth: 1,
       })
+      page.drawText('Sua Visão de Sucesso:', {
+        x: 60,
+        y: y - 25,
+        size: 12,
+        font: boldFont,
+        color: textWhite,
+      })
+
+      let cY = y - 45
+      compLines.forEach((l) => {
+        page.drawText(l, { x: 60, y: cY, size: 10, font, color: textGray })
+        cY -= 14
+      })
+      y -= compH + 20
     }
 
     // Detalhamento por Sessão
-    checkPageBreak(150)
-    y -= 30
-    page.drawText('Detalhamento por Sessão (Auditoria Técnica)', {
-      x: 50,
-      y,
-      size: 16,
-      font: boldFont,
-      color: rgb(0.1, 0.1, 0.1),
-    })
+    checkPageBreak(100)
+    y -= 10
+    page.drawText('Auditoria Técnica', { x: 40, y, size: 16, font: boldFont, color: textWhite })
     y -= 30
 
     const dict: Record<string, string> = {
@@ -306,9 +438,9 @@ Deno.serve(async (req: Request) => {
       Au4: 'Quanto tempo o time gasta com tarefas operacionais manuais?',
       Au5: 'Como são gerados e acompanhados os KPIs da empresa?',
       Au6: 'Observações adicionais sobre Automatizar',
-      T1: 'Como você avalia a atual dependência do negócio em relação aos donos? (1-10)',
-      T2: 'Quão claro é o principal gargalo atual da empresa? (1-10)',
-      T3: 'O quão bem definida está a visão de futuro da empresa? (1-10)',
+      T1: 'Como você avalia a atual dependência do negócio em relação aos donos?',
+      T2: 'Quão claro é o principal gargalo atual da empresa?',
+      T3: 'O quão bem definida está a visão de futuro da empresa?',
       T4: 'Qual é o principal desafio estratégico para os próximos 90 dias?',
     }
 
@@ -326,21 +458,14 @@ Deno.serve(async (req: Request) => {
     const respostasJson = diagnostico.respostas_json || {}
 
     blockSpecs.forEach((block) => {
-      checkPageBreak(60)
-      page.drawText(block.title, {
-        x: 50,
-        y,
-        size: 14,
-        font: boldFont,
-        color: rgb(0.18, 0.5, 0.92),
-      })
+      checkPageBreak(70)
+      page.drawText(block.title, { x: 40, y, size: 14, font: boldFont, color: teal })
       y -= 25
 
       block.keys.forEach((key) => {
         const qText = dict[key] || `Pergunta ${key}`
         let ans = respostasJson[key]
 
-        // Check in respostas_abertas se ausente ou em branco no json
         if (ans === undefined || ans === null || (typeof ans === 'string' && ans.trim() === '')) {
           const blockTypeMatch = key.replace(/[0-9]/g, '')
           const numMatch = parseInt(key.replace(/\D/g, ''))
@@ -353,30 +478,29 @@ Deno.serve(async (req: Request) => {
         }
 
         if (ans !== undefined && ans !== null && ans !== '') {
-          const qLines = wrapText(`${key}. ${qText}`, 490, boldFont, 10)
-
-          checkPageBreak(qLines.length * 15 + 40)
-
-          qLines.forEach((l) => {
-            page.drawText(l, { x: 50, y, size: 10, font: boldFont, color: rgb(0.2, 0.2, 0.2) })
-            y -= 14
-          })
-
+          const qLines = wrapText(`${key}. ${qText}`, 515, boldFont, 10)
           const isText = typeof ans === 'string'
           const ansText = isText ? ans : `Nota registrada: ${ans}`
+          const aLines = wrapText(ansText, 500, font, 10)
 
-          const aLines = wrapText(ansText, 470, font, 10)
+          const totalH = qLines.length * 15 + aLines.length * 15 + 15
+          checkPageBreak(totalH + 10)
+
+          qLines.forEach((l) => {
+            page.drawText(l, { x: 40, y, size: 10, font: boldFont, color: textWhite })
+            y -= 15
+          })
+
           aLines.forEach((l) => {
-            checkPageBreak(20)
-            page.drawText(l, { x: 65, y, size: 10, font, color: rgb(0.4, 0.4, 0.4) })
-            y -= 14
+            page.drawText(l, { x: 55, y, size: 10, font, color: textGray })
+            y -= 15
           })
 
           y -= 10
         }
       })
 
-      y -= 15
+      y -= 10
     })
 
     const pdfBytes = await pdfDoc.save()
