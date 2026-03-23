@@ -1,23 +1,12 @@
 import { cn } from '@/lib/utils'
+import logoImg from '@/assets/adapta-pass-logo-white-5b4d9.png'
 
-interface LogoProps {
-  className?: string
-}
-
-export function Logo({ className }: LogoProps) {
+export function Logo({ className }: { className?: string }) {
   return (
-    <div
-      className={cn(
-        'font-semibold tracking-[0.15em] flex items-center justify-center gap-3.5 select-none',
-        className,
-      )}
-    >
-      <span className="text-white">
-        ADAPT<span className="font-sans">Δ</span>
-      </span>
-      <span className="bg-gradient-to-r from-[#4bb7a5] via-[#957588] to-[#f45961] bg-clip-text text-transparent">
-        PASS
-      </span>
-    </div>
+    <img
+      src={logoImg}
+      alt="Adapta Pass"
+      className={cn('h-7 sm:h-9 w-auto object-contain', className)}
+    />
   )
 }
