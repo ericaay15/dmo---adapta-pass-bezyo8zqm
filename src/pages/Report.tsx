@@ -61,7 +61,10 @@ function getClassificacaoLabel(nota: number): string {
 }
 
 const SectionResponses = ({ title, prefix, data }: any) => {
-  const sectionKeys = Object.keys(questionsMap).filter((k) => k.startsWith(prefix))
+  const sectionKeys = Object.keys(questionsMap).filter((k) => {
+    if (prefix === 'A') return k.startsWith('A') && !k.startsWith('Au')
+    return k.startsWith(prefix)
+  })
 
   return (
     <div className="mb-8">
@@ -79,10 +82,13 @@ const SectionResponses = ({ title, prefix, data }: any) => {
                 (a.tipo_bloco === prefix && a.numero_pergunta === parseInt(k.replace(/\D/g, ''))) ||
                 (a.tipo_bloco === 'T' && k === 'T4' && a.numero_pergunta === 4),
             )
-            resposta = aberta ? aberta.resposta : 'Não respondido'
+            resposta = aberta?.resposta || resposta || 'Não respondido'
           }
 
-          if (resposta === undefined || resposta === null) return null
+          if (resposta === undefined || resposta === null || resposta === '') {
+            if (!isAberta) return null
+            resposta = 'Não respondido'
+          }
 
           return (
             <div
@@ -383,7 +389,7 @@ export default function Report() {
         <SectionResponses title="Amplificar" prefix="A" data={data} />
         <SectionResponses title="Sistematizar" prefix="S" data={data} />
         <SectionResponses title="Automatizar" prefix="Au" data={data} />
-        <SectionResponses title="Plano Estratégico" prefix="T" data={data} />
+        <SectionResponses title="Plano Estratégico (90 Dias)" prefix="T" data={data} />
 
         <div className="mt-16 pt-8 border-t border-[#262626] text-center text-slate-500 text-xs">
           <p>

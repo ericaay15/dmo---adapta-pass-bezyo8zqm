@@ -124,7 +124,11 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
   const historyHtml = ['A', 'S', 'Au', 'T']
     .map((prefix) => {
-      const sectionKeys = Object.keys(questionsMap).filter((k) => k.startsWith(prefix))
+      const sectionKeys = Object.keys(questionsMap).filter((k) => {
+        if (prefix === 'A') return k.startsWith('A') && !k.startsWith('Au')
+        return k.startsWith(prefix)
+      })
+
       let sectionTitle =
         prefix === 'A'
           ? 'Amplificar'
@@ -145,10 +149,13 @@ function generatePdfHtml(diag: any, logoUrl: string) {
                 (a.tipo_bloco === prefix && a.numero_pergunta === parseInt(k.replace(/\D/g, ''))) ||
                 (a.tipo_bloco === 'T' && k === 'T4' && a.numero_pergunta === 4),
             )
-            resposta = aberta ? aberta.resposta : 'Não respondido'
+            resposta = aberta?.resposta || resposta || 'Não respondido'
           }
 
-          if (resposta === undefined || resposta === null) return ''
+          if (resposta === undefined || resposta === null || resposta === '') {
+            if (!isAberta) return ''
+            resposta = 'Não respondido'
+          }
 
           let maxScore = k.startsWith('T') && k !== 'T4' ? 10 : 5
           let scoreHtml = ''

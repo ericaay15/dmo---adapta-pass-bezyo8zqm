@@ -2,7 +2,7 @@
   "_versions": {
     "calcular_scoring": 13,
     "exportar_para_sheets": 14,
-    "gerar_documento_pdf": 23,
+    "gerar_documento_pdf": 24,
     "sync-diagnosticos-to-sheets": 1
   }
 }
