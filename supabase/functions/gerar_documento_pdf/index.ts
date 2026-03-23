@@ -5,6 +5,34 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
+const questionsMap: Record<string, string> = {
+  A1: 'Qual a proporção do seu time que já utiliza ferramentas de IA de forma independente?',
+  A2: 'Como a empresa utiliza os dados para tomar decisões de negócio?',
+  A3: 'Qual o nível de envolvimento da liderança com a adoção de novas tecnologias?',
+  A4: 'A empresa possui programas de treinamento contínuo para a equipe?',
+  A5: 'Como a empresa mede o sucesso de suas iniciativas de inovação e automação?',
+  A6: 'Descreva brevemente a principal iniciativa ou processo que você gostaria de melhorar (Bloco A).',
+
+  S1: 'Como os processos principais da empresa são documentados?',
+  S2: 'Como ocorre o processo de integração (onboarding) de um novo colaborador?',
+  S3: 'Qual o nível de dependência da empresa em relação a pessoas-chave (incluindo o dono)?',
+  S4: 'Onde a maior parte das informações operacionais da empresa é armazenada?',
+  S5: 'Como a empresa constrói e atualiza sua base de conhecimento interna?',
+  S6: 'Existe alguma ferramenta que você considera essencial para o funcionamento do seu negócio? Qual?',
+
+  Au1: 'Quanto do trabalho diário da equipe é composto por tarefas manuais e repetitivas?',
+  Au2: 'Como a empresa lida com fluxos constantes de trabalho (ex: follow-ups, emissões)?',
+  Au3: 'Há um mapeamento claro dos processos antes de tentar automatizá-los?',
+  Au4: 'Qual o foco principal da sua empresa ao tentar automatizar processos?',
+  Au5: 'Como é feito o acompanhamento de metas e KPIs na empresa?',
+  Au6: 'Se você pudesse automatizar uma única tarefa hoje, qual seria e por quê?',
+
+  T1: 'Nível de sobrecarga da equipe e impacto em produtividade',
+  T2: 'Quantidade de horas semanais dedicadas a tarefas estritamente operacionais ou "apagar incêndios"',
+  T3: 'Nível de urgência para implementar melhorias e ver resultados no curto prazo',
+  T4: 'Qual é o principal desafio estratégico que você espera resolver nos próximos 90 dias?',
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -12,80 +40,32 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json()
-    let diagnosis = body.diagnosis
+    let diagId = body.diagnostico_id
 
-    // Fallback logo in case no URL is passed - Dark text for light background
+    // Logo Adapta Pass Dark Mode Format (White text, green icon)
     const defaultLogo =
-      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMjUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMCA0MEw0MCAxMEw2MCA0MEgyMFoiIGZpbGw9IiMwZDk0ODgiLz48dGV4dCB4PSI3NSIgeT0iMzgiIGZpbGw9IiMwZjE3MmEiIGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFkYXB0YSBQYXNzPC90ZXh0Pjwvc3ZnPg=='
+      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMjUwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMCA0MEw0MCAxMEw2MCA0MEgyMFoiIGZpbGw9IiMyZGQ0YmYiLz48dGV4dCB4PSI3NSIgeT0iMzgiIGZpbGw9IiNmOGZhZmMiIGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFkYXB0YSBQYXNzPC90ZXh0Pjwvc3ZnPg=='
     const logoUrl = body.logoUrl || defaultLogo
 
-    let diagId = body.diagnostico_id
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Fetch complete data if diagnostico_id is provided
-    if (!diagnosis && diagId) {
-      const { data: diag, error } = await supabase
-        .from('diagnosticos')
-        .select('*, empresas(*)')
-        .eq('id', diagId)
-        .single()
-
-      if (error || !diag) {
-        throw new Error(`Diagnóstico não encontrado: ${error?.message || ''}`)
-      }
-
-      diagnosis = {
-        company_name: diag.empresas?.nome || 'Sua Empresa',
-        action_plan: {
-          executive_summary:
-            diag.complemento_sucesso ||
-            'Plano de implementação de IA focado em resultados rápidos e escaláveis.',
-          phases: [] as any[],
-        },
-        responses: {} as Record<string, any>,
-      }
-
-      if (diag.first_impact_json) {
-        const fi = diag.first_impact_json as any
-        diagnosis.action_plan.phases.push({
-          title: fi.acao || 'Primeiros 90 Dias',
-          details: Array.isArray(fi.descricao)
-            ? fi.descricao.map((item: string) => `• ${item}`).join('\n')
-            : fi.descricao || '',
-        })
-      }
-
-      if (diag.top_3_oportunidades_json) {
-        const ops = diag.top_3_oportunidades_json as any[]
-        if (Array.isArray(ops)) {
-          diagnosis.action_plan.phases.push({
-            title: 'Top 3 Oportunidades',
-            details: ops
-              .map((op: any, i: number) => `${i + 1}. ${op.nome} (${op.bloco})`)
-              .join('\n\n'),
-          })
-        }
-      }
-
-      if (diag.metricas_json) {
-        const m = diag.metricas_json as any
-        diagnosis.responses['Métricas Chave'] =
-          `Pessoas Impactadas: ${m.pessoas_impactadas?.nivel || '-'}\nHoras Recuperadas: ${m.horas_recuperadas?.estimativa || '-'}\nDependência do Dono: ${m.dependencia_do_dono?.percentual || '0'}%`
-      }
-
-      diagnosis.responses['Classificação de Maturidade'] =
-        `Amplificar: ${diag.classificacao_a || '-'}\nSistematizar: ${diag.classificacao_s || '-'}\nAutomatizar: ${diag.classificacao_au || '-'}`
-      diagnosis.responses['Nota Geral'] = diag.nota_geral || '-'
+    if (!diagId) {
+      throw new Error('diagnostico_id is required')
     }
 
-    if (!diagnosis) {
-      throw new Error('Diagnosis data or diagnostico_id is required')
+    const { data: diag, error } = await supabase
+      .from('diagnosticos')
+      .select('*, empresas(*), respostas_abertas(*)')
+      .eq('id', diagId)
+      .single()
+
+    if (error || !diag) {
+      throw new Error(`Diagnóstico não encontrado: ${error?.message || ''}`)
     }
 
-    const html = generatePdfHtml(diagnosis, logoUrl)
+    const html = generatePdfHtml(diag, logoUrl)
 
-    // Save HTML as a document to Storage for robust printing and viewing
-    const fileName = `plano-de-sucesso-${diagId || crypto.randomUUID()}.html`
+    const fileName = `plano-de-sucesso-${diagId}.html`
 
     const { error: uploadError } = await supabase.storage
       .from('documentos')
@@ -102,10 +82,7 @@ Deno.serve(async (req: Request) => {
 
     const publicUrl = publicUrlData.publicUrl
 
-    if (diagId) {
-      // Sync URL in database
-      await supabase.from('diagnosticos').update({ pdf_url: publicUrl }).eq('id', diagId)
-    }
+    await supabase.from('diagnosticos').update({ pdf_url: publicUrl }).eq('id', diagId)
 
     return new Response(JSON.stringify({ url: publicUrl }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -118,294 +95,446 @@ Deno.serve(async (req: Request) => {
   }
 })
 
-function generatePdfHtml(diagnosis: any, logoUrl: string) {
-  const plan = diagnosis.action_plan || {}
-  const responses = diagnosis.responses || {}
-  const companyName = diagnosis.company_name || 'Sua Empresa'
+function getClassificacaoLabel(nota: number): string {
+  if (nota < 4) return 'Inicial'
+  if (nota < 7) return 'Em progresso'
+  if (nota < 9) return 'Avançado'
+  return 'Excelente'
+}
+
+function generatePdfHtml(diag: any, logoUrl: string) {
+  const empresa = diag.empresas || {}
+  const metricas = diag.metricas_json || {}
+  const firstImpact = diag.first_impact_json || {}
+  const top3 = diag.top_3_oportunidades_json || []
+
+  const getScoreColor = (val: number, max: number) => {
+    const r = val / max
+    if (r < 0.4) return '#ef4444'
+    if (r < 0.7) return '#f59e0b'
+    return '#2dd4bf'
+  }
+
+  const getMetricaColor = (nivel: string = '') => {
+    const n = nivel.toLowerCase()
+    if (n.includes('crític') || n.includes('critica') || n.includes('critico')) return '#ec4899'
+    if (n.includes('moderad')) return '#f59e0b'
+    return '#2dd4bf'
+  }
+
+  const historyHtml = ['A', 'S', 'Au', 'T']
+    .map((prefix) => {
+      const sectionKeys = Object.keys(questionsMap).filter((k) => k.startsWith(prefix))
+      let sectionTitle =
+        prefix === 'A'
+          ? 'Amplificar'
+          : prefix === 'S'
+            ? 'Sistematizar'
+            : prefix === 'Au'
+              ? 'Automatizar'
+              : 'Plano Estratégico (90 Dias)'
+
+      let itemsHtml = sectionKeys
+        .map((k) => {
+          let resposta = diag.respostas_json?.[k]
+          const isAberta = k.endsWith('6') || k === 'T4'
+
+          if (isAberta) {
+            const aberta = diag.respostas_abertas?.find(
+              (a: any) =>
+                (a.tipo_bloco === prefix && a.numero_pergunta === parseInt(k.replace(/\D/g, ''))) ||
+                (a.tipo_bloco === 'T' && k === 'T4' && a.numero_pergunta === 4),
+            )
+            resposta = aberta ? aberta.resposta : 'Não respondido'
+          }
+
+          if (resposta === undefined || resposta === null) return ''
+
+          return `
+        <div class="history-item">
+          <div class="history-q">${questionsMap[k]}</div>
+          <div class="history-a">${
+            isAberta
+              ? String(resposta).replace(/\n/g, '<br/>')
+              : `<strong>${resposta}</strong> <span style="color: #64748b">/ ${k.startsWith('T') && k !== 'T4' ? 10 : 5}</span>`
+          }</div>
+        </div>
+      `
+        })
+        .join('')
+
+      return itemsHtml
+        ? `
+      <div style="margin-bottom: 32px;">
+        <h3 class="history-section-title">${sectionTitle}</h3>
+        ${itemsHtml}
+      </div>
+    `
+        : ''
+    })
+    .join('')
 
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Plano de Sucesso - ${companyName}</title>
+  <title>Plano de Sucesso e Diagnóstico de IA</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
     
     :root {
-      --bg-main: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --card-bg: #f8fafc;
-      --card-border: #e2e8f0;
-      --primary: #0d9488;
-      --primary-light: #ccfbf1;
+      --bg-main: #0a0a0a;
+      --card-bg: #171717;
+      --card-border: #262626;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #2dd4bf;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg-main);
-      color: var(--text-main);
-      line-height: 1.6;
+      background-color: var(--bg-main) !important;
+      color: var(--text-main) !important;
+      line-height: 1.5;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
-      min-height: 100vh;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
       padding: 40px;
-      width: 100%;
-      overflow: hidden;
     }
 
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-      padding-bottom: 24px;
-      border-bottom: 2px solid var(--card-border);
+    @page {
+      margin: 0;
+      size: A4;
+    }
+    
+    @media print {
+      body {
+        background-color: #0a0a0a !important;
+        color: #f8fafc !important;
+        padding: 40px;
+      }
+      .card, .metrica-card, .history-item {
+        background-color: #171717 !important;
+        border-color: #262626 !important;
+      }
+      .text-muted { color: #94a3b8 !important; }
+      .text-main { color: #f8fafc !important; }
     }
 
-    .logo {
-      max-width: 240px;
-      max-height: 80px;
-      width: auto;
-      height: auto;
-      margin: 0 auto 20px auto;
-      display: block;
-      object-fit: contain;
-    }
+    .container { max-width: 900px; margin: 0 auto; }
 
-    .title {
-      font-size: 32px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: var(--text-main);
-      letter-spacing: -0.02em;
-    }
-
-    .subtitle {
-      font-size: 18px;
-      color: var(--text-muted);
-    }
-
-    .section {
-      margin-bottom: 40px;
-      width: 100%;
-    }
-
-    .section-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      color: var(--primary);
-      display: inline-block;
-      border-bottom: 3px solid var(--primary);
-      padding-bottom: 8px;
-    }
+    .header { text-align: center; margin-bottom: 40px; }
+    .logo { max-height: 50px; margin-bottom: 24px; object-fit: contain; }
+    .title { font-size: 32px; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; }
 
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-left: 4px solid var(--primary);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 24px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       page-break-inside: avoid;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-      width: 100%;
-      overflow: hidden;
     }
-
     .card-title {
       font-size: 18px;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
       color: var(--text-main);
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
     }
 
-    .card-content {
-      font-size: 15px;
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .data-item { font-size: 14px; font-weight: 600; color: var(--text-main); }
+    .data-item span { color: var(--text-muted); margin-right: 8px; font-weight: 400; }
+
+    .grid-scores {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .score-geral { text-align: left; display: flex; flex-direction: column; justify-content: center; }
+    .score-geral .val {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 8px;
       color: var(--text-main);
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      word-break: break-word;
-      max-width: 100%;
-      line-height: 1.7;
+    }
+    .score-geral .classificacao {
+      font-size: 18px;
+      font-weight: 700;
     }
 
-    .response-grid {
+    .progress-item { margin-bottom: 20px; }
+    .progress-item:last-child { margin-bottom: 0; }
+    .progress-header {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 100%;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #e2e8f0;
     }
-
-    .response-item {
-      background: var(--bg-main);
-      border: 1px solid var(--card-border);
-      padding: 20px;
-      border-radius: 8px;
-      page-break-inside: avoid;
-      width: 100%;
+    .progress-bar-bg {
+      background: #262626;
+      height: 10px;
+      border-radius: 5px;
       overflow: hidden;
     }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+    }
 
-    .response-q {
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .metrica-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      page-break-inside: avoid;
+    }
+    .metrica-title {
       font-size: 14px;
-      color: var(--primary);
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .metrica-val {
+      font-size: 24px;
+      font-weight: 900;
       margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .metrica-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 48px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+      page-break-after: avoid;
+    }
+    
+    .history-section-title {
+      font-size: 14px;
       font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
-    .response-a {
+    .history-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      page-break-inside: avoid;
+    }
+    .history-q {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .history-a {
+      font-size: 14px;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+    .history-a strong {
+      color: var(--primary);
       font-size: 16px;
-      font-weight: 500;
-      color: var(--text-main);
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      word-break: break-word;
-      white-space: pre-wrap;
     }
 
+    .list-item {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #e2e8f0;
+      padding-left: 20px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .list-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-size: 18px;
+      line-height: 1;
+      top: -2px;
+    }
+    
     .footer {
       text-align: center;
       margin-top: 60px;
       padding-top: 24px;
       border-top: 1px solid var(--card-border);
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-muted);
       page-break-inside: avoid;
-    }
-
-    @media print {
-      body {
-        background: #ffffff !important;
-        color: #000000 !important;
-      }
-      .title, .card-title, .response-a, .subtitle {
-        color: #000000 !important;
-      }
-      .card {
-        background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        border-left: 4px solid var(--primary) !important;
-        box-shadow: none !important;
-      }
-      .response-item {
-        background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-      }
-      .container {
-        padding: 0;
-        width: 100%;
-        max-width: 100%;
-      }
-      @page {
-        margin: 1.5cm;
-      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      ${logoUrl ? `<img src="${logoUrl}" alt="Adapta" class="logo" />` : `<h1 class="title" style="color: var(--primary)">Adapta Pass</h1>`}
-      <h1 class="title">Plano de Sucesso</h1>
-      <p class="subtitle">Preparado exclusivamente para <strong style="color: var(--text-main)">${companyName}</strong></p>
+      ${logoUrl ? `<img src="${logoUrl}" alt="Adapta Pass" class="logo" />` : ''}
+      <h1 class="title">Plano de Sucesso e Diagnóstico de IA</h1>
     </div>
 
-    ${
-      plan.executive_summary
-        ? `
-    <div class="section">
-      <h2 class="section-title">Resumo Executivo</h2>
-      <div class="card">
-        <div class="card-content">${plan.executive_summary}</div>
+    <div class="card">
+      <h2 class="card-title">Dados da Empresa</h2>
+      <div class="grid-2">
+        <div class="data-item"><span>Empresa:</span> ${empresa.nome || '-'}</div>
+        <div class="data-item"><span>CNPJ:</span> ${empresa.cnpj || '-'}</div>
+        <div class="data-item"><span>Responsável:</span> ${empresa.responsavel_nome || '-'}</div>
+        <div class="data-item"><span>E-mail:</span> ${empresa.responsavel_email || '-'}</div>
       </div>
     </div>
-    `
-        : ''
-    }
 
-    ${
-      plan.phases && plan.phases.length > 0
-        ? `
-    <div class="section">
-      <h2 class="section-title">Ações e Oportunidades</h2>
-      ${plan.phases
-        .map(
-          (phase: any, index: number) => `
-        <div class="card">
-          <h3 class="card-title">${phase.title || phase.name || `Fase ${index + 1}`}</h3>
-          <div class="card-content">${phase.details || phase.description || ''}</div>
+    <div class="grid-scores">
+      <div class="card score-geral" style="margin-bottom: 0; border: none; background: #171717; border: 1px solid #262626;">
+        <div style="margin-bottom: 8px; color: var(--text-muted); font-size: 14px; font-weight: 600;">Nota Geral</div>
+        <div class="val">${diag.nota_geral || '0.0'}</div>
+        <div class="classificacao" style="color: ${getScoreColor(diag.nota_geral || 0, 10)}">
+          ${getClassificacaoLabel(diag.nota_geral || 0)}
         </div>
-      `,
-        )
-        .join('')}
+      </div>
+
+      <div class="card" style="margin-bottom: 0;">
+        <div style="margin-bottom: 24px; color: var(--text-muted); font-size: 14px; font-weight: 600;">Maturidade por Dimensão</div>
+        
+        <div class="progress-item">
+          <div class="progress-header">
+            <span>Amplificar (A)</span>
+            <span style="color: ${getScoreColor(diag.nota_a || 0, 10)}">${diag.nota_a || 0}/10</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width: ${((diag.nota_a || 0) / 10) * 100}%; background-color: ${getScoreColor(diag.nota_a || 0, 10)}"></div>
+          </div>
+        </div>
+
+        <div class="progress-item">
+          <div class="progress-header">
+            <span>Sistematizar (S)</span>
+            <span style="color: ${getScoreColor(diag.nota_s || 0, 10)}">${diag.nota_s || 0}/10</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width: ${((diag.nota_s || 0) / 10) * 100}%; background-color: ${getScoreColor(diag.nota_s || 0, 10)}"></div>
+          </div>
+        </div>
+
+        <div class="progress-item">
+          <div class="progress-header">
+            <span>Automatizar (Au)</span>
+            <span style="color: ${getScoreColor(diag.nota_au || 0, 10)}">${diag.nota_au || 0}/10</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width: ${((diag.nota_au || 0) / 10) * 100}%; background-color: ${getScoreColor(diag.nota_au || 0, 10)}"></div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div class="grid-3">
+      <div class="metrica-card">
+        <div class="metrica-title">Pessoas Impactadas</div>
+        <div class="metrica-val" style="color: ${getMetricaColor(metricas?.pessoas_impactadas?.nivel)}">${metricas?.pessoas_impactadas?.nivel || '-'}</div>
+        <div class="metrica-desc">${metricas?.pessoas_impactadas?.descricao || ''}</div>
+      </div>
+
+      <div class="metrica-card">
+        <div class="metrica-title">Horas Recuperadas</div>
+        <div class="metrica-val" style="color: #ec4899">${metricas?.horas_recuperadas?.estimativa || '-'}</div>
+        <div class="metrica-desc">${metricas?.horas_recuperadas?.descricao || ''}</div>
+      </div>
+
+      <div class="metrica-card">
+        <div class="metrica-title">Dependência do Dono</div>
+        <div class="metrica-val" style="color: #f59e0b">${metricas?.dependencia_do_dono?.percentual || '0'}%</div>
+        <div class="metrica-desc">${metricas?.dependencia_do_dono?.descricao || ''}</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Plano de Sucesso</h2>
+    
+    ${
+      diag.complemento_sucesso
+        ? `
+      <div class="card">
+        <h3 class="card-title" style="border: none; margin-bottom: 16px;">Resumo Executivo</h3>
+        <div style="font-size: 14px; color: #e2e8f0; line-height: 1.6; white-space: pre-wrap;">${diag.complemento_sucesso}</div>
+      </div>
     `
         : ''
     }
 
-    <div class="section">
-      <h2 class="section-title">Resultados do Diagnóstico</h2>
-      <div class="response-grid">
-        ${Object.entries(responses)
-          .map(
-            ([key, value]) => `
-          <div class="response-item">
-            <div class="response-q">${formatQuestionKey(key)}</div>
-            <div class="response-a">${
-              typeof value === 'object' && value !== null
-                ? Object.entries(value)
-                    .map(([k, v]) => `- ${formatQuestionKey(k)}: ${v}`)
-                    .join('\\n')
-                : value
-            }</div>
-          </div>
-        `,
-          )
-          .join('')}
+    ${
+      firstImpact.acao
+        ? `
+      <div class="card">
+        <h3 class="card-title" style="border: none; margin-bottom: 16px;">${firstImpact.acao}</h3>
+        <div>
+          ${(Array.isArray(firstImpact.descricao) ? firstImpact.descricao : [firstImpact.descricao])
+            .map(
+              (d: string) => `
+            <div class="list-item">${d}</div>
+          `,
+            )
+            .join('')}
+        </div>
       </div>
-    </div>
+    `
+        : ''
+    }
+
+    ${
+      top3.length > 0
+        ? `
+      <div class="card">
+        <h3 class="card-title" style="border: none; margin-bottom: 16px;">Top 3 Oportunidades</h3>
+        <div>
+          ${top3
+            .map(
+              (op: any) => `
+            <div class="list-item"><strong>${op.nome}</strong> <span style="font-size: 11px; color: var(--primary); text-transform: uppercase; margin-left: 8px; font-weight: 700;">(${op.bloco})</span></div>
+          `,
+            )
+            .join('')}
+        </div>
+      </div>
+    `
+        : ''
+    }
+
+    <h2 class="section-title">Histórico de Respostas</h2>
+    ${historyHtml}
 
     <div class="footer">
-      <p>Este documento é confidencial e foi gerado pelo Adapta Pass para uso exclusivo de ${companyName}.</p>
+      <p>Este documento é confidencial e foi gerado pelo Adapta Pass para uso exclusivo de <strong>${empresa.nome || 'sua empresa'}</strong>.</p>
       <p>© ${new Date().getFullYear()} Adapta. Todos os direitos reservados.</p>
     </div>
   </div>
-
-  <script>
-    window.onload = function() {
-      // Auto trigger print dialog on load for seamless PDF generation experience
-      setTimeout(function() {
-        window.print();
-      }, 500);
-    };
-  </script>
 </body>
 </html>
   `
-}
-
-function formatQuestionKey(key: string): string {
-  if (!key) return ''
-  const words = key
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/_/g, ' ')
-    .trim()
-  return words.charAt(0).toUpperCase() + words.slice(1)
 }

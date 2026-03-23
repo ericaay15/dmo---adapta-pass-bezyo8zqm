@@ -33,30 +33,53 @@ const questionsMap: Record<string, string> = {
   T4: 'Qual é o principal desafio estratégico que você espera resolver nos próximos 90 dias?',
 }
 
-const SectionResponses = ({ title, prefix, json, questions, abertas }: any) => {
-  const sectionKeys = Object.keys(questions).filter((k) => k.startsWith(prefix))
+const getScoreColor = (val: number, max: number) => {
+  const r = val / max
+  if (r < 0.4) return '#ef4444' // red-500
+  if (r < 0.7) return '#f59e0b' // amber-500
+  return '#2dd4bf' // teal-400
+}
+
+const getClassificationColor = (val: number) => {
+  if (val < 4) return '#ef4444'
+  if (val < 7) return '#f59e0b'
+  return '#2dd4bf'
+}
+
+const getMetricaColor = (nivel: string = '') => {
+  const n = nivel.toLowerCase()
+  if (n.includes('crític') || n.includes('critica') || n.includes('critico')) return '#ec4899' // pink
+  if (n.includes('moderad')) return '#f59e0b' // orange
+  return '#2dd4bf' // teal
+}
+
+function getClassificacaoLabel(nota: number): string {
+  if (nota < 4) return 'Inicial'
+  if (nota < 7) return 'Em progresso'
+  if (nota < 9) return 'Avançado'
+  return 'Excelente'
+}
+
+const SectionResponses = ({ title, prefix, data }: any) => {
+  const sectionKeys = Object.keys(questionsMap).filter((k) => k.startsWith(prefix))
 
   return (
-    <div className="mb-8 break-inside-avoid">
-      <h3 className="text-xl font-bold text-teal-700 mb-4 border-b-2 border-slate-100 pb-2 flex items-center">
-        <span className="w-8 h-8 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center text-sm mr-3">
-          {prefix}
-        </span>
+    <div className="mb-8">
+      <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-widest text-sm">
         {title}
       </h3>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {sectionKeys.map((k) => {
-          let resposta = json?.[k]
-          const max = k.startsWith('T') && k !== 'T4' ? 10 : 5
+          let resposta = data.respostas_json?.[k]
           const isAberta = k.endsWith('6') || k === 'T4'
 
           if (isAberta) {
-            const abertaData = abertas?.find(
+            const aberta = data.respostas_abertas?.find(
               (a: any) =>
                 (a.tipo_bloco === prefix && a.numero_pergunta === parseInt(k.replace(/\D/g, ''))) ||
                 (a.tipo_bloco === 'T' && k === 'T4' && a.numero_pergunta === 4),
             )
-            resposta = abertaData ? abertaData.resposta : 'Não respondido'
+            resposta = aberta ? aberta.resposta : 'Não respondido'
           }
 
           if (resposta === undefined || resposta === null) return null
@@ -64,24 +87,19 @@ const SectionResponses = ({ title, prefix, json, questions, abertas }: any) => {
           return (
             <div
               key={k}
-              className="bg-slate-50 border border-slate-100 p-4 rounded-xl text-sm break-inside-avoid"
+              className="bg-[#171717] border border-[#262626] p-5 rounded-xl print-exact break-inside-avoid"
             >
-              <div className="font-bold text-slate-700 mb-2">{questions[k]}</div>
-              <div className="text-slate-600 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+              <div className="text-sm font-semibold text-slate-400 mb-2">{questionsMap[k]}</div>
+              <div className="text-sm text-slate-200">
                 {isAberta ? (
-                  <span className="whitespace-pre-wrap">{resposta}</span>
+                  <span className="whitespace-pre-wrap leading-relaxed">{resposta}</span>
                 ) : (
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden print:border print:border-slate-300">
-                      <div
-                        className="h-full bg-teal-500 rounded-full print:bg-teal-600"
-                        style={{ width: `${(Number(resposta) / max) * 100}%` }}
-                      />
-                    </div>
-                    <span className="font-bold text-teal-700">
-                      {resposta} <span className="text-slate-400 font-normal">/ {max}</span>
+                  <span>
+                    <strong className="text-[#2dd4bf] text-base">{resposta}</strong>{' '}
+                    <span className="text-slate-500">
+                      / {k.startsWith('T') && k !== 'T4' ? 10 : 5}
                     </span>
-                  </div>
+                  </span>
                 )}
               </div>
             </div>
@@ -116,253 +134,233 @@ export default function Report() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <Loader2 className="w-10 h-10 animate-spin text-teal-600" />
+      <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a]">
+        <Loader2 className="w-10 h-10 animate-spin text-[#2dd4bf]" />
       </div>
     )
   }
 
   if (!data) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 text-center">
-        <h2 className="text-2xl font-bold text-slate-800">Relatório não encontrado.</h2>
-        <p className="text-slate-500 mt-2">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#0a0a0a] p-6 text-center">
+        <h2 className="text-2xl font-bold text-white">Relatório não encontrado.</h2>
+        <p className="text-slate-400 mt-2">
           O link pode estar incorreto ou o relatório foi removido.
         </p>
       </div>
     )
   }
 
+  const metricas = data.metricas_json || {}
+  const top3 = data.top_3_oportunidades_json || []
+  const firstImpact = data.first_impact_json || {}
+
   return (
-    <div className="min-h-screen bg-slate-100 py-10 print:py-0 print:bg-white font-sans text-slate-900">
-      <div className="max-w-[210mm] mx-auto bg-white shadow-2xl print:shadow-none p-10 sm:p-16 print:p-0">
-        {/* Floating Print Button */}
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-50 py-10 print:py-0 print:bg-[#0a0a0a] font-sans">
+      <style>
+        {`
+          @media print {
+            body {
+              background-color: #0a0a0a !important;
+              color: #f8fafc !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .print-exact {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+          }
+        `}
+      </style>
+
+      <div className="max-w-[900px] mx-auto bg-[#0a0a0a] p-8 sm:p-12 print:p-8">
         <div className="fixed top-6 right-6 print:hidden z-50">
           <Button
             onClick={() => window.print()}
-            className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg rounded-full px-6 h-12 flex items-center gap-2"
+            className="bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold shadow-lg rounded-full px-6 h-12 flex items-center gap-2"
           >
             <Printer className="w-5 h-5" />
-            Imprimir / Salvar PDF
+            Salvar PDF
           </Button>
         </div>
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-4 border-teal-600 pb-8 mb-10 gap-6">
-          <div>
-            <div className="text-sm font-bold tracking-widest text-teal-600 uppercase mb-2">
-              Adapta Pass
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-              Plano de Sucesso <br /> e Diagnóstico de IA
-            </h1>
-          </div>
-          <div className="bg-slate-900 p-4 rounded-xl print:bg-slate-900 print:print-color-adjust-exact">
-            <img src={logoImg} alt="Adapta" className="h-8 object-contain" />
-          </div>
+        <div className="text-center mb-12 flex flex-col items-center">
+          <img src={logoImg} alt="Adapta Pass" className="h-12 object-contain mb-6" />
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Plano de Sucesso e Diagnóstico de IA
+          </h1>
         </div>
 
-        {/* Company Data */}
-        <div className="bg-slate-50 rounded-2xl p-6 mb-10 border border-slate-100 print:border-slate-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
-            <div>
-              <span className="block text-slate-500 mb-1 text-xs uppercase font-bold tracking-wider">
-                Empresa
-              </span>
-              <strong className="text-slate-900 text-base">
-                {data.empresas?.nome || 'Não informado'}
-              </strong>
-            </div>
-            <div>
-              <span className="block text-slate-500 mb-1 text-xs uppercase font-bold tracking-wider">
-                CNPJ
-              </span>
-              <strong className="text-slate-900 text-base">
-                {data.empresas?.cnpj || 'Não informado'}
-              </strong>
-            </div>
-            <div>
-              <span className="block text-slate-500 mb-1 text-xs uppercase font-bold tracking-wider">
-                Responsável
-              </span>
-              <strong className="text-slate-900 text-base">
-                {data.empresas?.responsavel_nome || 'Não informado'}
-              </strong>
-            </div>
-            <div className="sm:col-span-2 lg:col-span-1">
-              <span className="block text-slate-500 mb-1 text-xs uppercase font-bold tracking-wider">
-                Email
-              </span>
-              <strong className="text-slate-900 text-base break-all">
-                {data.empresas?.responsavel_email || 'Não informado'}
-              </strong>
-            </div>
-            <div>
-              <span className="block text-slate-500 mb-1 text-xs uppercase font-bold tracking-wider">
-                Data do Diagnóstico
-              </span>
-              <strong className="text-slate-900 text-base">
-                {new Date(data.data_preenchimento).toLocaleDateString('pt-BR')}
-              </strong>
-            </div>
-          </div>
-        </div>
-
-        {/* Scores */}
-        <div className="flex flex-col lg:flex-row gap-6 mb-12">
-          <div className="bg-teal-50 border-2 border-teal-100 p-8 rounded-3xl flex-1 text-center flex flex-col justify-center print:border-teal-200">
-            <div className="text-teal-800 font-bold mb-3 uppercase tracking-widest text-sm">
-              Maturidade Geral
-            </div>
-            <div className="text-7xl font-black text-teal-600 mb-2">{data.nota_geral}</div>
-            <div className="inline-flex items-center justify-center bg-teal-100 text-teal-800 px-4 py-1.5 rounded-full text-sm font-bold mx-auto print:border print:border-teal-200">
-              de 10 pontos
-            </div>
-          </div>
-
-          <div className="flex-[2] grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col items-center justify-center shadow-sm print:border-slate-200">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-teal-600 font-bold mb-3 shadow-sm print:border print:border-slate-200">
-                A
-              </div>
-              <div className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-2">
-                Amplificar
-              </div>
-              <div className="text-3xl font-black text-slate-800 mb-2">{data.nota_a}</div>
-              <div className="text-xs font-medium bg-slate-200 text-slate-700 px-3 py-1 rounded-full print:border print:border-slate-300">
-                {data.classificacao_a || '-'}
-              </div>
-            </div>
-            <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col items-center justify-center shadow-sm print:border-slate-200">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-teal-600 font-bold mb-3 shadow-sm print:border print:border-slate-200">
-                S
-              </div>
-              <div className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-2">
-                Sistematizar
-              </div>
-              <div className="text-3xl font-black text-slate-800 mb-2">{data.nota_s}</div>
-              <div className="text-xs font-medium bg-slate-200 text-slate-700 px-3 py-1 rounded-full print:border print:border-slate-300">
-                {data.classificacao_s || '-'}
-              </div>
-            </div>
-            <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col items-center justify-center shadow-sm print:border-slate-200">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-teal-600 font-bold mb-3 shadow-sm print:border print:border-slate-200">
-                Au
-              </div>
-              <div className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-2">
-                Automatizar
-              </div>
-              <div className="text-3xl font-black text-slate-800 mb-2">{data.nota_au}</div>
-              <div className="text-xs font-medium bg-slate-200 text-slate-700 px-3 py-1 rounded-full print:border print:border-slate-300">
-                {data.classificacao_au || '-'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Success Plan Summary */}
-        <div className="mb-12 print:break-inside-avoid">
-          <h2 className="text-2xl font-black text-slate-900 border-b-2 border-slate-100 pb-3 mb-6">
-            Resumo Executivo do Plano
+        {/* Dados da Empresa */}
+        <div className="bg-[#171717] border border-[#262626] rounded-xl p-6 mb-8 print-exact break-inside-avoid">
+          <h2 className="text-xl font-bold text-white mb-6 border-b border-[#262626] pb-3">
+            Dados da Empresa
           </h2>
-
-          {data.complemento_sucesso && (
-            <div className="bg-slate-800 text-white p-6 sm:p-8 rounded-2xl mb-8 shadow-md print:bg-slate-100 print:text-slate-900 print:print-color-adjust-exact">
-              <p className="whitespace-pre-wrap leading-relaxed text-lg">
-                {data.complemento_sucesso}
-              </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 text-sm">
+            <div>
+              <span className="text-slate-400 mr-2">Empresa:</span>{' '}
+              <strong className="text-slate-100">{data.empresas?.nome || '-'}</strong>
             </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {data.first_impact_json && (
-              <div className="bg-teal-50/50 border border-teal-100 p-6 rounded-2xl print:border-teal-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-teal-100 text-teal-700 p-2 rounded-lg print:border print:border-teal-200">
-                    🚀
-                  </div>
-                  <h3 className="font-bold text-lg text-slate-800">Ação de Primeiros 90 Dias</h3>
-                </div>
-                <strong className="block text-teal-700 mb-4 text-lg leading-tight">
-                  {data.first_impact_json.acao}
-                </strong>
-                <ul className="space-y-3">
-                  {(data.first_impact_json.descricao || []).map((d: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 text-slate-700">
-                      <div className="w-1.5 h-1.5 rounded-full bg-teal-400 mt-2 flex-shrink-0" />
-                      <span className="leading-snug">{d}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {data.top_3_oportunidades_json && (
-              <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-2xl print:border-blue-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-blue-100 text-blue-700 p-2 rounded-lg print:border print:border-blue-200">
-                    💡
-                  </div>
-                  <h3 className="font-bold text-lg text-slate-800">Top 3 Oportunidades</h3>
-                </div>
-                <ul className="space-y-4">
-                  {data.top_3_oportunidades_json.map((op: any, i: number) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-200 text-blue-800 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5 print:border print:border-blue-300">
-                        {i + 1}
-                      </div>
-                      <div>
-                        <strong className="block text-slate-800 leading-snug">{op.nome}</strong>
-                        <span className="text-blue-600 text-xs font-bold uppercase tracking-wider mt-1 block">
-                          {op.bloco}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <div>
+              <span className="text-slate-400 mr-2">CNPJ:</span>{' '}
+              <strong className="text-slate-100">{data.empresas?.cnpj || '-'}</strong>
+            </div>
+            <div>
+              <span className="text-slate-400 mr-2">Responsável:</span>{' '}
+              <strong className="text-slate-100">{data.empresas?.responsavel_nome || '-'}</strong>
+            </div>
+            <div>
+              <span className="text-slate-400 mr-2">E-mail:</span>{' '}
+              <strong className="text-slate-100">{data.empresas?.responsavel_email || '-'}</strong>
+            </div>
           </div>
         </div>
 
-        {/* Detailed Answers History */}
-        <div className="print:break-before-page pt-8">
-          <h2 className="text-2xl font-black text-slate-900 border-b-2 border-slate-100 pb-3 mb-8">
-            Detalhamento das Respostas
-          </h2>
+        {/* Scores Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Nota Geral */}
+          <div className="bg-[#171717] border border-[#262626] rounded-xl p-6 print-exact break-inside-avoid flex flex-col justify-center">
+            <h3 className="text-slate-400 text-sm font-semibold mb-2">Nota Geral</h3>
+            <div className="text-6xl font-black text-white mb-2 leading-none">
+              {data.nota_geral || '0.0'}
+            </div>
+            <div
+              className="text-lg font-bold"
+              style={{ color: getClassificationColor(data.nota_geral || 0) }}
+            >
+              {data.classificacao_geral || getClassificacaoLabel(data.nota_geral || 0)}
+            </div>
+          </div>
 
-          <SectionResponses
-            title="Amplificar"
-            prefix="A"
-            json={data.respostas_json}
-            questions={questionsMap}
-            abertas={data.respostas_abertas}
-          />
-          <SectionResponses
-            title="Sistematizar"
-            prefix="S"
-            json={data.respostas_json}
-            questions={questionsMap}
-            abertas={data.respostas_abertas}
-          />
-          <SectionResponses
-            title="Automatizar"
-            prefix="Au"
-            json={data.respostas_json}
-            questions={questionsMap}
-            abertas={data.respostas_abertas}
-          />
-          <SectionResponses
-            title="Plano Estratégico (90 Dias)"
-            prefix="T"
-            json={data.respostas_json}
-            questions={questionsMap}
-            abertas={data.respostas_abertas}
-          />
+          {/* Maturidade por Dimensão */}
+          <div className="md:col-span-2 bg-[#171717] border border-[#262626] rounded-xl p-6 print-exact break-inside-avoid flex flex-col justify-center">
+            <h3 className="text-slate-400 text-sm font-semibold mb-6">Maturidade por Dimensão</h3>
+            <div className="space-y-5">
+              {[
+                { label: 'Amplificar (A)', nota: data.nota_a },
+                { label: 'Sistematizar (S)', nota: data.nota_s },
+                { label: 'Automatizar (Au)', nota: data.nota_au },
+              ].map((item, idx) => (
+                <div key={idx}>
+                  <div className="flex justify-between text-sm font-bold mb-2">
+                    <span className="text-slate-200">{item.label}</span>
+                    <span style={{ color: getScoreColor(item.nota || 0, 10) }}>
+                      {item.nota || 0}/10
+                    </span>
+                  </div>
+                  <div className="h-2.5 bg-[#262626] rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000"
+                      style={{
+                        width: `${((item.nota || 0) / 10) * 100}%`,
+                        backgroundColor: getScoreColor(item.nota || 0, 10),
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-slate-200 text-center text-slate-400 text-sm">
+        {/* Métricas Chave Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="bg-[#171717] border border-[#262626] rounded-xl p-6 print-exact break-inside-avoid">
+            <h3 className="text-slate-400 text-sm font-semibold mb-3">Pessoas Impactadas</h3>
+            <div
+              className="text-2xl font-black mb-2"
+              style={{ color: getMetricaColor(metricas?.pessoas_impactadas?.nivel) }}
+            >
+              {metricas?.pessoas_impactadas?.nivel || '-'}
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              {metricas?.pessoas_impactadas?.descricao || ''}
+            </p>
+          </div>
+
+          <div className="bg-[#171717] border border-[#262626] rounded-xl p-6 print-exact break-inside-avoid">
+            <h3 className="text-slate-400 text-sm font-semibold mb-3">Horas Recuperadas</h3>
+            <div className="text-2xl font-black mb-2" style={{ color: '#ec4899' }}>
+              {metricas?.horas_recuperadas?.estimativa || '-'}
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              {metricas?.horas_recuperadas?.descricao || ''}
+            </p>
+          </div>
+
+          <div className="bg-[#171717] border border-[#262626] rounded-xl p-6 print-exact break-inside-avoid">
+            <h3 className="text-slate-400 text-sm font-semibold mb-3">Dependência do Dono</h3>
+            <div className="text-2xl font-black mb-2" style={{ color: '#f59e0b' }}>
+              {metricas?.dependencia_do_dono?.percentual || '0'}%
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              {metricas?.dependencia_do_dono?.descricao || ''}
+            </p>
+          </div>
+        </div>
+
+        {/* Plano de Sucesso */}
+        <h2 className="text-2xl font-bold text-[#2dd4bf] border-b border-[#262626] pb-3 mb-6 break-inside-avoid">
+          Plano de Sucesso
+        </h2>
+
+        {data.complemento_sucesso && (
+          <div className="bg-[#171717] border border-[#262626] rounded-xl p-6 mb-6 print-exact break-inside-avoid">
+            <h3 className="text-lg font-bold text-white mb-4">Resumo Executivo</h3>
+            <div className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+              {data.complemento_sucesso}
+            </div>
+          </div>
+        )}
+
+        {firstImpact.acao && (
+          <div className="bg-[#171717] border border-[#262626] rounded-xl p-6 mb-6 print-exact break-inside-avoid">
+            <h3 className="text-lg font-bold text-white mb-4">{firstImpact.acao}</h3>
+            <ul className="space-y-3">
+              {(Array.isArray(firstImpact.descricao)
+                ? firstImpact.descricao
+                : [firstImpact.descricao]
+              ).map((d: string, i: number) => (
+                <li key={i} className="flex gap-3 text-sm text-slate-300 leading-relaxed">
+                  <span className="text-[#2dd4bf] text-lg leading-none mt-0.5">•</span> {d}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {top3.length > 0 && (
+          <div className="bg-[#171717] border border-[#262626] rounded-xl p-6 mb-12 print-exact break-inside-avoid">
+            <h3 className="text-lg font-bold text-white mb-4">Top 3 Oportunidades</h3>
+            <ul className="space-y-4">
+              {top3.map((op: any, i: number) => (
+                <li key={i} className="flex gap-3 text-sm text-slate-300">
+                  <span className="text-[#2dd4bf] text-lg leading-none mt-0.5">•</span>
+                  <div>
+                    <strong className="text-white block sm:inline">{op.nome}</strong>
+                    <span className="text-[#2dd4bf] text-xs font-bold uppercase tracking-wider block sm:inline sm:ml-2 mt-1 sm:mt-0">
+                      ({op.bloco})
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* History */}
+        <h2 className="text-2xl font-bold text-[#2dd4bf] border-b border-[#262626] pb-3 mb-6 break-inside-avoid mt-16 pt-8 print:mt-0 print:pt-0">
+          Histórico de Respostas
+        </h2>
+
+        <SectionResponses title="Amplificar" prefix="A" data={data} />
+        <SectionResponses title="Sistematizar" prefix="S" data={data} />
+        <SectionResponses title="Automatizar" prefix="Au" data={data} />
+        <SectionResponses title="Plano Estratégico" prefix="T" data={data} />
+
+        <div className="mt-16 pt-8 border-t border-[#262626] text-center text-slate-500 text-xs">
           <p>
             Este documento é estritamente confidencial e foi gerado pelo Adapta Pass para uso
             exclusivo de <strong>{data.empresas?.nome || 'sua empresa'}</strong>.
