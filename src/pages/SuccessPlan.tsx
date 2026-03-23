@@ -11,7 +11,6 @@ import {
   Check,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 import { finalizeSuccessPlan } from '@/services/diagnostics'
@@ -21,7 +20,6 @@ import { cn } from '@/lib/utils'
 export default function SuccessPlan() {
   const navigate = useNavigate()
   const { data, updateData } = useDiagnosisStore()
-  const [complemento, setComplemento] = useState(data.complemento || '')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (!data.diagnosticoId || !data.scoringData) {
@@ -46,11 +44,12 @@ export default function SuccessPlan() {
 
   const handleFinalize = async () => {
     setIsSubmitting(true)
-    updateData({ complemento })
     try {
-      const { pdfUrl } = await finalizeSuccessPlan(data.diagnosticoId!, complemento)
+      const { pdfUrl } = await finalizeSuccessPlan(data.diagnosticoId!, '')
       if (pdfUrl) {
-        updateData({ pdfUrl })
+        updateData({ pdfUrl, complemento: '' })
+      } else {
+        updateData({ complemento: '' })
       }
       navigate('/resultados')
     } catch (error: any) {
@@ -224,7 +223,7 @@ export default function SuccessPlan() {
                   Meta dos primeiros 90 dias
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-4">
                   {Array.isArray(scoringData.first_impact.descricao)
                     ? scoringData.first_impact.descricao.map((item: string, i: number) => (
                         <li key={i} className="flex gap-4 items-start">
@@ -251,19 +250,6 @@ export default function SuccessPlan() {
                           </li>
                         ))}
                 </ul>
-
-                <div className="mt-auto pt-6 border-t border-[#2dd4bf]/20">
-                  <label className="block text-base font-semibold text-white mb-3">
-                    O que mais seria sucesso pra você em 90 dias?
-                  </label>
-                  <Textarea
-                    placeholder="Descreva suas expectativas..."
-                    className="bg-black/40 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[100px] resize-y relative z-20"
-                    value={complemento}
-                    onChange={(e) => setComplemento(e.target.value)}
-                    disabled={isSubmitting}
-                  />
-                </div>
               </div>
             </div>
           </div>
