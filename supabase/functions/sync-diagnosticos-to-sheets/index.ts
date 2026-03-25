@@ -1,5 +1,4 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 import { corsHeaders } from '../_shared/cors.ts'
 
 function base64url(str: string) {
@@ -93,7 +92,7 @@ async function appendToSheets(values: any[], accessToken: string, retries = 0): 
     console.error(`Google Sheets API Error: ${status} ${response.statusText}`)
 
     if (status === 503 && retries < maxRetries) {
-      const backoff = Math.pow(2, retries + 1) * 1000 // 2s, 4s, 8s
+      const backoff = Math.pow(2, retries + 1) * 1000
       console.log(`503 received, retrying in ${backoff}ms (retry ${retries + 1} of ${maxRetries})`)
       await new Promise((r) => setTimeout(r, backoff))
       return appendToSheets(values, accessToken, retries + 1)
@@ -110,38 +109,6 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'Nao foi possivel sincronizar com Google Sheets. Tente novamente.',
-        }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      )
-    }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-    const token = authHeader.replace('Bearer ', '')
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser(token)
-
-    if (authError || !user) {
-      console.error('Auth error:', authError?.message)
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'Nao foi possivel sincronizar com Google Sheets. Tente novamente.',
-        }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      )
-    }
-
     let body
     try {
       body = await req.json()
@@ -199,6 +166,7 @@ Deno.serve(async (req: Request) => {
 
     const missingFields = requiredFields.filter((f) => body[f] === undefined)
     if (missingFields.length > 0) {
+      console.error(`Missing fields: ${missingFields.join(', ')}`)
       return new Response(
         JSON.stringify({
           success: false,
@@ -211,7 +179,10 @@ Deno.serve(async (req: Request) => {
     const serviceAccountJson = Deno.env.get('GOOGLE_SERVICE_ACCOUNT_JSON')
     if (!serviceAccountJson) {
       console.error('Missing GOOGLE_SERVICE_ACCOUNT_JSON secret')
-      throw new Error('Configuration error')
+      return new Response(
+        JSON.stringify({ success: false, error: 'Configuração incompleta. Contate o suporte.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
     }
 
     const accessToken = await getGoogleAccessToken(serviceAccountJson)

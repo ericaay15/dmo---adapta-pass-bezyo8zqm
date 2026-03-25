@@ -124,7 +124,7 @@ export default function SuccessPlan() {
                 <div key={blocoId} className="space-y-2">
                   <div className="flex justify-between items-end">
                     <span className="font-semibold text-slate-200">
-                      {nomes[blocoId]} ({blocoId})
+                      {nomes[blocoId]} ({blocoId === 'Au' ? 'A' : blocoId})
                     </span>
                     <span className="text-sm font-bold" style={{ color: getColorHex(bloco.nota) }}>
                       {bloco.nota} / 10 - {bloco.classificacao}

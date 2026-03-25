@@ -466,7 +466,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
         <div class="progress-item">
           <div class="progress-header">
-            <span>Automatizar (Au)</span>
+            <span>Automatizar (A)</span>
             <span style="color: ${getScoreColor(diag.nota_au || 0, 10)}">${diag.nota_au || 0}/10</span>
           </div>
           <div class="progress-bar-bg">

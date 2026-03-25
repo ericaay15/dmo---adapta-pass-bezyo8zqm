@@ -270,7 +270,7 @@ export default function Report() {
               {[
                 { label: 'Amplificar (A)', nota: data.nota_a },
                 { label: 'Sistematizar (S)', nota: data.nota_s },
-                { label: 'Automatizar (Au)', nota: data.nota_au },
+                { label: 'Automatizar (A)', nota: data.nota_au },
               ].map((item, idx) => (
                 <div key={idx}>
                   <div className="flex justify-between text-sm font-bold mb-2">

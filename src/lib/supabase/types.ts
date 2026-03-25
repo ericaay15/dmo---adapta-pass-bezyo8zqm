@@ -786,73 +786,75 @@ export const Constants = {
 //   CREATE OR REPLACE FUNCTION public.trigger_sync_diagnosticos()
 //    RETURNS trigger
 //    LANGUAGE plpgsql
-//   AS $function$
-//   DECLARE
-//     v_token text := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlYnFyd2psd2tza250ZnF5a3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxOTYyNDIsImV4cCI6MjA4OTc3MjI0Mn0.ZYos9qcrj82NUmXxgSmU66hdCgmFwo5SQRMSf1Uq5N4';
+//   AS $function$DECLARE
+//     v_empresa RECORD;
 //   BEGIN
+//     SELECT nome, cnpj, email_admin, responsavel_nome, responsavel_email
+//     INTO v_empresa
+//     FROM empresas
+//     WHERE id = NEW.empresa_id;
+//
 //     PERFORM
 //       net.http_post(
 //         url := 'https://gebqrwjlwkskntfqykub.supabase.co/functions/v1/sync-diagnosticos-to-sheets',
 //         headers := jsonb_build_object(
-//           'Content-Type', 'application/json',
-//           'Authorization', 'Bearer ' || v_token
+//           'Content-Type', 'application/json'
 //         ),
 //         body := jsonb_build_object(
-//           'diagnostico_id', NEW.diagnostico_id,
+//           'diagnostico_id', NEW.id,
 //           'data_preenchimento', NEW.data_preenchimento,
 //           'empresa_id', NEW.empresa_id,
-//           'nome_empresa', NEW.nome_empresa,
-//           'cnpj', NEW.cnpj,
-//           'email_admin', NEW.email_admin,
-//           'responsavel_nome', NEW.responsavel_nome,
-//           'responsavel_email', NEW.responsavel_email,
+//           'nome_empresa', COALESCE(v_empresa.nome, ''),
+//           'cnpj', COALESCE(v_empresa.cnpj, ''),
+//           'email_admin', COALESCE(v_empresa.email_admin, ''),
+//           'responsavel_nome', COALESCE(v_empresa.responsavel_nome, ''),
+//           'responsavel_email', COALESCE(v_empresa.responsavel_email, ''),
 //           'quem_preencheu', NEW.quem_preencheu,
-//           'resposta_a1', NEW.resposta_a1,
-//           'resposta_a2', NEW.resposta_a2,
-//           'resposta_a3', NEW.resposta_a3,
-//           'resposta_a4', NEW.resposta_a4,
-//           'resposta_a5', NEW.resposta_a5,
-//           'resposta_aberta_a6', NEW.resposta_aberta_a6,
+//           'resposta_a1', (NEW.respostas_json::jsonb->>'A1'),
+//           'resposta_a2', (NEW.respostas_json::jsonb->>'A2'),
+//           'resposta_a3', (NEW.respostas_json::jsonb->>'A3'),
+//           'resposta_a4', (NEW.respostas_json::jsonb->>'A4'),
+//           'resposta_a5', (NEW.respostas_json::jsonb->>'A5'),
+//           'resposta_aberta_a6', (NEW.respostas_json::jsonb->>'A6'),
 //           'nota_a', NEW.nota_a,
 //           'classificacao_a', NEW.classificacao_a,
-//           'resposta_s1', NEW.resposta_s1,
-//           'resposta_s2', NEW.resposta_s2,
-//           'resposta_s3', NEW.resposta_s3,
-//           'resposta_s4', NEW.resposta_s4,
-//           'resposta_s5', NEW.resposta_s5,
-//           'resposta_aberta_s6', NEW.resposta_aberta_s6,
+//           'resposta_s1', (NEW.respostas_json::jsonb->>'S1'),
+//           'resposta_s2', (NEW.respostas_json::jsonb->>'S2'),
+//           'resposta_s3', (NEW.respostas_json::jsonb->>'S3'),
+//           'resposta_s4', (NEW.respostas_json::jsonb->>'S4'),
+//           'resposta_s5', (NEW.respostas_json::jsonb->>'S5'),
+//           'resposta_aberta_s6', (NEW.respostas_json::jsonb->>'S6'),
 //           'nota_s', NEW.nota_s,
 //           'classificacao_s', NEW.classificacao_s,
-//           'resposta_au1', NEW.resposta_au1,
-//           'resposta_au2', NEW.resposta_au2,
-//           'resposta_au3', NEW.resposta_au3,
-//           'resposta_au4', NEW.resposta_au4,
-//           'resposta_au5', NEW.resposta_au5,
-//           'resposta_aberta_au6', NEW.resposta_aberta_au6,
+//           'resposta_au1', (NEW.respostas_json::jsonb->>'Au1'),
+//           'resposta_au2', (NEW.respostas_json::jsonb->>'Au2'),
+//           'resposta_au3', (NEW.respostas_json::jsonb->>'Au3'),
+//           'resposta_au4', (NEW.respostas_json::jsonb->>'Au4'),
+//           'resposta_au5', (NEW.respostas_json::jsonb->>'Au5'),
+//           'resposta_aberta_au6', (NEW.respostas_json::jsonb->>'Au6'),
 //           'nota_au', NEW.nota_au,
 //           'classificacao_au', NEW.classificacao_au,
-//           'resposta_t1', NEW.resposta_t1,
-//           'resposta_t2', NEW.resposta_t2,
-//           'resposta_t3', NEW.resposta_t3,
-//           'resposta_aberta_t4', NEW.resposta_aberta_t4,
+//           'resposta_t1', (NEW.respostas_json::jsonb->>'T1'),
+//           'resposta_t2', (NEW.respostas_json::jsonb->>'T2'),
+//           'resposta_t3', (NEW.respostas_json::jsonb->>'T3'),
+//           'resposta_aberta_t4', (NEW.respostas_json::jsonb->>'T4'),
 //           'nota_t', NEW.nota_t,
 //           'nota_geral', NEW.nota_geral,
-//           'resposta_plano_sucesso', NEW.resposta_plano_sucesso,
-//           'pdf_url', NEW.pdf_url,
-//           'atualizado_em', NEW.atualizado_em
+//           'resposta_plano_sucesso', NEW.complemento_sucesso,
+//           'pdf_url', COALESCE(NEW.pdf_url, ''),
+//           'atualizado_em', NEW.data_preenchimento
 //         )
 //       );
 //     RETURN NEW;
 //   EXCEPTION WHEN OTHERS THEN
-//     -- Mute errors to prevent transaction rollback and allow the data to save
 //     RETURN NEW;
-//   END;
-//   $function$
+//   END;$function$
 //
 
 // --- TRIGGERS ---
 // Table: diagnosticos
 //   on_diagnostico_change: CREATE TRIGGER on_diagnostico_change AFTER INSERT OR UPDATE ON public.diagnosticos FOR EACH ROW EXECUTE FUNCTION trg_sync_relatorio_diagnosticos()
+//   sync_diagnosticos_trigger: CREATE TRIGGER sync_diagnosticos_trigger AFTER INSERT OR UPDATE OF pdf_url ON public.diagnosticos FOR EACH ROW WHEN ((new.pdf_url IS NOT NULL)) EXECUTE FUNCTION trigger_sync_diagnosticos()
 // Table: empresas
 //   on_empresas_change: CREATE TRIGGER on_empresas_change AFTER UPDATE ON public.empresas FOR EACH ROW EXECUTE FUNCTION trg_sync_relatorio_empresas()
 // Table: respostas_abertas
