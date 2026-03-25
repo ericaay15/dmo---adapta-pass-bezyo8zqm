@@ -204,7 +204,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Plano de Sucesso e Diagnóstico de IA</title>
+  <title>Plano de Sucesso Inicial</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
     
@@ -419,7 +419,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
   <div class="container">
     <div class="header">
       ${logoUrl ? `<img src="${logoUrl}" alt="Adapta Pass" class="logo" />` : ''}
-      <h1 class="title">Plano de Sucesso e Diagnóstico de IA</h1>
+      <h1 class="title">Plano de Sucesso Inicial</h1>
     </div>
 
     <div class="card">

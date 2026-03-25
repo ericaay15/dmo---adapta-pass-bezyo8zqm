@@ -70,7 +70,7 @@ export default function SuccessPlan() {
         <div className="relative bg-black/50 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-12 shadow-2xl z-10">
           <div className="text-center mb-10">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
-              Plano de Sucesso Adapta Pass
+              Plano de Sucesso Inicial
             </h1>
             <p className="text-lg md:text-xl text-[#2dd4bf] font-medium mb-6">
               Aqui começa sua jornada de implementação de IA com quem realmente entende.
