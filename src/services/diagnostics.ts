@@ -85,6 +85,7 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
         email_admin: data.adminEmail || 'nao_informado@email.com',
         responsavel_nome: data.leadName,
         responsavel_email: data.leadEmail,
+        segmento: data.segmento,
       } as any)
       .eq('id', empresaId)
 
@@ -98,6 +99,7 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
         email_admin: data.adminEmail || 'nao_informado@email.com',
         responsavel_nome: data.leadName,
         responsavel_email: data.leadEmail,
+        segmento: data.segmento,
       } as any)
       .select('id')
       .single()

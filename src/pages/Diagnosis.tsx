@@ -16,12 +16,34 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
+
+const segmentos = [
+  'Medicina / Saúde',
+  'Construção / Engenharia',
+  'E-commerce',
+  'Varejo / Comércio',
+  'Financeiro',
+  'Vendas',
+  'Marketing',
+  'Tecnologia',
+  'Outros',
+] as const
 
 const formSchema = z.object({
   companyName: z.string().min(2, { message: 'O nome da empresa é obrigatório.' }),
   cnpj: z.string().length(18, { message: 'O CNPJ deve estar completo (14 dígitos).' }),
+  segmento: z.enum(segmentos, {
+    required_error: 'Selecione um segmento de mercado.',
+  }),
   adminEmail: z.string().email({ message: 'Insira um e-mail válido.' }),
   userName: z.string().min(2, { message: 'O nome é obrigatório.' }),
   leadName: z.string().min(2, { message: 'O nome do responsável é obrigatório.' }),
@@ -48,6 +70,7 @@ export default function Diagnosis() {
     defaultValues: {
       companyName: storeData.companyName || '',
       cnpj: storeData.cnpj || '',
+      segmento: (storeData.segmento as any) || undefined,
       adminEmail: storeData.adminEmail || '',
       userName: storeData.userName || '',
       leadName: storeData.leadName || '',
@@ -143,6 +166,33 @@ export default function Diagnosis() {
                           className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] h-12"
                         />
                       </FormControl>
+                      <FormMessage className="text-rose-400" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                <FormField
+                  control={form.control}
+                  name="segmento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-300">Segmento de Mercado</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-[#2dd4bf] h-12">
+                            <SelectValue placeholder="Selecione o segmento" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-[#171717] border-white/10 text-white">
+                          {segmentos.map((seg) => (
+                            <SelectItem key={seg} value={seg}>
+                              {seg}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage className="text-rose-400" />
                     </FormItem>
                   )}
