@@ -27,7 +27,8 @@ import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 
 const segmentos = [
-  'Medicina / Saúde',
+  'Medicina',
+  'Saúde',
   'Construção / Engenharia',
   'E-commerce',
   'Varejo / Comércio',

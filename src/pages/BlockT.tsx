@@ -33,7 +33,6 @@ const formSchema = z.object({
 export default function BlockT() {
   const navigate = useNavigate()
   const { data: storeData, updateData } = useDiagnosisStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,27 +72,11 @@ export default function BlockT() {
 
   const isPreviousValid = hasCompletedPreviousBlocks()
   const isFormValid = form.formState.isValid
-  const canSubmit = isPreviousValid && isFormValid && !isSubmitting
+  const canSubmit = isPreviousValid && isFormValid
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true)
-    const finalData = { ...storeData, ...values }
+  function onSubmit(values: z.infer<typeof formSchema>) {
     updateData(values)
-
-    try {
-      const res = await submitDiagnosis(finalData)
-      updateData({
-        scoringData: res.scoringData,
-        diagnosticoId: res.diagnosticoId,
-      })
-      navigate('/plano-de-sucesso')
-    } catch (error: any) {
-      console.error(error)
-      toast.error('Erro ao processar diagnóstico', {
-        description: error.message || 'Tente novamente mais tarde.',
-      })
-      setIsSubmitting(false)
-    }
+    navigate('/segmento')
   }
 
   return (
@@ -104,7 +87,6 @@ export default function BlockT() {
             variant="ghost"
             asChild
             className="text-slate-400 hover:text-white hover:bg-white/5 -ml-4"
-            disabled={isSubmitting}
           >
             <Link to="/bloco-au">
               <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
@@ -323,7 +305,6 @@ export default function BlockT() {
                   type="button"
                   variant="outline"
                   asChild
-                  disabled={isSubmitting}
                   className="w-full sm:w-1/3 border-white/10 text-white hover:bg-white/5 hover:text-white h-14 text-lg rounded-xl"
                 >
                   <Link to="/bloco-au">Voltar</Link>
@@ -333,17 +314,8 @@ export default function BlockT() {
                   disabled={!canSubmit}
                   className="w-full sm:w-2/3 bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] disabled:opacity-50 disabled:hover:shadow-none group"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                      Gerando Plano de Sucesso...
-                    </>
-                  ) : (
-                    <>
-                      Ver Meu Plano de Sucesso
-                      <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-                    </>
-                  )}
+                  Próximo
+                  <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
             </form>

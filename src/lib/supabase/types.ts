@@ -96,6 +96,7 @@ export type Database = {
           nome: string | null
           responsavel_email: string | null
           responsavel_nome: string | null
+          segmento: string
         }
         Insert: {
           cnpj: string
@@ -105,6 +106,7 @@ export type Database = {
           nome?: string | null
           responsavel_email?: string | null
           responsavel_nome?: string | null
+          segmento?: string
         }
         Update: {
           cnpj?: string
@@ -114,6 +116,7 @@ export type Database = {
           nome?: string | null
           responsavel_email?: string | null
           responsavel_nome?: string | null
+          segmento?: string
         }
         Relationships: []
       }
@@ -528,6 +531,7 @@ export const Constants = {
 //   responsavel_email: text (nullable)
 //   data_criacao: timestamp with time zone (not null, default: now())
 //   nome: text (nullable)
+//   segmento: text (not null, default: 'Outros'::text)
 // Table: relatorio_diagnosticos_completos
 //   diagnostico_id: uuid (not null)
 //   data_preenchimento: timestamp with time zone (nullable)

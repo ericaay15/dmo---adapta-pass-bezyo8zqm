@@ -113,7 +113,11 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     .insert({
       empresa_id: empresaId,
       quem_preencheu: data.userName,
-      respostas_json: payload as any,
+      respostas_json: {
+        ...payload,
+        temasSelecionados: data.temasSelecionados,
+        temaOutros: data.temaOutros,
+      } as any,
       nota_a: scoringData.blocos.A.nota,
       nota_s: scoringData.blocos.S.nota,
       nota_au: scoringData.blocos.Au.nota,
@@ -155,6 +159,18 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
       tipo_bloco: 'T',
       numero_pergunta: 4,
       resposta: data.t4 || '',
+    },
+    {
+      diagnostico_id: diagnostico.id,
+      tipo_bloco: 'SEG',
+      numero_pergunta: 1,
+      resposta: (data.temasSelecionados || []).join(', '),
+    },
+    {
+      diagnostico_id: diagnostico.id,
+      tipo_bloco: 'SEG',
+      numero_pergunta: 2,
+      resposta: data.temaOutros || '',
     },
   ].filter((a) => a.resposta.trim() !== '')
 

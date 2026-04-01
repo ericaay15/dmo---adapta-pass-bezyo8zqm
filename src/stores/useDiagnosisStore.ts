@@ -8,6 +8,8 @@ export type DiagnosisState = {
   leadName: string
   leadEmail: string
   segmento: string
+  temasSelecionados: string[]
+  temaOutros: string
   a1: string
   a2: string
   a3: string
@@ -44,6 +46,8 @@ let store: DiagnosisState = {
   leadName: '',
   leadEmail: '',
   segmento: '',
+  temasSelecionados: [],
+  temaOutros: '',
   a1: '',
   a2: '',
   a3: '',
@@ -102,6 +106,8 @@ const useDiagnosisStore = () => {
       leadName: '',
       leadEmail: '',
       segmento: '',
+      temasSelecionados: [],
+      temaOutros: '',
       a1: '',
       a2: '',
       a3: '',
