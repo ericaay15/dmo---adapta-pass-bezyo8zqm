@@ -4,6 +4,7 @@ import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import Index from './pages/Index'
 import Diagnosis from './pages/Diagnosis'
+import Instructions from './pages/Instructions'
 import BlockA from './pages/BlockA'
 import BlockB from './pages/BlockB'
 import BlockS from './pages/BlockS'
@@ -25,6 +26,7 @@ const App = () => (
         <Route element={<Layout />}>
           <Route path="/" element={<Index />} />
           <Route path="/diagnostico" element={<Diagnosis />} />
+          <Route path="/instrucoes" element={<Instructions />} />
           <Route path="/bloco-a" element={<BlockA />} />
           <Route path="/bloco-b" element={<BlockB />} />
           <Route path="/bloco-s" element={<BlockS />} />

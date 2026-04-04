@@ -83,7 +83,7 @@ export default function Diagnosis() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     updateData(values)
-    navigate('/bloco-a')
+    navigate('/instrucoes')
   }
 
   return (
