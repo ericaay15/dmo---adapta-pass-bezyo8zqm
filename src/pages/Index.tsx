@@ -13,7 +13,7 @@ const journeySteps = [
   },
   {
     title: 'Kick-Off e Plano de Sucesso',
-    description: 'Alinhamento com seu Gerente de Negócios',
+    description: 'Alinhamento com o/a Gerente de Negócios',
     icon: Users,
     status: 'locked',
   },
