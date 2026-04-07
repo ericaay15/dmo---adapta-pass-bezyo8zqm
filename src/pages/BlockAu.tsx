@@ -26,7 +26,7 @@ const formSchema = z.object({
   au3: z.string().min(1, { message: 'Selecione uma opção.' }),
   au4: z.string().min(1, { message: 'Selecione uma opção.' }),
   au5: z.string().min(1, { message: 'Selecione uma opção.' }),
-  au6: z.string().optional(),
+  au6: z.string().min(3, { message: 'Por favor, detalhe um pouco mais a sua resposta.' }),
 })
 
 const scaleQuestions = [

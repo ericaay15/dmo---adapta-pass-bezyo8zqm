@@ -26,7 +26,7 @@ const formSchema = z.object({
   a3: z.string().min(1, { message: 'Selecione uma opção.' }),
   a4: z.string().min(1, { message: 'Selecione uma opção.' }),
   a5: z.string().min(1, { message: 'Selecione uma opção.' }),
-  a6: z.string().optional(),
+  a6: z.string().min(3, { message: 'Por favor, detalhe um pouco mais a sua resposta.' }),
 })
 
 const scaleQuestions = [
@@ -195,7 +195,7 @@ export default function BlockA() {
                       </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Sua resposta (opcional)"
+                          placeholder="Sua resposta..."
                           className="bg-black/40 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-[#2dd4bf] min-h-[120px] resize-y"
                           {...field}
                         />

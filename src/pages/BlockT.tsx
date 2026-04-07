@@ -57,16 +57,19 @@ export default function BlockT() {
       storeData.a3 &&
       storeData.a4 &&
       storeData.a5 &&
+      storeData.a6 &&
       storeData.s1 &&
       storeData.s2 &&
       storeData.s3 &&
       storeData.s4 &&
       storeData.s5 &&
+      storeData.s6 &&
       storeData.au1 &&
       storeData.au2 &&
       storeData.au3 &&
       storeData.au4 &&
-      storeData.au5,
+      storeData.au5 &&
+      storeData.au6,
     )
   }
 
