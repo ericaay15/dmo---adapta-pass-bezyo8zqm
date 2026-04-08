@@ -343,12 +343,47 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
   return { scoringData, sessionId }
 }
 
-export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: string) => {
+export const finalizeSuccessPlan = async (sessionId: string, complemento: string) => {
   if (complemento && complemento.trim() !== '') {
+    const { error: updateSessionError } = await supabase
+      .from('sessions')
+      .update({ success_complement: complemento.trim() })
+      .eq('id', sessionId)
+
+    if (updateSessionError) {
+      console.error('Erro ao atualizar success_complement no banco:', updateSessionError.message)
+      throw new Error(`Erro ao atualizar plano de sucesso: ${updateSessionError.message}`)
+    }
+
+    const { data: sessionData, error: sessionQueryError } = await supabase
+      .from('sessions')
+      .select('company_id')
+      .eq('id', sessionId)
+      .single()
+
+    if (sessionQueryError) {
+      throw new Error(`Erro ao buscar company_id: ${sessionQueryError.message}`)
+    }
+
+    const { error: answersError } = await supabase.from('answers').insert({
+      session_id: sessionId,
+      company_id: sessionData.company_id,
+      block: 'P',
+      question_name: 'success_complement',
+      question_type: 'text',
+      question_answer: complemento.trim(),
+    })
+
+    if (answersError) {
+      throw new Error(`Erro ao salvar complemento em answers: ${answersError.message}`)
+    }
+
+    // LEGACY — disabled, kept for reference.
+    /*
     const { error: updateDiagError } = await supabase
       .from('diagnosticos')
       .update({ complemento_sucesso: complemento.trim() } as any)
-      .eq('id', diagnosticoId)
+      .eq('id', sessionId)
 
     if (updateDiagError) {
       console.error('Erro ao atualizar complemento_sucesso no banco:', updateDiagError.message)
@@ -356,7 +391,7 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
     }
 
     const { error: abertasError } = await supabase.from('respostas_abertas').insert({
-      diagnostico_id: diagnosticoId,
+      diagnostico_id: sessionId,
       tipo_bloco: 'P',
       numero_pergunta: 1,
       resposta: complemento.trim(),
@@ -365,28 +400,52 @@ export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: st
     if (abertasError) {
       throw new Error(`Erro ao salvar complemento em respostas: ${abertasError.message}`)
     }
+    */
   }
 
   // Define a URL da página de relatório do frontend
-  const pdfUrl = `${window.location.origin}/relatorio/${diagnosticoId}`
+  const pdfUrl = `${window.location.origin}/relatorio/${sessionId}`
 
   // Atualiza no banco para ficar registrado na tabela e triggar a exportação para o Sheets
+  const { error: updatePdfSessionError } = await supabase
+    .from('sessions')
+    .update({ pdf_url: pdfUrl })
+    .eq('id', sessionId)
+
+  if (updatePdfSessionError) {
+    console.error('Erro ao atualizar pdf_url em sessions:', updatePdfSessionError.message)
+  }
+
+  // LEGACY — disabled, kept for reference.
+  /*
   const { error: updatePdfError } = await supabase
     .from('diagnosticos')
     .update({ pdf_url: pdfUrl } as any)
-    .eq('id', diagnosticoId)
+    .eq('id', sessionId)
 
   if (updatePdfError) {
     console.error('Erro ao atualizar pdf_url no banco:', updatePdfError.message)
   }
+  */
 
   supabase.functions
     .invoke('exportar_para_sheets', {
-      body: { diagnostico_id: diagnosticoId },
+      body: { session_id: sessionId },
     })
     .catch((err) => {
       console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
     })
+
+  // LEGACY — disabled, kept for reference.
+  /*
+  supabase.functions
+    .invoke('exportar_para_sheets', {
+      body: { diagnostico_id: sessionId },
+    })
+    .catch((err) => {
+      console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
+    })
+  */
 
   return { pdfUrl }
 }
