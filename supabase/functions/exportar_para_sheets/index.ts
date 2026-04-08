@@ -128,76 +128,81 @@ Deno.serve(async (req: Request) => {
     const body = await req.json()
     console.log('Body recebido:', body)
 
-    let values: string[] = []
-
-    // Se receber apenas o diagnostico_id (como na nova implementação), busca do banco
-    if (body.diagnostico_id) {
-      console.log(`Buscando dados do diagnostico_id: ${body.diagnostico_id}`)
-
-      const { data: diag, error: diagError } = await supabase
-        .from('diagnosticos')
-        .select('*, empresas(*)')
-        .eq('id', body.diagnostico_id)
-        .single()
-
-      if (diagError || !diag) {
-        throw new Error(`Diagnóstico não encontrado: ${diagError?.message || 'Erro desconhecido'}`)
-      }
-
-      console.log('Dados do diagnóstico resgatados com sucesso.')
-
-      const top3Array = diag.top_3_oportunidades_json as any[]
-      const top3Str = Array.isArray(top3Array)
-        ? top3Array.map((op: any, i: number) => `${i + 1}. ${op.nome}`).join('\n')
-        : ''
-
-      const metricas = (diag.metricas_json as any) || {}
-      const metricasStr = `Impactadas: ${metricas.pessoas_impactadas?.nivel || '-'}\nHoras: ${metricas.horas_recuperadas?.estimativa || '-'}\nDependência: ${metricas.dependencia_do_dono?.percentual || 0}%`
-
-      const firstImpact = (diag.first_impact_json as any) || {}
-      const firstImpactStr = Array.isArray(firstImpact.descricao)
-        ? firstImpact.descricao.join('\n')
-        : firstImpact.descricao || ''
-
-      values = [
-        diag.empresas?.cnpj || '',
-        diag.empresas?.email_admin || '',
-        diag.empresas?.responsavel_nome || '',
-        new Date(diag.data_preenchimento).toLocaleDateString('pt-BR'),
-        diag.nota_a?.toString() || '',
-        diag.nota_s?.toString() || '',
-        diag.nota_au?.toString() || '',
-        diag.nota_geral?.toString() || '',
-        diag.classificacao_a || '',
-        diag.classificacao_s || '',
-        diag.classificacao_au || '',
-        top3Str,
-        metricasStr,
-        firstImpactStr,
-        diag.complemento_sucesso || '',
-        diag.pdf_url || '',
-      ]
-    } else {
-      // Fallback legada caso receba os valores diretamente
-      values = [
-        body.cnpj || '',
-        body.email_admin || '',
-        body.responsavel || '',
-        body.data || '',
-        body.nota_a || '',
-        body.nota_s || '',
-        body.nota_au || '',
-        body.nota_geral || '',
-        body.classificacao_a || '',
-        body.classificacao_s || '',
-        body.classificacao_au || '',
-        body.top_3_oportunidades || '',
-        body.metricas || '',
-        body.first_impact || '',
-        body.complemento_plano || body.complemento_sucesso || '',
-        body.link_documento_pdf || '',
-      ]
+    if (!body.session_id) {
+      return new Response(JSON.stringify({ success: false, error: 'session_id is required' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      })
     }
+
+    const sessionId = body.session_id
+    console.log(`Buscando dados da session_id: ${sessionId}`)
+
+    const { data: session, error: sessionError } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .single()
+
+    if (sessionError || !session) {
+      throw new Error(`Sessão não encontrada: ${sessionError?.message || 'Erro desconhecido'}`)
+    }
+
+    const { data: company, error: companyError } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('id', session.company_id)
+      .single()
+
+    if (companyError || !company) {
+      throw new Error(`Empresa não encontrada: ${companyError?.message || 'Erro desconhecido'}`)
+    }
+
+    const { data: aggregatedAnswers, error: aggregatedAnswersError } = await supabase
+      .from('aggregated_answers')
+      .select('*')
+      .eq('session_id', sessionId)
+      .single()
+
+    if (aggregatedAnswersError) {
+      console.log(`Aviso: erro ao buscar aggregated_answers: ${aggregatedAnswersError.message}`)
+    }
+
+    console.log('Dados da sessão resgatados com sucesso.')
+
+    const scoring = (session.scoring_json as any) || {}
+
+    const top3Array = (scoring.top_3_oportunidades as any[]) || []
+    const top3Str = Array.isArray(top3Array)
+      ? top3Array.map((op: any, i: number) => `${i + 1}. ${op.nome}`).join('\n')
+      : ''
+
+    const metricas = scoring.metricas_chave || {}
+    const metricasStr = `Impactadas: ${metricas.pessoas_impactadas?.nivel || '-'}\nHoras: ${metricas.horas_recuperadas?.estimativa || '-'}\nDependência: ${metricas.dependencia_do_dono?.percentual || 0}%`
+
+    const firstImpact = scoring.first_impact || {}
+    const firstImpactStr = Array.isArray(firstImpact.descricao)
+      ? firstImpact.descricao.join('\n')
+      : firstImpact.descricao || ''
+
+    const values = [
+      company.cnpj || '',
+      company.filler_email || '',
+      session.responsible_name || '',
+      new Date(session.created_at).toLocaleDateString('pt-BR'),
+      scoring.blocos?.A?.nota?.toString() || '',
+      scoring.blocos?.S?.nota?.toString() || '',
+      scoring.blocos?.Au?.nota?.toString() || '',
+      scoring.nota_geral?.valor?.toString() || '',
+      scoring.blocos?.A?.classificacao || '',
+      scoring.blocos?.S?.classificacao || '',
+      scoring.blocos?.Au?.classificacao || '',
+      top3Str,
+      metricasStr,
+      firstImpactStr,
+      session.success_complement || '',
+      session.pdf_url || '',
+    ]
 
     console.log('Valores formatados para envio ao Sheets:', values)
 
