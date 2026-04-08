@@ -62,13 +62,170 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
   if (scoringError) throw new Error(`Erro ao calcular scoring: ${scoringError.message}`)
   if (scoringData?.error) throw new Error(`Erro de validação do servidor: ${scoringData.error}`)
 
-  let empresaId: string
+  // WRITE 1: Upsert into companies
+  let companyId: string
   const cnpjValue = data.cnpj || 'Não informado'
+
+  const { data: existingCompany, error: findCompanyError } = await supabase
+    .from('companies')
+    .select('id')
+    .eq('cnpj', cnpjValue)
+    .limit(1)
+    .maybeSingle()
+
+  if (findCompanyError) {
+    throw new Error(`Erro ao verificar company: ${findCompanyError.message}`)
+  }
+
+  if (existingCompany) {
+    companyId = existingCompany.id
+    const { error: updateError } = await supabase
+      .from('companies')
+      .update({
+        name: data.companyName,
+        segment: data.segmento,
+        filler_email: data.adminEmail || 'nao_informado@email.com',
+      } as any)
+      .eq('id', companyId)
+
+    if (updateError) throw new Error(`Erro ao atualizar company: ${updateError.message}`)
+  } else {
+    const { data: newCompany, error: companyError } = await supabase
+      .from('companies')
+      .insert({
+        cnpj: cnpjValue,
+        name: data.companyName,
+        segment: data.segmento,
+        filler_email: data.adminEmail || 'nao_informado@email.com',
+      } as any)
+      .select('id')
+      .single()
+
+    if (companyError) throw new Error(`Erro ao salvar company: ${companyError.message}`)
+    companyId = newCompany.id
+  }
+
+  // WRITE 2: Insert into sessions
+  const { data: session, error: sessionError } = await supabase
+    .from('sessions')
+    .insert({
+      company_id: companyId,
+      filled_by: data.userName,
+      responsible_name: data.leadName,
+      responsible_email: data.leadEmail,
+      scoring_json: scoringData as any,
+    })
+    .select('id')
+    .single()
+
+  if (sessionError) throw new Error(`Erro ao salvar session: ${sessionError.message}`)
+  const sessionId = session.id
+
+  // WRITE 3: Batch insert into answers
+  const rawAnswers = [
+    { block: 'A', question_name: 'A1', question_type: 'numeric', question_answer: String(data.a1) },
+    { block: 'A', question_name: 'A2', question_type: 'numeric', question_answer: String(data.a2) },
+    { block: 'A', question_name: 'A3', question_type: 'numeric', question_answer: String(data.a3) },
+    { block: 'A', question_name: 'A4', question_type: 'numeric', question_answer: String(data.a4) },
+    { block: 'A', question_name: 'A5', question_type: 'numeric', question_answer: String(data.a5) },
+    { block: 'A', question_name: 'A6', question_type: 'text', question_answer: data.a6 },
+
+    { block: 'S', question_name: 'S1', question_type: 'numeric', question_answer: String(data.s1) },
+    { block: 'S', question_name: 'S2', question_type: 'numeric', question_answer: String(data.s2) },
+    { block: 'S', question_name: 'S3', question_type: 'numeric', question_answer: String(data.s3) },
+    { block: 'S', question_name: 'S4', question_type: 'numeric', question_answer: String(data.s4) },
+    { block: 'S', question_name: 'S5', question_type: 'numeric', question_answer: String(data.s5) },
+    { block: 'S', question_name: 'S6', question_type: 'text', question_answer: data.s6 },
+
+    {
+      block: 'Au',
+      question_name: 'Au1',
+      question_type: 'numeric',
+      question_answer: String(data.au1),
+    },
+    {
+      block: 'Au',
+      question_name: 'Au2',
+      question_type: 'numeric',
+      question_answer: String(data.au2),
+    },
+    {
+      block: 'Au',
+      question_name: 'Au3',
+      question_type: 'numeric',
+      question_answer: String(data.au3),
+    },
+    {
+      block: 'Au',
+      question_name: 'Au4',
+      question_type: 'numeric',
+      question_answer: String(data.au4),
+    },
+    {
+      block: 'Au',
+      question_name: 'Au5',
+      question_type: 'numeric',
+      question_answer: String(data.au5),
+    },
+    { block: 'Au', question_name: 'Au6', question_type: 'text', question_answer: data.au6 },
+
+    { block: 'T', question_name: 'T1', question_type: 'numeric', question_answer: String(data.t1) },
+    { block: 'T', question_name: 'T2', question_type: 'numeric', question_answer: String(data.t2) },
+    { block: 'T', question_name: 'T3', question_type: 'numeric', question_answer: String(data.t3) },
+    { block: 'T', question_name: 'T4', question_type: 'text', question_answer: data.t4 },
+
+    {
+      block: 'SEG',
+      question_name: 'temasSelecionados',
+      question_type: 'array',
+      question_answer: (data.temasSelecionados || []).join(', '),
+    },
+    {
+      block: 'SEG',
+      question_name: 'temaOutros',
+      question_type: 'text',
+      question_answer: data.temaOutros,
+    },
+  ]
+
+  const answersToInsert = rawAnswers
+    .filter(
+      (a) =>
+        a.question_answer !== undefined &&
+        a.question_answer !== null &&
+        a.question_answer !== '' &&
+        a.question_answer !== 'undefined',
+    )
+    .map((a) => ({ ...a, session_id: sessionId, company_id: companyId }))
+
+  if (answersToInsert.length > 0) {
+    const { error: answersError } = await supabase.from('answers').insert(answersToInsert)
+    if (answersError) throw new Error(`Erro ao salvar answers: ${answersError.message}`)
+  }
+
+  // WRITE 4: Insert into aggregated_answers
+  const { error: aggregatedError } = await supabase.from('aggregated_answers').insert({
+    session_id: sessionId,
+    company_id: companyId,
+    answers_json: {
+      ...payload,
+      temasSelecionados: data.temasSelecionados,
+      temaOutros: data.temaOutros,
+    } as any,
+  })
+
+  if (aggregatedError)
+    throw new Error(`Erro ao salvar aggregated_answers: ${aggregatedError.message}`)
+
+  // LEGACY — disabled, kept for reference.
+  /*
+  let empresaId: string
+  const cnpjValueLegacy = data.cnpj || 'Não informado'
 
   const { data: existingEmpresa, error: findEmpresaError } = await supabase
     .from('empresas')
     .select('id')
-    .eq('cnpj', cnpjValue)
+    .eq('cnpj', cnpjValueLegacy)
     .limit(1)
     .maybeSingle()
 
@@ -94,7 +251,7 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     const { data: newEmpresa, error: empresaError } = await supabase
       .from('empresas')
       .insert({
-        cnpj: cnpjValue,
+        cnpj: cnpjValueLegacy,
         nome: data.companyName,
         email_admin: data.adminEmail || 'nao_informado@email.com',
         responsavel_nome: data.leadName,
@@ -181,6 +338,9 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
   }
 
   return { scoringData, diagnosticoId: diagnostico.id }
+  */
+
+  return { scoringData, sessionId }
 }
 
 export const finalizeSuccessPlan = async (diagnosticoId: string, complemento: string) => {
