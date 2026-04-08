@@ -156,7 +156,7 @@ export default function SegmentQuestions() {
       const res = await submitDiagnosis(finalData)
       updateData({
         scoringData: res.scoringData,
-        diagnosticoId: res.diagnosticoId,
+        sessionId: res.sessionId,
       })
       navigate('/plano-de-sucesso')
     } catch (error: any) {
