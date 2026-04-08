@@ -3,6 +3,7 @@
     "calcular_scoring": 14,
     "exportar_para_sheets": 17,
     "gerar_documento_pdf": 29,
-    "sync-diagnosticos-to-sheets": 4
+    "sync-diagnosticos-to-sheets": 4,
+    "enviar_webhook": 1
   }
 }
