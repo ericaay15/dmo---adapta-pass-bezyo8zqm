@@ -22,7 +22,7 @@ export default function SuccessPlan() {
   const { data, updateData } = useDiagnosisStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  if (!data.diagnosticoId || !data.scoringData) {
+  if (!data.sessionId || !data.scoringData) {
     return <Navigate to="/" replace />
   }
 
@@ -45,7 +45,7 @@ export default function SuccessPlan() {
   const handleFinalize = async () => {
     setIsSubmitting(true)
     try {
-      const { pdfUrl } = await finalizeSuccessPlan(data.diagnosticoId!, '')
+      const { pdfUrl } = await finalizeSuccessPlan(data.sessionId!, '')
       if (pdfUrl) {
         updateData({ pdfUrl, complemento: '' })
       } else {

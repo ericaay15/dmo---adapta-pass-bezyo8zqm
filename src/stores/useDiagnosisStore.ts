@@ -34,7 +34,7 @@ export type DiagnosisState = {
   t4: string
   pdfUrl?: string
   scoringData?: any
-  diagnosticoId?: string
+  sessionId?: string
   complemento?: string
 }
 
@@ -72,7 +72,7 @@ let store: DiagnosisState = {
   t4: '',
   pdfUrl: undefined,
   scoringData: undefined,
-  diagnosticoId: undefined,
+  sessionId: undefined,
   complemento: undefined,
 }
 
@@ -132,7 +132,7 @@ const useDiagnosisStore = () => {
       t4: '',
       pdfUrl: undefined,
       scoringData: undefined,
-      diagnosticoId: undefined,
+      sessionId: undefined,
       complemento: undefined,
     }
     listeners.forEach((listener) => listener())
