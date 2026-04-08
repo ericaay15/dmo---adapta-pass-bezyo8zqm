@@ -9,6 +9,120 @@ export type Database = {
   }
   public: {
     Tables: {
+      aggregated_answers: {
+        Row: {
+          answers_json: Json | null
+          company_id: string
+          created_at: string
+          id: string
+          session_id: string
+        }
+        Insert: {
+          answers_json?: Json | null
+          company_id: string
+          created_at?: string
+          id?: string
+          session_id: string
+        }
+        Update: {
+          answers_json?: Json | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'aggregated_answers_company_id_fkey'
+            columns: ['company_id']
+            isOneToOne: false
+            referencedRelation: 'companies'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'aggregated_answers_session_id_fkey'
+            columns: ['session_id']
+            isOneToOne: true
+            referencedRelation: 'sessions'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      answers: {
+        Row: {
+          block: string
+          company_id: string | null
+          created_at: string
+          id: string
+          question_answer: string | null
+          question_name: string
+          question_type: string
+          session_id: string
+        }
+        Insert: {
+          block: string
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          question_answer?: string | null
+          question_name: string
+          question_type: string
+          session_id: string
+        }
+        Update: {
+          block?: string
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          question_answer?: string | null
+          question_name?: string
+          question_type?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'answers_company_id_fkey'
+            columns: ['company_id']
+            isOneToOne: false
+            referencedRelation: 'companies'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'answers_session_id_fkey'
+            columns: ['session_id']
+            isOneToOne: false
+            referencedRelation: 'sessions'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          cnpj: string
+          created_at: string
+          filler_email: string | null
+          id: string
+          name: string | null
+          segment: string
+        }
+        Insert: {
+          cnpj: string
+          created_at?: string
+          filler_email?: string | null
+          id?: string
+          name?: string | null
+          segment?: string
+        }
+        Update: {
+          cnpj?: string
+          created_at?: string
+          filler_email?: string | null
+          id?: string
+          name?: string | null
+          segment?: string
+        }
+        Relationships: []
+      }
       diagnosticos: {
         Row: {
           classificacao_a: string | null
@@ -309,6 +423,53 @@ export type Database = {
           },
         ]
       }
+      sessions: {
+        Row: {
+          company_id: string
+          created_at: string
+          filled_by: string | null
+          id: string
+          pdf_url: string | null
+          responsible_email: string | null
+          responsible_name: string | null
+          scoring_json: Json | null
+          success_complement: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          filled_by?: string | null
+          id?: string
+          pdf_url?: string | null
+          responsible_email?: string | null
+          responsible_name?: string | null
+          scoring_json?: Json | null
+          success_complement?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          filled_by?: string | null
+          id?: string
+          pdf_url?: string | null
+          responsible_email?: string | null
+          responsible_name?: string | null
+          scoring_json?: Json | null
+          success_complement?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'sessions_company_id_fkey'
+            columns: ['company_id']
+            isOneToOne: false
+            referencedRelation: 'companies'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       vw_diagnosticos_completos: {
@@ -504,6 +665,28 @@ export const Constants = {
 // --- COLUMN TYPES (actual PostgreSQL types) ---
 // Use this to know the real database type when writing migrations.
 // "string" in TypeScript types above may be uuid, text, varchar, timestamptz, etc.
+// Table: aggregated_answers
+//   id: uuid (not null, default: gen_random_uuid())
+//   session_id: uuid (not null)
+//   company_id: uuid (not null)
+//   answers_json: jsonb (nullable)
+//   created_at: timestamp with time zone (not null, default: now())
+// Table: answers
+//   id: uuid (not null, default: gen_random_uuid())
+//   session_id: uuid (not null)
+//   block: text (not null)
+//   question_name: text (not null)
+//   question_type: text (not null)
+//   question_answer: text (nullable)
+//   created_at: timestamp with time zone (not null, default: now())
+//   company_id: uuid (nullable)
+// Table: companies
+//   id: uuid (not null, default: gen_random_uuid())
+//   cnpj: text (not null)
+//   name: text (nullable)
+//   segment: text (not null, default: 'Outros'::text)
+//   filler_email: text (nullable)
+//   created_at: timestamp with time zone (not null, default: now())
 // Table: diagnosticos
 //   id: uuid (not null, default: gen_random_uuid())
 //   empresa_id: uuid (not null)
@@ -581,6 +764,17 @@ export const Constants = {
 //   tipo_bloco: text (not null)
 //   numero_pergunta: integer (not null)
 //   resposta: text (not null)
+// Table: sessions
+//   id: uuid (not null, default: gen_random_uuid())
+//   company_id: uuid (not null)
+//   filled_by: text (nullable)
+//   responsible_name: text (nullable)
+//   responsible_email: text (nullable)
+//   scoring_json: jsonb (nullable)
+//   success_complement: text (nullable)
+//   pdf_url: text (nullable)
+//   created_at: timestamp with time zone (not null, default: now())
+//   updated_at: timestamp with time zone (not null, default: now())
 // Table: vw_diagnosticos_completos
 //   diagnostico_id: uuid (nullable)
 //   data_preenchimento: timestamp with time zone (nullable)
@@ -625,6 +819,19 @@ export const Constants = {
 //   pdf_url: text (nullable)
 
 // --- CONSTRAINTS ---
+// Table: aggregated_answers
+//   FOREIGN KEY aggregated_answers_company_id_fkey: FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+//   PRIMARY KEY aggregated_answers_pkey: PRIMARY KEY (id)
+//   FOREIGN KEY aggregated_answers_session_id_fkey: FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+//   UNIQUE uq_aggregated_answers_session: UNIQUE (session_id)
+// Table: answers
+//   FOREIGN KEY answers_company_id_fkey: FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+//   PRIMARY KEY answers_pkey: PRIMARY KEY (id)
+//   FOREIGN KEY answers_session_id_fkey: FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+//   UNIQUE uq_answers_session_question: UNIQUE (session_id, question_name)
+// Table: companies
+//   UNIQUE companies_cnpj_key: UNIQUE (cnpj)
+//   PRIMARY KEY companies_pkey: PRIMARY KEY (id)
 // Table: diagnosticos
 //   FOREIGN KEY diagnosticos_empresa_id_fkey: FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
 //   PRIMARY KEY diagnosticos_pkey: PRIMARY KEY (id)
@@ -636,8 +843,32 @@ export const Constants = {
 // Table: respostas_abertas
 //   FOREIGN KEY respostas_abertas_diagnostico_id_fkey: FOREIGN KEY (diagnostico_id) REFERENCES diagnosticos(id) ON DELETE CASCADE
 //   PRIMARY KEY respostas_abertas_pkey: PRIMARY KEY (id)
+// Table: sessions
+//   FOREIGN KEY sessions_company_id_fkey: FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+//   PRIMARY KEY sessions_pkey: PRIMARY KEY (id)
 
 // --- ROW LEVEL SECURITY POLICIES ---
+// Table: aggregated_answers
+//   Policy "Allow public inserts on aggregated_answers" (INSERT, PERMISSIVE) roles={public}
+//     WITH CHECK: true
+//   Policy "Allow public selects on aggregated_answers" (SELECT, PERMISSIVE) roles={public}
+//     USING: true
+//   Policy "Allow public updates on aggregated_answers" (UPDATE, PERMISSIVE) roles={public}
+//     USING: true
+//     WITH CHECK: true
+// Table: answers
+//   Policy "Allow public inserts on answers" (INSERT, PERMISSIVE) roles={public}
+//     WITH CHECK: true
+//   Policy "Allow public selects on answers" (SELECT, PERMISSIVE) roles={public}
+//     USING: true
+// Table: companies
+//   Policy "Allow public inserts on companies" (INSERT, PERMISSIVE) roles={public}
+//     WITH CHECK: true
+//   Policy "Allow public selects on companies" (SELECT, PERMISSIVE) roles={public}
+//     USING: true
+//   Policy "Allow public updates on companies" (UPDATE, PERMISSIVE) roles={public}
+//     USING: true
+//     WITH CHECK: true
 // Table: diagnosticos
 //   Policy "Allow public inserts on diagnosticos" (INSERT, PERMISSIVE) roles={public}
 //     WITH CHECK: true
@@ -662,6 +893,14 @@ export const Constants = {
 //     WITH CHECK: true
 //   Policy "Allow public selects on respostas_abertas" (SELECT, PERMISSIVE) roles={public}
 //     USING: true
+// Table: sessions
+//   Policy "Allow public inserts on sessions" (INSERT, PERMISSIVE) roles={public}
+//     WITH CHECK: true
+//   Policy "Allow public selects on sessions" (SELECT, PERMISSIVE) roles={public}
+//     USING: true
+//   Policy "Allow public updates on sessions" (UPDATE, PERMISSIVE) roles={public}
+//     USING: true
+//     WITH CHECK: true
 
 // --- DATABASE FUNCTIONS ---
 // FUNCTION sync_relatorio_diagnostico(uuid)
@@ -865,7 +1104,19 @@ export const Constants = {
 //   on_respostas_change: CREATE TRIGGER on_respostas_change AFTER INSERT OR DELETE OR UPDATE ON public.respostas_abertas FOR EACH ROW EXECUTE FUNCTION trg_sync_relatorio_respostas()
 
 // --- INDEXES ---
+// Table: aggregated_answers
+//   CREATE INDEX idx_aggregated_answers_company_id ON public.aggregated_answers USING btree (company_id)
+//   CREATE INDEX idx_aggregated_answers_session_id ON public.aggregated_answers USING btree (session_id)
+//   CREATE UNIQUE INDEX uq_aggregated_answers_session ON public.aggregated_answers USING btree (session_id)
+// Table: answers
+//   CREATE INDEX idx_answers_company_id ON public.answers USING btree (company_id)
+//   CREATE INDEX idx_answers_session_id ON public.answers USING btree (session_id)
+//   CREATE UNIQUE INDEX uq_answers_session_question ON public.answers USING btree (session_id, question_name)
+// Table: companies
+//   CREATE UNIQUE INDEX companies_cnpj_key ON public.companies USING btree (cnpj)
 // Table: diagnosticos
 //   CREATE INDEX idx_diagnosticos_empresa_id ON public.diagnosticos USING btree (empresa_id)
 // Table: respostas_abertas
 //   CREATE INDEX idx_respostas_abertas_diagnostico_id ON public.respostas_abertas USING btree (diagnostico_id)
+// Table: sessions
+//   CREATE INDEX idx_sessions_company_id ON public.sessions USING btree (company_id)

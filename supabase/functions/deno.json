@@ -1,8 +1,8 @@
 {
   "_versions": {
-    "calcular_scoring": 13,
-    "exportar_para_sheets": 14,
-    "gerar_documento_pdf": 27,
-    "sync-diagnosticos-to-sheets": 3
+    "calcular_scoring": 14,
+    "exportar_para_sheets": 15,
+    "gerar_documento_pdf": 28,
+    "sync-diagnosticos-to-sheets": 4
   }
 }
