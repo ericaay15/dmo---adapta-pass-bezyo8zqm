@@ -40,7 +40,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json()
-    let diagId = body.diagnostico_id
+    let sessionId = body.session_id
 
     // Logo Adapta Pass Dark Mode Format (White text, green icon)
     const defaultLogo =
@@ -49,23 +49,82 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    if (!diagId) {
-      throw new Error('diagnostico_id is required')
+    if (!sessionId) {
+      throw new Error('session_id is required')
     }
 
-    const { data: diag, error } = await supabase
-      .from('diagnosticos')
-      .select('*, empresas(*), respostas_abertas(*)')
-      .eq('id', diagId)
+    const { data: session, error: sessionError } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('id', sessionId)
       .single()
 
-    if (error || !diag) {
-      throw new Error(`Diagnóstico não encontrado: ${error?.message || ''}`)
+    if (sessionError || !session) {
+      throw new Error(`Sessão não encontrada: ${sessionError?.message || ''}`)
+    }
+
+    const { data: company, error: companyError } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('id', session.company_id)
+      .single()
+
+    if (companyError || !company) {
+      throw new Error(`Empresa não encontrada: ${companyError?.message || ''}`)
+    }
+
+    const { data: aggregatedAnswers, error: aggregatedAnswersError } = await supabase
+      .from('aggregated_answers')
+      .select('*')
+      .eq('session_id', sessionId)
+      .single()
+
+    if (aggregatedAnswersError || !aggregatedAnswers) {
+      throw new Error(`Respostas não encontradas: ${aggregatedAnswersError?.message || ''}`)
+    }
+
+    const answersJson: any = aggregatedAnswers.answers_json || {}
+    const scoring: any = session.scoring_json || {}
+
+    const diag = {
+      // Company info mapped to the old field names the HTML template uses
+      empresas: {
+        nome: company.name,
+        cnpj: company.cnpj,
+        responsavel_nome: session.responsible_name,
+        responsavel_email: session.responsible_email,
+      },
+
+      // All form answers used by questionsMap rendering
+      respostas_json: answersJson,
+
+      // Scoring extracted from the JSONB blob
+      nota_a: scoring.blocos?.A?.nota,
+      nota_s: scoring.blocos?.S?.nota,
+      nota_au: scoring.blocos?.Au?.nota,
+      nota_geral: scoring.nota_geral?.valor,
+      classificacao_a: scoring.blocos?.A?.classificacao,
+      classificacao_s: scoring.blocos?.S?.classificacao,
+      classificacao_au: scoring.blocos?.Au?.classificacao,
+      top_3_oportunidades_json: scoring.top_3_oportunidades,
+      metricas_json: scoring.metricas_chave,
+      first_impact_json: scoring.first_impact,
+
+      // Success plan
+      complemento_sucesso: session.success_complement,
+
+      // Open answers built from answersJson to match the shape the HTML template expects
+      respostas_abertas: [
+        { tipo_bloco: 'A', numero_pergunta: 6, resposta: answersJson.A6 || '' },
+        { tipo_bloco: 'S', numero_pergunta: 6, resposta: answersJson.S6 || '' },
+        { tipo_bloco: 'Au', numero_pergunta: 6, resposta: answersJson.Au6 || '' },
+        { tipo_bloco: 'T', numero_pergunta: 4, resposta: answersJson.T4 || '' },
+      ],
     }
 
     const html = generatePdfHtml(diag, logoUrl)
 
-    const fileName = `plano-de-sucesso-${diagId}.html`
+    const fileName = `plano-de-sucesso-${sessionId}.html`
 
     const { error: uploadError } = await supabase.storage
       .from('documentos')
@@ -82,7 +141,7 @@ Deno.serve(async (req: Request) => {
 
     const publicUrl = publicUrlData.publicUrl
 
-    await supabase.from('diagnosticos').update({ pdf_url: publicUrl }).eq('id', diagId)
+    await supabase.from('sessions').update({ pdf_url: publicUrl }).eq('id', sessionId)
 
     return new Response(JSON.stringify({ url: publicUrl }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
