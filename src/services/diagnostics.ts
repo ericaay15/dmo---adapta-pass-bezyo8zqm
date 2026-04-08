@@ -436,6 +436,14 @@ export const finalizeSuccessPlan = async (sessionId: string, complemento: string
       console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
     })
 
+  supabase.functions
+    .invoke('enviar_webhook', {
+      body: { session_id: sessionId },
+    })
+    .catch((err) => {
+      console.error('Falha ao invocar enviar_webhook:', err)
+    })
+
   // LEGACY — disabled, kept for reference.
   /*
   supabase.functions
