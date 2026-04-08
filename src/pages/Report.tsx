@@ -148,14 +148,77 @@ export default function Report() {
     const fetchReport = async () => {
       if (!id) return
 
-      const { data: diag } = await supabase
-        .from('diagnosticos')
-        .select('*, empresas(*), respostas_abertas(*)')
-        .eq('id', id)
-        .single()
+      try {
+        const { data: session, error: sessionError } = await supabase
+          .from('sessions')
+          .select('*')
+          .eq('id', id)
+          .single()
 
-      setData(diag)
-      setLoading(false)
+        if (sessionError || !session) {
+          setData(null)
+          setLoading(false)
+          return
+        }
+
+        const { data: company, error: companyError } = await supabase
+          .from('companies')
+          .select('*')
+          .eq('id', session.company_id)
+          .single()
+
+        if (companyError || !company) {
+          setData(null)
+          setLoading(false)
+          return
+        }
+
+        const { data: aggregatedAnswers, error: aggregatedAnswersError } = await supabase
+          .from('aggregated_answers')
+          .select('*')
+          .eq('session_id', id)
+          .single()
+
+        if (aggregatedAnswersError || !aggregatedAnswers) {
+          setData(null)
+          setLoading(false)
+          return
+        }
+
+        const answersJson = (aggregatedAnswers.answers_json as any) || {}
+        const scoringJson = (session.scoring_json as any) || {}
+
+        const diag = {
+          empresas: {
+            nome: company.name,
+            cnpj: company.cnpj,
+            responsavel_nome: session.responsible_name,
+            responsavel_email: session.responsible_email,
+          },
+          respostas_json: answersJson,
+          nota_a: scoringJson.blocos?.A?.nota,
+          nota_s: scoringJson.blocos?.S?.nota,
+          nota_au: scoringJson.blocos?.Au?.nota,
+          nota_geral: scoringJson.nota_geral?.valor,
+          classificacao_geral: scoringJson.nota_geral?.classificacao,
+          metricas_json: scoringJson.metricas_chave,
+          top_3_oportunidades_json: scoringJson.top_3_oportunidades,
+          first_impact_json: scoringJson.first_impact,
+          complemento_sucesso: session.success_complement,
+          respostas_abertas: [
+            { tipo_bloco: 'A', numero_pergunta: 6, resposta: answersJson.A6 || '' },
+            { tipo_bloco: 'S', numero_pergunta: 6, resposta: answersJson.S6 || '' },
+            { tipo_bloco: 'Au', numero_pergunta: 6, resposta: answersJson.Au6 || '' },
+            { tipo_bloco: 'T', numero_pergunta: 4, resposta: answersJson.T4 || '' },
+          ],
+        }
+
+        setData(diag)
+      } catch (error) {
+        setData(null)
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchReport()
