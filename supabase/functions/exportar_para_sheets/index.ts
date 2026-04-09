@@ -113,8 +113,11 @@ function buildDataMap(
   map['updated_at'] = session.updated_at ?? ''
 
   // --- Dynamic question answers ---
+  const TEMAS_KEYS = new Set(['temasSelecionados', 'temaOutros'])
   for (const [key, value] of Object.entries(answersJson ?? {})) {
-    map[key] = String(value ?? '')
+    if (!TEMAS_KEYS.has(key)) {
+      map[key] = String(value ?? '')
+    }
   }
 
   // --- SEG block (if present) ---
