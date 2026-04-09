@@ -120,7 +120,7 @@ Deno.serve(async (req: Request) => {
     ) {
       answersArray.push({
         key: 'temasSelecionados',
-        label: 'Temas selecionados para aprofundamento',
+        label: labelsFromDb['temasSelecionados'] || 'Temas selecionados para aprofundamento',
         block: 'SEG',
         type: 'array',
         value: Array.isArray(answersJson.temasSelecionados)
@@ -136,7 +136,7 @@ Deno.serve(async (req: Request) => {
     ) {
       answersArray.push({
         key: 'temaOutros',
-        label: 'Outros temas mencionados',
+        label: labelsFromDb['temaOutros'] || 'Outros temas mencionados',
         block: 'SEG',
         type: 'text',
         value: String(answersJson.temaOutros),

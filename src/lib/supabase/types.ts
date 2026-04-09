@@ -55,6 +55,7 @@ export type Database = {
           created_at: string
           id: string
           question_answer: string | null
+          question_label: string | null
           question_name: string
           question_type: string
           session_id: string
@@ -65,6 +66,7 @@ export type Database = {
           created_at?: string
           id?: string
           question_answer?: string | null
+          question_label?: string | null
           question_name: string
           question_type: string
           session_id: string
@@ -75,6 +77,7 @@ export type Database = {
           created_at?: string
           id?: string
           question_answer?: string | null
+          question_label?: string | null
           question_name?: string
           question_type?: string
           session_id?: string
@@ -680,6 +683,7 @@ export const Constants = {
 //   question_answer: text (nullable)
 //   created_at: timestamp with time zone (not null, default: now())
 //   company_id: uuid (nullable)
+//   question_label: text (nullable)
 // Table: companies
 //   id: uuid (not null, default: gen_random_uuid())
 //   cnpj: text (not null)
