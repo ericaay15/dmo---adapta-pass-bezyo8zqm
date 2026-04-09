@@ -113,12 +113,13 @@ export default function SuccessPlan() {
           <div className="grid grid-cols-1 gap-6 mb-12 bg-white/5 border border-white/10 p-6 md:p-8 rounded-xl">
             <h3 className="text-xl font-bold text-white mb-2">Maturidade por Dimensão</h3>
 
-            {['A', 'S', 'Au'].map((blocoId) => {
+            {['A', 'S', 'Au', 'T'].map((blocoId) => {
               const bloco = scoringData.blocos[blocoId]
               const nomes: Record<string, string> = {
                 A: 'Amplificar',
                 S: 'Sistematizar',
                 Au: 'Automatizar',
+                T: 'Transformar',
               }
               return (
                 <div key={blocoId} className="space-y-2">

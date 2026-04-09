@@ -99,6 +99,7 @@ Deno.serve(async (req: Request) => {
       classificacao_s: scoring.blocos?.S?.classificacao,
       classificacao_au: scoring.blocos?.Au?.classificacao,
       classificacao_t: scoring.blocos?.T?.classificacao,
+      classificacao_geral: scoring.nota_geral?.classificacao ?? '',
       top_3_oportunidades_json: scoring.top_3_oportunidades,
       metricas_json: scoring.metricas_chave,
       first_impact_json: scoring.first_impact,
@@ -514,7 +515,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
         <div style="margin-bottom: 8px; color: var(--text-muted); font-size: 14px; font-weight: 600;">Nota Geral</div>
         <div class="val">${diag.nota_geral || '0.0'}</div>
         <div class="classificacao" style="color: ${getScoreColor(diag.nota_geral || 0, 10)}">
-          ${getClassificacaoLabel(diag.nota_geral || 0)}
+          ${diag.classificacao_geral || getClassificacaoLabel(diag.nota_geral || 0)}
         </div>
       </div>
 
