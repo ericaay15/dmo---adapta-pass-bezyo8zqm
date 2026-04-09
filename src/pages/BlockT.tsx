@@ -22,6 +22,7 @@ import { Progress } from '@/components/ui/progress'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
 import { submitDiagnosis } from '@/services/diagnostics'
+import { questionsMap } from '@/constants/questionsMap'
 
 const formSchema = z.object({
   t1: z.number().min(1).max(10),
@@ -148,8 +149,7 @@ export default function BlockT() {
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                         <FormLabel className="text-base text-slate-200 font-medium leading-relaxed md:max-w-[80%]">
-                          T1. Numa escala de 1-10, o quanto a empresa funciona sem você (dono) no
-                          operacional diário?
+                          {`T1. ${questionsMap['T1']}`}
                         </FormLabel>
                         <Badge
                           variant="outline"
@@ -196,8 +196,7 @@ export default function BlockT() {
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                         <FormLabel className="text-base text-slate-200 font-medium leading-relaxed md:max-w-[80%]">
-                          T2. Numa escala de 1-10, quanto controle você tem sobre os números do
-                          negócio em tempo real?
+                          {`T2. ${questionsMap['T2']}`}
                         </FormLabel>
                         <Badge
                           variant="outline"
@@ -242,8 +241,7 @@ export default function BlockT() {
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                         <FormLabel className="text-base text-slate-200 font-medium leading-relaxed md:max-w-[80%]">
-                          T3. Numa escala de 1-10, o quanto você sente que a empresa está preparada
-                          pro futuro com IA?
+                          {`T3. ${questionsMap['T3']}`}
                         </FormLabel>
                         <Badge
                           variant="outline"
@@ -287,8 +285,7 @@ export default function BlockT() {
                   render={({ field }) => (
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                        T4. Se você pudesse resolver UM problema do seu negócio nos próximos 90
-                        dias, qual seria?
+                        {`T4. ${questionsMap['T4']}`}
                       </FormLabel>
                       <FormControl>
                         <Textarea

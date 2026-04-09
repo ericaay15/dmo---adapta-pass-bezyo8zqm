@@ -5,34 +5,6 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-const questionsMap: Record<string, string> = {
-  A1: 'A1. Quantas pessoas do time usam IA no trabalho diário?',
-  A2: 'A2. Qual a profundidade do uso de IA?',
-  A3: 'A3. A liderança usa IA ativamente para pensar o negócio?',
-  A4: 'A4. O time recebeu capacitação formal em IA nos últimos 6 meses?',
-  A5: 'A5. A IA já gerou um resultado tangível e mensurável no negócio?',
-  A6: 'A6. Qual foi o melhor resultado que você já teve usando IA? Se não teve, o que esperaria conseguir?',
-
-  S1: 'S1. Os processos críticos da empresa estão documentados?',
-  S2: 'S2. Quando alguém novo entra, existe um sistema de onboarding estruturado?',
-  S3: 'S3. Se uma pessoa-chave saísse hoje, quanto conhecimento crítico se perderia?',
-  S4: 'S4. A empresa usa ferramentas integradas (CRM, controles, fluxos) ou planilhas/WhatsApp?',
-  S5: 'S5. Existe uma base de conhecimento interna que o time consulta?',
-  S6: 'S6. Qual é o processo mais crítico da empresa que ainda mora na cabeça de alguém?',
-
-  Au1: 'Au1. Quantas tarefas repetitivas do dia a dia já foram automatizadas?',
-  Au2: 'Au2. A empresa tem automações rodando (follow-ups, relatórios, agendamentos)?',
-  Au3: 'Au3. Existem processos que humanos fazem manualmente mas que poderiam ser automáticos?',
-  Au4: 'Au4. O time gasta quanto tempo por semana em tarefas puramente operacionais/repetitivas?',
-  Au5: 'Au5. A empresa monitora KPIs automaticamente ou alguém monta relatórios manualmente?',
-  Au6: 'Au6. Qual tarefa do dia a dia você mais gostaria de nunca mais ter que fazer?',
-
-  T1: 'T1. Numa escala de 1-10, o quanto a empresa funciona sem você (dono) no operacional diário?',
-  T2: 'T2. Numa escala de 1-10, quanto controle você tem sobre os números do negócio em tempo real?',
-  T3: 'T3. Numa escala de 1-10, o quanto você sente que a empresa está preparada pro futuro com IA?',
-  T4: 'T4. Se você pudesse resolver UM problema do seu negócio nos próximos 90 dias, qual seria?',
-}
-
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -83,10 +55,23 @@ Deno.serve(async (req: Request) => {
       throw new Error(`Respostas não encontradas: ${aggregatedAnswersError?.message || ''}`)
     }
 
+    const { data: answersDb } = await supabase
+      .from('answers')
+      .select('question_name, question_label')
+      .eq('session_id', sessionId)
+
+    const labelsFromDb: Record<string, string> = {}
+    if (answersDb) {
+      answersDb.forEach((a: any) => {
+        labelsFromDb[a.question_name] = a.question_label
+      })
+    }
+
     const answersJson: any = aggregatedAnswers.answers_json || {}
     const scoring: any = session.scoring_json || {}
 
     const diag = {
+      labelsFromDb,
       // Company info mapped to the old field names the HTML template uses
       empresas: {
         nome: company.name,
@@ -163,6 +148,31 @@ function getClassificacaoLabel(nota: number): string {
 
 function generatePdfHtml(diag: any, logoUrl: string) {
   const empresa = diag.empresas || {}
+  const labelsFromDb = diag.labelsFromDb || {}
+  const allKeys = [
+    'A1',
+    'A2',
+    'A3',
+    'A4',
+    'A5',
+    'A6',
+    'S1',
+    'S2',
+    'S3',
+    'S4',
+    'S5',
+    'S6',
+    'Au1',
+    'Au2',
+    'Au3',
+    'Au4',
+    'Au5',
+    'Au6',
+    'T1',
+    'T2',
+    'T3',
+    'T4',
+  ]
   const metricas = diag.metricas_json || {}
   const firstImpact = diag.first_impact_json || {}
   const top3 = diag.top_3_oportunidades_json || []
@@ -183,7 +193,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
   const historyHtml = ['A', 'S', 'Au', 'T']
     .map((prefix) => {
-      const sectionKeys = Object.keys(questionsMap).filter((k) => {
+      const sectionKeys = allKeys.filter((k) => {
         if (prefix === 'A') return k.startsWith('A') && !k.startsWith('Au')
         return k.startsWith(prefix)
       })
@@ -238,7 +248,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
           return `
         <div class="history-item">
-          <div class="history-q">${questionsMap[k]}</div>
+          <div class="history-q">${k}. ${labelsFromDb[k] || k}</div>
           <div class="history-a">${
             isAberta ? String(resposta).replace(/\n/g, '<br/>') : scoreHtml
           }</div>

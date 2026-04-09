@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
+import { questionsMap } from '@/constants/questionsMap'
 
 const formSchema = z.object({
   au1: z.string().min(1, { message: 'Selecione uma opção.' }),
@@ -32,31 +33,31 @@ const formSchema = z.object({
 const scaleQuestions = [
   {
     id: 'au1' as const,
-    text: 'Au1. Quantas tarefas repetitivas do dia a dia já foram automatizadas?',
+    text: `Au1. ${questionsMap['Au1']}`,
     minLabel: '(1=nenhuma)',
     maxLabel: '(5=a maioria)',
   },
   {
     id: 'au2' as const,
-    text: 'Au2. A empresa tem automações rodando (follow-ups, relatórios, agendamentos)?',
+    text: `Au2. ${questionsMap['Au2']}`,
     minLabel: '(1=zero)',
     maxLabel: '(5=várias ativas)',
   },
   {
     id: 'au3' as const,
-    text: 'Au3. Existem processos que humanos fazem manualmente mas que poderiam ser automáticos?',
+    text: `Au3. ${questionsMap['Au3']}`,
     minLabel: '(1=muitos)',
     maxLabel: '(5=quase nenhum)',
   },
   {
     id: 'au4' as const,
-    text: 'Au4. O time gasta quanto tempo por semana em tarefas puramente operacionais/repetitivas?',
+    text: `Au4. ${questionsMap['Au4']}`,
     minLabel: '(1=maioria do tempo)',
     maxLabel: '(5=muito pouco)',
   },
   {
     id: 'au5' as const,
-    text: 'Au5. A empresa monitora KPIs automaticamente ou alguém monta relatórios manualmente?',
+    text: `Au5. ${questionsMap['Au5']}`,
     minLabel: '(1=tudo manual)',
     maxLabel: '(5=dashboards automáticos)',
   },
@@ -185,8 +186,7 @@ export default function BlockAu() {
                   render={({ field }) => (
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                        Au6. Qual tarefa do dia a dia você mais gostaria de nunca mais ter que
-                        fazer?
+                        {`Au6. ${questionsMap['Au6']}`}
                       </FormLabel>
                       <FormControl>
                         <Textarea

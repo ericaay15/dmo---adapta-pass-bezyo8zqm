@@ -1,9 +1,9 @@
 {
   "_versions": {
-    "calcular_scoring": 14,
-    "exportar_para_sheets": 17,
-    "gerar_documento_pdf": 29,
-    "sync-diagnosticos-to-sheets": 4,
-    "enviar_webhook": 1
+    "calcular_scoring": 15,
+    "exportar_para_sheets": 18,
+    "gerar_documento_pdf": 30,
+    "sync-diagnosticos-to-sheets": 5,
+    "enviar_webhook": 2
   }
 }

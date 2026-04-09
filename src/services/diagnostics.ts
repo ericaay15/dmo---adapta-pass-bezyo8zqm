@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase/client'
 import { DiagnosisState } from '@/stores/useDiagnosisStore'
+import { questionsMap } from '@/constants/questionsMap'
 
 export const submitDiagnosis = async (data: DiagnosisState) => {
   const payload = {
@@ -196,7 +197,12 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
         a.question_answer !== '' &&
         a.question_answer !== 'undefined',
     )
-    .map((a) => ({ ...a, session_id: sessionId, company_id: companyId }))
+    .map((a) => ({
+      ...a,
+      session_id: sessionId,
+      company_id: companyId,
+      question_label: questionsMap[a.question_name] || a.question_name,
+    }))
 
   if (answersToInsert.length > 0) {
     const { error: answersError } = await supabase.from('answers').insert(answersToInsert)
@@ -372,6 +378,7 @@ export const finalizeSuccessPlan = async (sessionId: string, complemento: string
       question_name: 'success_complement',
       question_type: 'text',
       question_answer: complemento.trim(),
+      question_label: questionsMap['success_complement'] || 'success_complement',
     })
 
     if (answersError) {

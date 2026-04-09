@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
+import { questionsMap } from '@/constants/questionsMap'
 
 const formSchema = z.object({
   a1: z.string().min(1, { message: 'Selecione uma opção.' }),
@@ -32,31 +33,31 @@ const formSchema = z.object({
 const scaleQuestions = [
   {
     id: 'a1' as const,
-    text: 'A1. Quantas pessoas do time usam IA no trabalho diário?',
+    text: `A1. ${questionsMap['A1']}`,
     minLabel: '1 = ninguém',
     maxLabel: '5 = todos',
   },
   {
     id: 'a2' as const,
-    text: 'A2. Qual a profundidade do uso de IA?',
+    text: `A2. ${questionsMap['A2']}`,
     minLabel: '1 = corrigir texto',
     maxLabel: '5 = simular cenários, tomar decisões estratégicas',
   },
   {
     id: 'a3' as const,
-    text: 'A3. A liderança usa IA ativamente para pensar o negócio?',
+    text: `A3. ${questionsMap['A3']}`,
     minLabel: '1 = nunca',
     maxLabel: '5 = diariamente',
   },
   {
     id: 'a4' as const,
-    text: 'A4. O time recebeu capacitação formal em IA nos últimos 6 meses?',
+    text: `A4. ${questionsMap['A4']}`,
     minLabel: '1 = nenhuma',
     maxLabel: '5 = programa estruturado',
   },
   {
     id: 'a5' as const,
-    text: 'A5. A IA já gerou um resultado tangível e mensurável no negócio?',
+    text: `A5. ${questionsMap['A5']}`,
     minLabel: '1 = nenhum',
     maxLabel: '5 = vários comprováveis',
   },
@@ -190,8 +191,7 @@ export default function BlockA() {
                   render={({ field }) => (
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                        A6. Qual foi o melhor resultado que você já teve usando IA? Se não teve, o
-                        que esperaria conseguir?
+                        {`A6. ${questionsMap['A6']}`}
                       </FormLabel>
                       <FormControl>
                         <Textarea

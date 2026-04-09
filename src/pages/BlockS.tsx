@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
+import { questionsMap } from '@/constants/questionsMap'
 
 const formSchema = z.object({
   s1: z.string().min(1, { message: 'Selecione uma opção.' }),
@@ -32,31 +33,31 @@ const formSchema = z.object({
 const scaleQuestions = [
   {
     id: 's1' as const,
-    text: 'S1. Os processos críticos da empresa estão documentados?',
+    text: `S1. ${questionsMap['S1']}`,
     minLabel: '1 = na cabeça',
     maxLabel: '5 = todos mapeados e acessíveis',
   },
   {
     id: 's2' as const,
-    text: 'S2. Quando alguém novo entra, existe um sistema de onboarding estruturado?',
+    text: `S2. ${questionsMap['S2']}`,
     minLabel: '1 = cada um se vira',
     maxLabel: '5 = processo completo',
   },
   {
     id: 's3' as const,
-    text: 'S3. Se uma pessoa-chave saísse hoje, quanto conhecimento crítico se perderia?',
+    text: `S3. ${questionsMap['S3']}`,
     minLabel: '1 = tudo',
     maxLabel: '5 = nada, está em sistema',
   },
   {
     id: 's4' as const,
-    text: 'S4. A empresa usa ferramentas integradas (CRM, controles, fluxos) ou planilhas/WhatsApp?',
+    text: `S4. ${questionsMap['S4']}`,
     minLabel: '1 = só planilha/WhatsApp',
     maxLabel: '5 = sistemas integrados',
   },
   {
     id: 's5' as const,
-    text: 'S5. Existe uma base de conhecimento interna que o time consulta?',
+    text: `S5. ${questionsMap['S5']}`,
     minLabel: '1 = não existe',
     maxLabel: '5 = completa e atualizada',
   },
@@ -185,8 +186,7 @@ export default function BlockS() {
                   render={({ field }) => (
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                        S6. Qual é o processo mais crítico da empresa que ainda mora na cabeça de
-                        alguém?
+                        {`S6. ${questionsMap['S6']}`}
                       </FormLabel>
                       <FormControl>
                         <Textarea
