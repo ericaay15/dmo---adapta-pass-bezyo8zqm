@@ -544,21 +544,11 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
         <div class="progress-item">
           <div class="progress-header">
-            <span>Automatizar (Au)</span>
+            <span>Automatizar (A)</span>
             <span style="color: ${getScoreColor(diag.nota_au || 0, 10)}">${diag.nota_au || 0}/10</span>
           </div>
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" style="width: ${((diag.nota_au || 0) / 10) * 100}%; background-color: ${getScoreColor(diag.nota_au || 0, 10)}"></div>
-          </div>
-        </div>
-
-        <div class="progress-item">
-          <div class="progress-header">
-            <span>Transformar (T)</span>
-            <span style="color: ${getScoreColor(diag.nota_t || 0, 10)}">${diag.nota_t || 0}/10</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" style="width: ${((diag.nota_t || 0) / 10) * 100}%; background-color: ${getScoreColor(diag.nota_t || 0, 10)}"></div>
           </div>
         </div>
       </div>
