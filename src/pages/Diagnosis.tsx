@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -61,6 +61,29 @@ export const formatCnpj = (value: string) => {
     .replace(/(-\d{2})\d+?$/, '$1')
 }
 
+const isEnterpriseEmail = (email: string) => {
+  if (!email) return false
+  const domain = email.split('@')[1]?.toLowerCase()
+  if (!domain) return false
+  const freeDomains = [
+    'gmail.com',
+    'yahoo.com',
+    'yahoo.com.br',
+    'hotmail.com',
+    'hotmail.com.br',
+    'outlook.com',
+    'outlook.com.br',
+    'uol.com.br',
+    'bol.com.br',
+    'ig.com.br',
+    'terra.com.br',
+    'live.com',
+    'live.com.br',
+    'icloud.com',
+  ]
+  return !freeDomains.includes(domain)
+}
+
 export default function Diagnosis() {
   const navigate = useNavigate()
   const { data: storeData, updateData } = useDiagnosisStore()
@@ -78,6 +101,31 @@ export default function Diagnosis() {
       leadEmail: storeData.leadEmail || '',
     },
   })
+
+  useEffect(() => {
+    if (storeData.companyName && !form.getValues('companyName')) {
+      form.setValue('companyName', storeData.companyName, { shouldValidate: true })
+    }
+    if (storeData.cnpj && !form.getValues('cnpj')) {
+      form.setValue('cnpj', formatCnpj(storeData.cnpj), { shouldValidate: true })
+    }
+    if (storeData.userName && !form.getValues('userName')) {
+      form.setValue('userName', storeData.userName, { shouldValidate: true })
+    }
+    if (storeData.leadName && !form.getValues('leadName')) {
+      form.setValue('leadName', storeData.leadName, { shouldValidate: true })
+    }
+    if (storeData.adminEmail && !form.getValues('adminEmail')) {
+      if (isEnterpriseEmail(storeData.adminEmail)) {
+        form.setValue('adminEmail', storeData.adminEmail, { shouldValidate: true })
+      }
+    }
+    if (storeData.leadEmail && !form.getValues('leadEmail')) {
+      if (isEnterpriseEmail(storeData.leadEmail)) {
+        form.setValue('leadEmail', storeData.leadEmail, { shouldValidate: true })
+      }
+    }
+  }, [storeData, form])
 
   const isFormValid = form.formState.isValid
 
