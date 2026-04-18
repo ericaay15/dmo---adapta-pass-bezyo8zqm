@@ -16,9 +16,47 @@ import Results from './pages/Results'
 import NotFound from './pages/NotFound'
 import Report from './pages/Report'
 import Layout from './components/Layout'
+import { useEffect } from 'react'
+import useDiagnosisStore from './stores/useDiagnosisStore'
+
+function URLParamsHandler() {
+  const { updateData } = useDiagnosisStore()
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+
+    const cnpj = params.get('doc') || ''
+    const companyName = params.get('company_name') || ''
+    const contactName = [params.get('contact_name'), params.get('contact_surname')]
+      .filter(Boolean)
+      .join(' ')
+      .trim()
+    const email = params.get('email') || ''
+
+    const dataToUpdate: Record<string, string> = {}
+
+    if (cnpj) dataToUpdate.cnpj = cnpj
+    if (companyName) dataToUpdate.companyName = companyName
+    if (contactName) {
+      dataToUpdate.userName = contactName
+      dataToUpdate.leadName = contactName
+    }
+    if (email) {
+      dataToUpdate.adminEmail = email
+      dataToUpdate.leadEmail = email
+    }
+
+    if (Object.keys(dataToUpdate).length > 0) {
+      updateData(dataToUpdate)
+    }
+  }, [])
+
+  return null
+}
 
 const App = () => (
   <BrowserRouter future={{ v7_startTransition: false, v7_relativeSplatPath: false }}>
+    <URLParamsHandler />
     <TooltipProvider>
       <Toaster />
       <Sonner position="top-center" />
