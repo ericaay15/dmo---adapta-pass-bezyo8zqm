@@ -61,27 +61,38 @@ export const formatCnpj = (value: string) => {
     .replace(/(-\d{2})\d+?$/, '$1')
 }
 
-const isEnterpriseEmail = (email: string) => {
-  if (!email) return false
+const isEnterpriseDomain = (email: string): boolean => {
+  if (!email || !email.includes('@')) return false
+
   const domain = email.split('@')[1]?.toLowerCase()
   if (!domain) return false
-  const freeDomains = [
+
+  const freeProviders = [
     'gmail.com',
-    'yahoo.com',
-    'yahoo.com.br',
+    'googlemail.com',
     'hotmail.com',
     'hotmail.com.br',
     'outlook.com',
     'outlook.com.br',
-    'uol.com.br',
-    'bol.com.br',
-    'ig.com.br',
-    'terra.com.br',
     'live.com',
-    'live.com.br',
+    'msn.com',
+    'yahoo.com',
+    'yahoo.com.br',
+    'terra.com.br',
+    'bol.com.br',
+    'uol.com.br',
     'icloud.com',
+    'me.com',
+    'aol.com',
+    'protonmail.com',
+    'proton.me',
+    'ig.com.br',
+    'globo.com',
+    'zipmail.com.br',
+    'r7.com',
   ]
-  return !freeDomains.includes(domain)
+
+  return !freeProviders.includes(domain)
 }
 
 export default function Diagnosis() {
@@ -95,10 +106,14 @@ export default function Diagnosis() {
       companyName: storeData.companyName || '',
       cnpj: storeData.cnpj || '',
       segmento: (storeData.segmento as any) || undefined,
-      adminEmail: storeData.adminEmail || '',
+      adminEmail:
+        storeData.adminEmail && isEnterpriseDomain(storeData.adminEmail)
+          ? storeData.adminEmail
+          : '',
       userName: storeData.userName || '',
       leadName: storeData.leadName || '',
-      leadEmail: storeData.leadEmail || '',
+      leadEmail:
+        storeData.leadEmail && isEnterpriseDomain(storeData.leadEmail) ? storeData.leadEmail : '',
     },
   })
 
@@ -116,12 +131,12 @@ export default function Diagnosis() {
       form.setValue('leadName', storeData.leadName, { shouldValidate: true })
     }
     if (storeData.adminEmail && !form.getValues('adminEmail')) {
-      if (isEnterpriseEmail(storeData.adminEmail)) {
+      if (isEnterpriseDomain(storeData.adminEmail)) {
         form.setValue('adminEmail', storeData.adminEmail, { shouldValidate: true })
       }
     }
     if (storeData.leadEmail && !form.getValues('leadEmail')) {
-      if (isEnterpriseEmail(storeData.leadEmail)) {
+      if (isEnterpriseDomain(storeData.leadEmail)) {
         form.setValue('leadEmail', storeData.leadEmail, { shouldValidate: true })
       }
     }
