@@ -45,7 +45,11 @@ export default function Instructions() {
             <p className="text-lg text-center text-slate-200">
               Sabemos que preencher formulários pode ser chato, mas{' '}
               <strong>30 min dedicados com foco</strong> agora farão toda a diferença na sua
-              jornada.&nbsp;
+              jornada.
+              <br />
+              <br />
+              Levamos nosso método <b>muito a sério</b> e esse primeiro passo é essencial para que
+              você tenha sucesso.&nbsp;&nbsp;
             </p>
 
             <div className="grid gap-4 mt-8">
