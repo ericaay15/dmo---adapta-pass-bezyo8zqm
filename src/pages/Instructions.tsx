@@ -45,7 +45,7 @@ export default function Instructions() {
             <p className="text-lg text-center text-slate-200">
               Sabemos que preencher formulários pode ser chato, mas{' '}
               <strong>30 minutos dedicados com foco</strong> agora farão toda a diferença no rumo da
-              sua implementação de IA. Este é apenas o começo da sua jornada conosco.
+              sua implementação de IA.
             </p>
 
             <div className="grid gap-4 mt-8">
