@@ -74,7 +74,8 @@ export default function Instructions() {
                   <h4 className="text-white font-semibold mb-1">Atenção às perguntas abertas</h4>
                   <p className="text-sm text-slate-400">
                     &nbsp;É nelas que conseguimos entender a essência dos seus desafios e
-                    identificar as melhores oportunidades de automação.
+                    identificar as melhores oportunidades e designar o(a) melhor consultor(a) para
+                    seus desafios.&nbsp;
                   </p>
                 </div>
               </div>
