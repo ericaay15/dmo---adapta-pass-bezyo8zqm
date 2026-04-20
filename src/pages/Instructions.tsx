@@ -56,9 +56,8 @@ export default function Instructions() {
                 <div>
                   <h4 className="text-white font-semibold mb-1">Evite respostas rasas</h4>
                   <p className="text-sm text-slate-400">
-                    Não economize nas palavras. Quanto mais profunda for a sua descrição sobre o
-                    cenário atual, mais personalizado e assertivo será o plano de ação que nossa
-                    equipe vai preparar.
+                    Quanto mais profunda for a sua descrição sobre o cenário atual, mais
+                    personalizado e assertivo será o plano de ação que nossa equipe vai preparar.
                   </p>
                 </div>
               </div>
