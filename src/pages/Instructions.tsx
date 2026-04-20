@@ -50,20 +50,6 @@ export default function Instructions() {
 
             <div className="grid gap-4 mt-8">
               <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex gap-4 items-start hover:bg-white/10 transition-colors">
-                <div className="bg-[#2dd4bf]/20 p-2 rounded-lg mt-1 shrink-0">
-                  <Clock className="w-5 h-5 text-[#2dd4bf]" />
-                </div>
-                <div>
-                  <h4 className="text-white font-semibold mb-1">Tire um tempo para você</h4>
-                  <p className="text-sm text-slate-400">
-                    Preencha este Diagnóstico com o máximo de atenção e detalhes. Suas respostas
-                    serão o guia do seu gerente e consultor para estruturar a sua implementação de
-                    IA.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex gap-4 items-start hover:bg-white/10 transition-colors">
                 <div className="bg-rose-500/20 p-2 rounded-lg mt-1 shrink-0">
                   <AlertCircle className="w-5 h-5 text-rose-400" />
                 </div>
