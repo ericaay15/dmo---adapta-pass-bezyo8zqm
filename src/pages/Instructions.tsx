@@ -1,5 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Clock, AlertCircle, FileText } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Clock, AlertCircle, FileText, Users } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
@@ -76,6 +76,18 @@ export default function Instructions() {
                     &nbsp;É nelas que conseguimos entender a essência dos seus desafios e
                     identificar as melhores oportunidades e designar o(a) melhor consultor(a) para
                     seus desafios.&nbsp;
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex gap-4 items-start hover:bg-white/10 transition-colors">
+                <div className="bg-blue-500/20 p-2 rounded-lg mt-1 shrink-0">
+                  <Users className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold mb-1">Envolva sua equipe</h4>
+                  <p className="text-sm text-slate-400">
+                    Chame os responsáveis e outros líderes da empresa para preencher o diagnóstico.
                   </p>
                 </div>
               </div>
