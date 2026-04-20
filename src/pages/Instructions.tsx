@@ -70,9 +70,8 @@ export default function Instructions() {
                 <div>
                   <h4 className="text-white font-semibold mb-1">Atenção às perguntas abertas</h4>
                   <p className="text-sm text-slate-400">
-                    As questões dissertativas são o ponto mais importante deste formulário. É nelas
-                    que conseguimos entender a essência dos seus desafios e identificar as melhores
-                    oportunidades de automação.
+                    &nbsp;É nelas que conseguimos entender a essência dos seus desafios e
+                    identificar as melhores oportunidades de automação.
                   </p>
                 </div>
               </div>
