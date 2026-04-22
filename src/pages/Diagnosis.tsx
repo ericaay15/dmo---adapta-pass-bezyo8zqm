@@ -104,7 +104,7 @@ export default function Diagnosis() {
     mode: 'onChange',
     defaultValues: {
       companyName: storeData.companyName || '',
-      cnpj: storeData.cnpj || '',
+      cnpj: storeData.cnpj ? formatCnpj(storeData.cnpj) : '',
       segmento: (storeData.segmento as any) || undefined,
       adminEmail:
         storeData.adminEmail && isEnterpriseDomain(storeData.adminEmail)
@@ -121,8 +121,11 @@ export default function Diagnosis() {
     if (storeData.companyName && !form.getValues('companyName')) {
       form.setValue('companyName', storeData.companyName, { shouldValidate: true })
     }
-    if (storeData.cnpj && !form.getValues('cnpj')) {
-      form.setValue('cnpj', formatCnpj(storeData.cnpj), { shouldValidate: true })
+    if (storeData.cnpj) {
+      const formatted = formatCnpj(storeData.cnpj)
+      if (form.getValues('cnpj') !== formatted) {
+        form.setValue('cnpj', formatted, { shouldValidate: true })
+      }
     }
     if (storeData.userName && !form.getValues('userName')) {
       form.setValue('userName', storeData.userName, { shouldValidate: true })
