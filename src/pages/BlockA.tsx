@@ -213,7 +213,7 @@ export default function BlockA() {
                   asChild
                   className="w-full sm:w-1/3 border-white/10 text-white hover:bg-white/5 hover:text-white h-14 text-lg rounded-xl"
                 >
-                  <Link to="/diagnostico">Voltar</Link>
+                  <Link to="/motivacao">Voltar</Link>
                 </Button>
                 <Button
                   type="submit"

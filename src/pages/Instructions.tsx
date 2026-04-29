@@ -96,7 +96,7 @@ export default function Instructions() {
 
           <div className="pt-10">
             <Button
-              onClick={() => navigate('/bloco-a')}
+              onClick={() => navigate('/motivacao')}
               className="w-full bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] group"
             >
               Estou pronto, vamos começar

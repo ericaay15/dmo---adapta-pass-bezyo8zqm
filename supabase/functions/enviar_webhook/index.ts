@@ -79,6 +79,7 @@ Deno.serve(async (req: Request) => {
     const answersArray: any[] = []
 
     const keysToProcess = [
+      'motivacao',
       'A1',
       'A2',
       'A3',
@@ -105,12 +106,17 @@ Deno.serve(async (req: Request) => {
     for (const key of keysToProcess) {
       const val = answersJson[key]
       if (val !== undefined && val !== null && val !== '') {
-        const block = key.startsWith('Au') ? 'Au' : key.replace(/[0-9]/g, '')
+        const block =
+          key === 'motivacao' ? 'INTRO' : key.startsWith('Au') ? 'Au' : key.replace(/[0-9]/g, '')
+        const type = key.endsWith('6') || key === 'T4' || key === 'motivacao' ? 'text' : 'numeric'
         answersArray.push({
           key,
-          label: labelsFromDb[key] || key,
+          label:
+            key === 'motivacao'
+              ? 'O que te fez tomar a decisão de entrar para o Adapta Pass?'
+              : labelsFromDb[key] || key,
           block,
-          type: key.endsWith('6') || key === 'T4' ? 'text' : 'numeric',
+          type,
           value: String(val),
         })
       }
