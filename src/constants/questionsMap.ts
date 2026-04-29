@@ -1,4 +1,6 @@
 export const questionsMap: Record<string, string> = {
+  motivacao: 'O que te fez tomar a decisão e o que mais te chamou atenção no Adapta Pass?',
+
   A1: 'Quantas pessoas do time usam IA no trabalho diário?',
   A2: 'Qual a profundidade do uso de IA?',
   A3: 'A liderança usa IA ativamente para pensar o negócio?',

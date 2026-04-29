@@ -4,6 +4,7 @@ import { questionsMap } from '@/constants/questionsMap'
 
 export const submitDiagnosis = async (data: DiagnosisState) => {
   const payload = {
+    motivacao: data.motivacao,
     A1: parseInt(data.a1),
     A2: parseInt(data.a2),
     A3: parseInt(data.a3),
@@ -124,6 +125,12 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
 
   // WRITE 3: Batch insert into answers
   const rawAnswers = [
+    {
+      block: 'INTRO',
+      question_name: 'motivacao',
+      question_type: 'text',
+      question_answer: data.motivacao,
+    },
     { block: 'A', question_name: 'A1', question_type: 'numeric', question_answer: String(data.a1) },
     { block: 'A', question_name: 'A2', question_type: 'numeric', question_answer: String(data.a2) },
     { block: 'A', question_name: 'A3', question_type: 'numeric', question_answer: String(data.a3) },

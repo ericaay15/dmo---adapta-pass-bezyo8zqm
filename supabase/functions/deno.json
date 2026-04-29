@@ -2,7 +2,7 @@
   "_versions": {
     "calcular_scoring": 15,
     "exportar_para_sheets": 20,
-    "gerar_documento_pdf": 35,
+    "gerar_documento_pdf": 36,
     "enviar_webhook": 7
   }
 }

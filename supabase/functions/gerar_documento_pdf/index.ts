@@ -109,6 +109,7 @@ Deno.serve(async (req: Request) => {
 
       // Open answers built from answersJson to match the shape the HTML template expects
       respostas_abertas: [
+        { tipo_bloco: 'INTRO', numero_pergunta: 1, resposta: answersJson.motivacao || '' },
         { tipo_bloco: 'A', numero_pergunta: 6, resposta: answersJson.A6 || '' },
         { tipo_bloco: 'S', numero_pergunta: 6, resposta: answersJson.S6 || '' },
         { tipo_bloco: 'Au', numero_pergunta: 6, resposta: answersJson.Au6 || '' },
@@ -159,6 +160,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
   const empresa = diag.empresas || {}
   const labelsFromDb = diag.labelsFromDb || {}
   const allKeys = [
+    'motivacao',
     'A1',
     'A2',
     'A3',
@@ -200,32 +202,36 @@ function generatePdfHtml(diag: any, logoUrl: string) {
     return '#2dd4bf'
   }
 
-  const historyHtml = ['A', 'S', 'Au', 'T']
+  const historyHtml = ['INTRO', 'A', 'S', 'Au', 'T']
     .map((prefix) => {
       const sectionKeys = allKeys.filter((k) => {
+        if (prefix === 'INTRO') return k === 'motivacao'
         if (prefix === 'A') return k.startsWith('A') && !k.startsWith('Au')
         return k.startsWith(prefix)
       })
 
       let sectionTitle =
-        prefix === 'A'
-          ? 'Sessão Amplificar'
-          : prefix === 'S'
-            ? 'Sessão Sistematizar'
-            : prefix === 'Au'
-              ? 'Sessão Automatizar'
-              : 'Sessão Transformar'
+        prefix === 'INTRO'
+          ? 'Motivação'
+          : prefix === 'A'
+            ? 'Sessão Amplificar'
+            : prefix === 'S'
+              ? 'Sessão Sistematizar'
+              : prefix === 'Au'
+                ? 'Sessão Automatizar'
+                : 'Sessão Transformar'
 
       let itemsHtml = sectionKeys
         .map((k) => {
           let resposta = diag.respostas_json?.[k]
-          const isAberta = k.endsWith('6') || k === 'T4'
+          const isAberta = k.endsWith('6') || k === 'T4' || k === 'motivacao'
 
           if (isAberta) {
             const aberta = diag.respostas_abertas?.find(
               (a: any) =>
                 (a.tipo_bloco === prefix && a.numero_pergunta === parseInt(k.replace(/\D/g, ''))) ||
-                (a.tipo_bloco === 'T' && k === 'T4' && a.numero_pergunta === 4),
+                (a.tipo_bloco === 'T' && k === 'T4' && a.numero_pergunta === 4) ||
+                (a.tipo_bloco === 'INTRO' && k === 'motivacao' && a.numero_pergunta === 1),
             )
             resposta = aberta?.resposta || resposta || 'Não respondido'
           }
