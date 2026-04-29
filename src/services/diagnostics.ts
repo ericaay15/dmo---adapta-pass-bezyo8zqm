@@ -230,6 +230,34 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
   if (aggregatedError)
     throw new Error(`Erro ao salvar aggregated_answers: ${aggregatedError.message}`)
 
+  // Define a URL da página de relatório do frontend e salva antes de notificar as integrações
+  const pdfUrl = `${window.location.origin}/relatorio/${sessionId}`
+
+  const { error: updatePdfSessionError } = await supabase
+    .from('sessions')
+    .update({ pdf_url: pdfUrl })
+    .eq('id', sessionId)
+
+  if (updatePdfSessionError) {
+    console.error('Erro ao atualizar pdf_url em sessions:', updatePdfSessionError.message)
+  }
+
+  supabase.functions
+    .invoke('exportar_para_sheets', {
+      body: { session_id: sessionId },
+    })
+    .catch((err) => {
+      console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
+    })
+
+  supabase.functions
+    .invoke('enviar_webhook', {
+      body: { session_id: sessionId },
+    })
+    .catch((err) => {
+      console.error('Falha ao invocar enviar_webhook:', err)
+    })
+
   // LEGACY — disabled, kept for reference.
   /*
   let empresaId: string
@@ -417,57 +445,11 @@ export const finalizeSuccessPlan = async (sessionId: string, complemento: string
     */
   }
 
-  // Define a URL da página de relatório do frontend
   const pdfUrl = `${window.location.origin}/relatorio/${sessionId}`
 
-  // Atualiza no banco para ficar registrado na tabela e triggar a exportação para o Sheets
-  const { error: updatePdfSessionError } = await supabase
-    .from('sessions')
-    .update({ pdf_url: pdfUrl })
-    .eq('id', sessionId)
-
-  if (updatePdfSessionError) {
-    console.error('Erro ao atualizar pdf_url em sessions:', updatePdfSessionError.message)
-  }
-
-  // LEGACY — disabled, kept for reference.
-  /*
-  const { error: updatePdfError } = await supabase
-    .from('diagnosticos')
-    .update({ pdf_url: pdfUrl } as any)
-    .eq('id', sessionId)
-
-  if (updatePdfError) {
-    console.error('Erro ao atualizar pdf_url no banco:', updatePdfError.message)
-  }
-  */
-
-  supabase.functions
-    .invoke('exportar_para_sheets', {
-      body: { session_id: sessionId },
-    })
-    .catch((err) => {
-      console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
-    })
-
-  supabase.functions
-    .invoke('enviar_webhook', {
-      body: { session_id: sessionId },
-    })
-    .catch((err) => {
-      console.error('Falha ao invocar enviar_webhook:', err)
-    })
-
-  // LEGACY — disabled, kept for reference.
-  /*
-  supabase.functions
-    .invoke('exportar_para_sheets', {
-      body: { diagnostico_id: sessionId },
-    })
-    .catch((err) => {
-      console.error('Falha de rede ao tentar invocar exportar_para_sheets:', err)
-    })
-  */
+  // As funções de integração (Sheets e Webhook) agora são chamadas automaticamente
+  // dentro do submitDiagnosis para garantir que os dados sejam registrados mesmo se
+  // o usuário fechar a aba antes de finalizar o Plano de Sucesso.
 
   return { pdfUrl }
 }
