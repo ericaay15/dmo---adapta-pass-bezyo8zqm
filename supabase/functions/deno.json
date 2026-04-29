@@ -3,6 +3,6 @@
     "calcular_scoring": 15,
     "exportar_para_sheets": 20,
     "gerar_documento_pdf": 35,
-    "enviar_webhook": 6
+    "enviar_webhook": 7
   }
 }

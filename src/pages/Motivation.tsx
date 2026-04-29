@@ -91,7 +91,7 @@ export default function Motivation() {
                   render={({ field }) => (
                     <FormItem className="space-y-4 bg-white/5 border border-white/10 p-5 rounded-xl">
                       <FormLabel className="text-base text-slate-200 font-medium leading-relaxed">
-                        O que te fez tomar a decisão de entrar para o Adapta Pass?
+                        O que te fez tomar a decisão e o que mais te chamou atenção no Adapta Pass?
                       </FormLabel>
                       <FormControl>
                         <Textarea

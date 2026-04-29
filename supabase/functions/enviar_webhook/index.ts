@@ -113,7 +113,7 @@ Deno.serve(async (req: Request) => {
           key,
           label:
             key === 'motivacao'
-              ? 'O que te fez tomar a decisão de entrar para o Adapta Pass?'
+              ? 'O que te fez tomar a decisão e o que mais te chamou atenção no Adapta Pass?'
               : labelsFromDb[key] || key,
           block,
           type,
