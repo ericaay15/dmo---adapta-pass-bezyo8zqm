@@ -1,8 +1,8 @@
 {
   "_versions": {
-    "calcular_scoring": 15,
-    "exportar_para_sheets": 20,
-    "gerar_documento_pdf": 36,
-    "enviar_webhook": 7
+    "calcular_scoring": 16,
+    "exportar_para_sheets": 21,
+    "gerar_documento_pdf": 37,
+    "enviar_webhook": 8
   }
 }
