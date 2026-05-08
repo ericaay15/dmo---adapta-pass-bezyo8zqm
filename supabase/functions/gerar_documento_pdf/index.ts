@@ -72,7 +72,7 @@ Deno.serve(async (req: Request) => {
     if (answersDb) {
       answersDb.forEach((a: any) => {
         labelsFromDb[a.question_name] = a.question_label
-
+        
         if (a.block === 'SEG') {
           let answerText = a.question_answer || 'Não respondido'
           try {
@@ -80,18 +80,12 @@ Deno.serve(async (req: Request) => {
             if (Array.isArray(parsed)) {
               answerText = parsed.join(', ')
             }
-          } catch (e) {}
+          } catch(e) {}
           segAnswers.push({ label: a.question_label, answer: answerText })
         }
-
-        if (
-          a.block === 'FERR' &&
-          (a.question_name === 'ferramentas' || a.question_label?.includes('ferramentas'))
-        ) {
-          ferrAnswers.push({
-            label: a.question_label,
-            answer: a.question_answer || 'Não respondido',
-          })
+        
+        if (a.block === 'FERR' && (a.question_name === 'ferramentas' || a.question_label?.includes('ferramentas'))) {
+          ferrAnswers.push({ label: a.question_label, answer: a.question_answer || 'Não respondido' })
         }
       })
     }
@@ -663,32 +657,24 @@ function generatePdfHtml(diag: any, logoUrl: string) {
     <h2 class="section-title">Informações Adicionais</h2>
     <div style="margin-bottom: 32px;">
       
-      ${(diag.ferrAnswers || [])
-        .map(
-          (ans: any) => `
+      ${(diag.ferrAnswers || []).map((ans: any) => `
       <div class="history-item">
         <div class="history-q">${ans.label || 'Quais ferramentas ou sistemas que você já usa na sua empresa?'}</div>
         <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
       </div>
-      `,
-        )
-        .join('')}
+      `).join('')}
 
       <div class="history-item">
         <div class="history-q">Segmento da Empresa</div>
         <div class="history-a">${empresa.segmento || 'Não informado'}</div>
       </div>
 
-      ${(diag.segAnswers || [])
-        .map(
-          (ans: any) => `
+      ${(diag.segAnswers || []).map((ans: any) => `
       <div class="history-item">
         <div class="history-q">${ans.label || 'Pergunta de Segmento'}</div>
         <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
       </div>
-      `,
-        )
-        .join('')}
+      `).join('')}
     </div>
 
     <div class="footer">
