@@ -63,13 +63,33 @@ Deno.serve(async (req: Request) => {
 
     const { data: answersDb } = await supabase
       .from('answers')
-      .select('question_name, question_label')
+      .select('question_name, question_label, question_answer, block')
       .eq('session_id', sessionId)
 
     const labelsFromDb: Record<string, string> = {}
+    const segAnswers: any[] = []
+    const ferrAnswers: any[] = []
     if (answersDb) {
       answersDb.forEach((a: any) => {
         labelsFromDb[a.question_name] = a.question_label
+
+        if (a.block === 'SEG') {
+          let answerText = a.question_answer || 'Não respondido'
+          try {
+            const parsed = JSON.parse(answerText)
+            if (Array.isArray(parsed)) {
+              answerText = parsed.join(', ')
+            }
+          } catch (e) {}
+          segAnswers.push({ label: a.question_label, answer: answerText })
+        }
+
+        if (a.block === 'FERR') {
+          ferrAnswers.push({
+            label: a.question_label,
+            answer: a.question_answer || 'Não respondido',
+          })
+        }
       })
     }
 
@@ -84,7 +104,10 @@ Deno.serve(async (req: Request) => {
         cnpj: company.cnpj,
         responsavel_nome: session.responsible_name,
         responsavel_email: session.responsible_email,
+        segmento: company.segment,
       },
+      segAnswers,
+      ferrAnswers,
 
       // All form answers used by questionsMap rendering
       respostas_json: answersJson,
@@ -114,7 +137,6 @@ Deno.serve(async (req: Request) => {
         { tipo_bloco: 'S', numero_pergunta: 6, resposta: answersJson.S6 || '' },
         { tipo_bloco: 'Au', numero_pergunta: 6, resposta: answersJson.Au6 || '' },
         { tipo_bloco: 'T', numero_pergunta: 4, resposta: answersJson.T4 || '' },
-        { tipo_bloco: 'FERR', numero_pergunta: 1, resposta: answersJson.ferramentas || '' },
       ],
     }
 
@@ -184,7 +206,6 @@ function generatePdfHtml(diag: any, logoUrl: string) {
     'T2',
     'T3',
     'T4',
-    'ferramentas',
   ]
   const metricas = diag.metricas_json || {}
   const firstImpact = diag.first_impact_json || {}
@@ -204,11 +225,10 @@ function generatePdfHtml(diag: any, logoUrl: string) {
     return '#2dd4bf'
   }
 
-  const historyHtml = ['INTRO', 'A', 'S', 'Au', 'T', 'FERR']
+  const historyHtml = ['INTRO', 'A', 'S', 'Au', 'T']
     .map((prefix) => {
       const sectionKeys = allKeys.filter((k) => {
         if (prefix === 'INTRO') return k === 'motivacao'
-        if (prefix === 'FERR') return k === 'ferramentas'
         if (prefix === 'A') return k.startsWith('A') && !k.startsWith('Au')
         return k.startsWith(prefix)
       })
@@ -216,8 +236,6 @@ function generatePdfHtml(diag: any, logoUrl: string) {
       let sectionTitle =
         prefix === 'INTRO'
           ? 'Motivação'
-          : prefix === 'FERR'
-            ? 'Ferramentas e Sistemas'
           : prefix === 'A'
             ? 'Sessão Amplificar'
             : prefix === 'S'
@@ -236,8 +254,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
               (a: any) =>
                 (a.tipo_bloco === prefix && a.numero_pergunta === parseInt(k.replace(/\D/g, ''))) ||
                 (a.tipo_bloco === 'T' && k === 'T4' && a.numero_pergunta === 4) ||
-                (a.tipo_bloco === 'INTRO' && k === 'motivacao' && a.numero_pergunta === 1) ||
-                (a.tipo_bloco === 'FERR' && k === 'ferramentas' && a.numero_pergunta === 1),
+                (a.tipo_bloco === 'INTRO' && k === 'motivacao' && a.numero_pergunta === 1),
             )
             resposta = aberta?.resposta || resposta || 'Não respondido'
           }
@@ -639,6 +656,37 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
     <h2 class="section-title">Histórico de Respostas</h2>
     ${historyHtml}
+
+    <h2 class="section-title">Informações Adicionais</h2>
+    <div style="margin-bottom: 32px;">
+      
+      <div class="history-item">
+        <div class="history-q">Segmento da Empresa</div>
+        <div class="history-a">${empresa.segmento || 'Não informado'}</div>
+      </div>
+
+      ${(diag.segAnswers || [])
+        .map(
+          (ans: any) => `
+      <div class="history-item">
+        <div class="history-q">${ans.label || 'Pergunta de Segmento'}</div>
+        <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
+      </div>
+      `,
+        )
+        .join('')}
+
+      ${(diag.ferrAnswers || [])
+        .map(
+          (ans: any) => `
+      <div class="history-item">
+        <div class="history-q">${ans.label || 'Ferramentas e Sistemas'}</div>
+        <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
+      </div>
+      `,
+        )
+        .join('')}
+    </div>
 
     <div class="footer">
       <p>Este documento é confidencial e foi gerado pelo Adapta Pass para uso exclusivo de <strong>${empresa.nome || 'sua empresa'}</strong>.</p>
