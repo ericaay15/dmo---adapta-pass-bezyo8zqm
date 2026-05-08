@@ -218,13 +218,13 @@ function generatePdfHtml(diag: any, logoUrl: string) {
           ? 'Motivação'
           : prefix === 'FERR'
             ? 'Ferramentas e Sistemas'
-            : prefix === 'A'
-              ? 'Sessão Amplificar'
-              : prefix === 'S'
-                ? 'Sessão Sistematizar'
-                : prefix === 'Au'
-                  ? 'Sessão Automatizar'
-                  : 'Sessão Transformar'
+          : prefix === 'A'
+            ? 'Sessão Amplificar'
+            : prefix === 'S'
+              ? 'Sessão Sistematizar'
+              : prefix === 'Au'
+                ? 'Sessão Automatizar'
+                : 'Sessão Transformar'
 
       let itemsHtml = sectionKeys
         .map((k) => {
