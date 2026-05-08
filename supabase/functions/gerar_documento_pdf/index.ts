@@ -114,6 +114,7 @@ Deno.serve(async (req: Request) => {
         { tipo_bloco: 'S', numero_pergunta: 6, resposta: answersJson.S6 || '' },
         { tipo_bloco: 'Au', numero_pergunta: 6, resposta: answersJson.Au6 || '' },
         { tipo_bloco: 'T', numero_pergunta: 4, resposta: answersJson.T4 || '' },
+        { tipo_bloco: 'FERR', numero_pergunta: 1, resposta: answersJson.ferramentas || '' },
       ],
     }
 
@@ -183,6 +184,7 @@ function generatePdfHtml(diag: any, logoUrl: string) {
     'T2',
     'T3',
     'T4',
+    'ferramentas',
   ]
   const metricas = diag.metricas_json || {}
   const firstImpact = diag.first_impact_json || {}
@@ -202,10 +204,11 @@ function generatePdfHtml(diag: any, logoUrl: string) {
     return '#2dd4bf'
   }
 
-  const historyHtml = ['INTRO', 'A', 'S', 'Au', 'T']
+  const historyHtml = ['INTRO', 'A', 'S', 'Au', 'T', 'FERR']
     .map((prefix) => {
       const sectionKeys = allKeys.filter((k) => {
         if (prefix === 'INTRO') return k === 'motivacao'
+        if (prefix === 'FERR') return k === 'ferramentas'
         if (prefix === 'A') return k.startsWith('A') && !k.startsWith('Au')
         return k.startsWith(prefix)
       })
@@ -213,25 +216,28 @@ function generatePdfHtml(diag: any, logoUrl: string) {
       let sectionTitle =
         prefix === 'INTRO'
           ? 'Motivação'
-          : prefix === 'A'
-            ? 'Sessão Amplificar'
-            : prefix === 'S'
-              ? 'Sessão Sistematizar'
-              : prefix === 'Au'
-                ? 'Sessão Automatizar'
-                : 'Sessão Transformar'
+          : prefix === 'FERR'
+            ? 'Ferramentas e Sistemas'
+            : prefix === 'A'
+              ? 'Sessão Amplificar'
+              : prefix === 'S'
+                ? 'Sessão Sistematizar'
+                : prefix === 'Au'
+                  ? 'Sessão Automatizar'
+                  : 'Sessão Transformar'
 
       let itemsHtml = sectionKeys
         .map((k) => {
           let resposta = diag.respostas_json?.[k]
-          const isAberta = k.endsWith('6') || k === 'T4' || k === 'motivacao'
+          const isAberta = k.endsWith('6') || k === 'T4' || k === 'motivacao' || k === 'ferramentas'
 
           if (isAberta) {
             const aberta = diag.respostas_abertas?.find(
               (a: any) =>
                 (a.tipo_bloco === prefix && a.numero_pergunta === parseInt(k.replace(/\D/g, ''))) ||
                 (a.tipo_bloco === 'T' && k === 'T4' && a.numero_pergunta === 4) ||
-                (a.tipo_bloco === 'INTRO' && k === 'motivacao' && a.numero_pergunta === 1),
+                (a.tipo_bloco === 'INTRO' && k === 'motivacao' && a.numero_pergunta === 1) ||
+                (a.tipo_bloco === 'FERR' && k === 'ferramentas' && a.numero_pergunta === 1),
             )
             resposta = aberta?.resposta || resposta || 'Não respondido'
           }

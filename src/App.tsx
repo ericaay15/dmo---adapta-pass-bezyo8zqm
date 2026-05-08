@@ -12,6 +12,7 @@ import BlockS from './pages/BlockS'
 import BlockAu from './pages/BlockAu'
 import BlockT from './pages/BlockT'
 import SegmentQuestions from './pages/SegmentQuestions'
+import ToolsQuestion from './pages/ToolsQuestion'
 import SuccessPlan from './pages/SuccessPlan'
 import Results from './pages/Results'
 import NotFound from './pages/NotFound'
@@ -73,6 +74,7 @@ const App = () => (
           <Route path="/bloco-au" element={<BlockAu />} />
           <Route path="/bloco-t" element={<BlockT />} />
           <Route path="/segmento" element={<SegmentQuestions />} />
+          <Route path="/ferramentas" element={<ToolsQuestion />} />
           <Route path="/plano-de-sucesso" element={<SuccessPlan />} />
           <Route path="/resultados" element={<Results />} />
         </Route>

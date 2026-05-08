@@ -10,6 +10,7 @@ export type DiagnosisState = {
   segmento: string
   temasSelecionados: string[]
   temaOutros: string
+  ferramentasUsadas: string
   motivacao: string
   a1: string
   a2: string
@@ -49,6 +50,7 @@ let store: DiagnosisState = {
   segmento: '',
   temasSelecionados: [],
   temaOutros: '',
+  ferramentasUsadas: '',
   motivacao: '',
   a1: '',
   a2: '',
@@ -110,6 +112,7 @@ const useDiagnosisStore = () => {
       segmento: '',
       temasSelecionados: [],
       temaOutros: '',
+      ferramentasUsadas: '',
       motivacao: '',
       a1: '',
       a2: '',

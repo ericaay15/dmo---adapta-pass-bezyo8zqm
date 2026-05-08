@@ -102,13 +102,23 @@ Deno.serve(async (req: Request) => {
       'T2',
       'T3',
       'T4',
+      'ferramentas',
     ]
     for (const key of keysToProcess) {
       const val = answersJson[key]
       if (val !== undefined && val !== null && val !== '') {
         const block =
-          key === 'motivacao' ? 'INTRO' : key.startsWith('Au') ? 'Au' : key.replace(/[0-9]/g, '')
-        const type = key.endsWith('6') || key === 'T4' || key === 'motivacao' ? 'text' : 'numeric'
+          key === 'motivacao'
+            ? 'INTRO'
+            : key === 'ferramentas'
+              ? 'FERR'
+              : key.startsWith('Au')
+                ? 'Au'
+                : key.replace(/[0-9]/g, '')
+        const type =
+          key.endsWith('6') || key === 'T4' || key === 'motivacao' || key === 'ferramentas'
+            ? 'text'
+            : 'numeric'
         answersArray.push({
           key,
           label:

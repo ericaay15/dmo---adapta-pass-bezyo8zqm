@@ -27,6 +27,7 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     S6: data.s6,
     Au6: data.au6,
     T4: data.t4,
+    ferramentas: data.ferramentasUsadas,
   }
 
   const numericFields = [
@@ -181,6 +182,12 @@ export const submitDiagnosis = async (data: DiagnosisState) => {
     { block: 'T', question_name: 'T2', question_type: 'numeric', question_answer: String(data.t2) },
     { block: 'T', question_name: 'T3', question_type: 'numeric', question_answer: String(data.t3) },
     { block: 'T', question_name: 'T4', question_type: 'text', question_answer: data.t4 },
+    {
+      block: 'FERR',
+      question_name: 'ferramentas',
+      question_type: 'text',
+      question_answer: data.ferramentasUsadas,
+    },
 
     {
       block: 'SEG',

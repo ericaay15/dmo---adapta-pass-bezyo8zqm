@@ -27,6 +27,9 @@ export const questionsMap: Record<string, string> = {
   T3: 'Numa escala de 1-10, o quanto você sente que a empresa está preparada pro futuro com IA?',
   T4: 'Se você pudesse resolver UM problema do seu negócio nos próximos 90 dias, qual seria?',
 
+  ferramentas:
+    'Quais ferramentas ou sistemas que você já usa na sua empresa? (Ex: Pacote Google, Microsoft, CRM, ERP, Notion, Miro, etc...)',
+
   temasSelecionados: 'Temas selecionados para aprofundamento',
   temaOutros: 'Outros temas mencionados',
   success_complement: 'Complemento do plano de sucesso',

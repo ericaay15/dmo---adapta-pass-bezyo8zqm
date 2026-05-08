@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
-import { toast } from 'sonner'
+import { ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -9,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import { Logo } from '@/components/Logo'
 import useDiagnosisStore from '@/stores/useDiagnosisStore'
-import { submitDiagnosis } from '@/services/diagnostics'
 
 const segmentQuestions: Record<string, string[]> = {
   Medicina: [
@@ -97,7 +95,6 @@ const segmentQuestions: Record<string, string[]> = {
 export default function SegmentQuestions() {
   const navigate = useNavigate()
   const { data: storeData, updateData } = useDiagnosisStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [selected, setSelected] = useState<string[]>(storeData.temasSelecionados || [])
   const [otherText, setOtherText] = useState(storeData.temaOutros || '')
 
@@ -138,34 +135,18 @@ export default function SegmentQuestions() {
   const isFormValid = isOtherOnly
     ? otherText.trim().length > 0
     : selected.length > 0 || otherText.trim().length > 0
-  const canSubmit = isPreviousValid && isFormValid && !isSubmitting
+  const canSubmit = isPreviousValid && isFormValid
 
   const toggleItem = (item: string) => {
     setSelected((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]))
   }
 
-  async function onSubmit(e: React.FormEvent) {
+  function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!canSubmit) return
 
-    setIsSubmitting(true)
-    const finalData = { ...storeData, temasSelecionados: selected, temaOutros: otherText }
     updateData({ temasSelecionados: selected, temaOutros: otherText })
-
-    try {
-      const res = await submitDiagnosis(finalData)
-      updateData({
-        scoringData: res.scoringData,
-        sessionId: res.sessionId,
-      })
-      navigate('/plano-de-sucesso')
-    } catch (error: any) {
-      console.error(error)
-      toast.error('Erro ao processar diagnóstico', {
-        description: error.message || 'Tente novamente mais tarde.',
-      })
-      setIsSubmitting(false)
-    }
+    navigate('/ferramentas')
   }
 
   return (
@@ -176,7 +157,6 @@ export default function SegmentQuestions() {
             variant="ghost"
             asChild
             className="text-slate-400 hover:text-white hover:bg-white/5 -ml-4"
-            disabled={isSubmitting}
           >
             <Link to="/bloco-t">
               <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
@@ -188,13 +168,10 @@ export default function SegmentQuestions() {
 
         <div className="space-y-2 w-full">
           <div className="flex justify-between text-xs text-slate-400 font-medium px-1">
-            <span>Passo Final: Personalização</span>
-            <span>100%</span>
+            <span>Passo 6: Personalização</span>
+            <span>90%</span>
           </div>
-          <Progress
-            value={100}
-            className="h-1.5 bg-white/10 [&>div]:bg-gradient-to-r [&>div]:from-[#4bb7a5] [&>div]:via-[#957588] [&>div]:to-[#f45961]"
-          />
+          <Progress value={90} className="h-1.5 bg-white/10 [&>div]:bg-[#2dd4bf]" />
         </div>
       </div>
 
@@ -277,7 +254,6 @@ export default function SegmentQuestions() {
                 type="button"
                 variant="outline"
                 asChild
-                disabled={isSubmitting}
                 className="w-full sm:w-1/3 border-white/10 text-white hover:bg-white/5 hover:text-white h-14 text-lg rounded-xl"
               >
                 <Link to="/bloco-t">Voltar</Link>
@@ -287,17 +263,8 @@ export default function SegmentQuestions() {
                 disabled={!canSubmit}
                 className="w-full sm:w-2/3 bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-bold h-14 text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] disabled:opacity-50 disabled:hover:shadow-none group"
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                    Gerando Plano de Sucesso...
-                  </>
-                ) : (
-                  <>
-                    Ver Meu Plano de Sucesso
-                    <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </>
-                )}
+                Próximo Passo
+                <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
             </div>
           </form>
