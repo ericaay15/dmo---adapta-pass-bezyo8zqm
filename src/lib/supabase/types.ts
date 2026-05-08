@@ -1,17 +1,11 @@
 // AVOID UPDATING THIS FILE DIRECTLY. It is automatically generated.
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: '14.4'
   }
   public: {
     Tables: {
@@ -39,18 +33,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "aggregated_answers_company_id_fkey"
-            columns: ["company_id"]
+            foreignKeyName: 'aggregated_answers_company_id_fkey'
+            columns: ['company_id']
             isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
+            referencedRelation: 'companies'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "aggregated_answers_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: 'aggregated_answers_session_id_fkey'
+            columns: ['session_id']
             isOneToOne: true
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
+            referencedRelation: 'sessions'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -90,18 +84,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "answers_company_id_fkey"
-            columns: ["company_id"]
+            foreignKeyName: 'answers_company_id_fkey'
+            columns: ['company_id']
             isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
+            referencedRelation: 'companies'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "answers_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: 'answers_session_id_fkey'
+            columns: ['session_id']
             isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
+            referencedRelation: 'sessions'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -195,18 +189,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "diagnosticos_empresa_id_fkey"
-            columns: ["empresa_id"]
+            foreignKeyName: 'diagnosticos_empresa_id_fkey'
+            columns: ['empresa_id']
             isOneToOne: false
-            referencedRelation: "empresas"
-            referencedColumns: ["id"]
+            referencedRelation: 'empresas'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "diagnosticos_empresa_id_fkey"
-            columns: ["empresa_id"]
+            foreignKeyName: 'diagnosticos_empresa_id_fkey'
+            columns: ['empresa_id']
             isOneToOne: false
-            referencedRelation: "vw_diagnosticos_completos"
-            referencedColumns: ["empresa_id"]
+            referencedRelation: 'vw_diagnosticos_completos'
+            referencedColumns: ['empresa_id']
           },
         ]
       }
@@ -378,18 +372,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "relatorio_diagnosticos_completos_diagnostico_id_fkey"
-            columns: ["diagnostico_id"]
+            foreignKeyName: 'relatorio_diagnosticos_completos_diagnostico_id_fkey'
+            columns: ['diagnostico_id']
             isOneToOne: true
-            referencedRelation: "diagnosticos"
-            referencedColumns: ["id"]
+            referencedRelation: 'diagnosticos'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "relatorio_diagnosticos_completos_diagnostico_id_fkey"
-            columns: ["diagnostico_id"]
+            foreignKeyName: 'relatorio_diagnosticos_completos_diagnostico_id_fkey'
+            columns: ['diagnostico_id']
             isOneToOne: true
-            referencedRelation: "vw_diagnosticos_completos"
-            referencedColumns: ["diagnostico_id"]
+            referencedRelation: 'vw_diagnosticos_completos'
+            referencedColumns: ['diagnostico_id']
           },
         ]
       }
@@ -417,18 +411,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "respostas_abertas_diagnostico_id_fkey"
-            columns: ["diagnostico_id"]
+            foreignKeyName: 'respostas_abertas_diagnostico_id_fkey'
+            columns: ['diagnostico_id']
             isOneToOne: false
-            referencedRelation: "diagnosticos"
-            referencedColumns: ["id"]
+            referencedRelation: 'diagnosticos'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "respostas_abertas_diagnostico_id_fkey"
-            columns: ["diagnostico_id"]
+            foreignKeyName: 'respostas_abertas_diagnostico_id_fkey'
+            columns: ['diagnostico_id']
             isOneToOne: false
-            referencedRelation: "vw_diagnosticos_completos"
-            referencedColumns: ["diagnostico_id"]
+            referencedRelation: 'vw_diagnosticos_completos'
+            referencedColumns: ['diagnostico_id']
           },
         ]
       }
@@ -471,11 +465,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "sessions_company_id_fkey"
-            columns: ["company_id"]
+            foreignKeyName: 'sessions_company_id_fkey'
+            columns: ['company_id']
             isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
+            referencedRelation: 'companies'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -543,33 +537,31 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -578,23 +570,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
+    | keyof DefaultSchema['Tables']
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -603,23 +595,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
+    | keyof DefaultSchema['Tables']
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -628,36 +620,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
+    | keyof DefaultSchema['Enums']
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
+    | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
@@ -665,7 +657,6 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
 
 // ====== DATABASE EXTENDED CONTEXT (auto-generated) ======
 // This section contains actual PostgreSQL column types, constraints, RLS policies,
@@ -931,21 +922,21 @@ export const Constants = {
 //           resposta_t1, resposta_t2, resposta_t3, resposta_aberta_t4, nota_t,
 //           nota_geral, resposta_plano_sucesso, pdf_url
 //       )
-//       SELECT 
+//       SELECT
 //           v.diagnostico_id, v.data_preenchimento, v.empresa_id, v.nome_empresa, v.cnpj, v.email_admin, v.responsavel_nome, v.responsavel_email, v.quem_preencheu,
 //           v.resposta_a1, v.resposta_a2, v.resposta_a3, v.resposta_a4, v.resposta_a5, v.resposta_aberta_a6, v.nota_a, v.classificacao_a,
 //           v.resposta_s1, v.resposta_s2, v.resposta_s3, v.resposta_s4, v.resposta_s5, v.resposta_aberta_s6, v.nota_s, v.classificacao_s,
 //           v.resposta_au1, v.resposta_au2, v.resposta_au3, v.resposta_au4, v.resposta_au5, v.resposta_aberta_au6, v.nota_au, v.classificacao_au,
 //           v.resposta_t1, v.resposta_t2, v.resposta_t3, v.resposta_aberta_t4, v.nota_t,
-//           v.nota_geral, 
+//           v.nota_geral,
 //           -- Puxa diretamente da tabela de diagnósticos para garantir integridade do dado recém-salvo
-//           COALESCE(d.complemento_sucesso, v.resposta_plano_sucesso), 
+//           COALESCE(d.complemento_sucesso, v.resposta_plano_sucesso),
 //           COALESCE(d.pdf_url, v.pdf_url)
 //       FROM public.vw_diagnosticos_completos v
 //       JOIN public.diagnosticos d ON d.id = v.diagnostico_id
 //       WHERE v.diagnostico_id = p_diagnostico_id
-//       ON CONFLICT (diagnostico_id) 
-//       DO UPDATE SET 
+//       ON CONFLICT (diagnostico_id)
+//       DO UPDATE SET
 //           data_preenchimento = EXCLUDED.data_preenchimento,
 //           empresa_id = EXCLUDED.empresa_id,
 //           nome_empresa = EXCLUDED.nome_empresa,
@@ -989,7 +980,7 @@ export const Constants = {
 //           atualizado_em = NOW();
 //   END;
 //   $function$
-//   
+//
 // FUNCTION trg_sync_relatorio_diagnosticos()
 //   CREATE OR REPLACE FUNCTION public.trg_sync_relatorio_diagnosticos()
 //    RETURNS trigger
@@ -1000,12 +991,12 @@ export const Constants = {
 //           DELETE FROM public.relatorio_diagnosticos_completos WHERE diagnostico_id = OLD.id;
 //           RETURN OLD;
 //       END IF;
-//       
+//
 //       PERFORM public.sync_relatorio_diagnostico(NEW.id);
 //       RETURN NEW;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION trg_sync_relatorio_empresas()
 //   CREATE OR REPLACE FUNCTION public.trg_sync_relatorio_empresas()
 //    RETURNS trigger
@@ -1021,7 +1012,7 @@ export const Constants = {
 //       RETURN NEW;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION trg_sync_relatorio_respostas()
 //   CREATE OR REPLACE FUNCTION public.trg_sync_relatorio_respostas()
 //    RETURNS trigger
@@ -1032,12 +1023,12 @@ export const Constants = {
 //           PERFORM public.sync_relatorio_diagnostico(OLD.diagnostico_id);
 //           RETURN OLD;
 //       END IF;
-//       
+//
 //       PERFORM public.sync_relatorio_diagnostico(NEW.diagnostico_id);
 //       RETURN NEW;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION trigger_sync_diagnosticos()
 //   CREATE OR REPLACE FUNCTION public.trigger_sync_diagnosticos()
 //    RETURNS trigger
@@ -1049,7 +1040,7 @@ export const Constants = {
 //     INTO v_empresa
 //     FROM empresas
 //     WHERE id = NEW.empresa_id;
-//   
+//
 //     PERFORM
 //       net.http_post(
 //         url := 'https://gebqrwjlwkskntfqykub.supabase.co/functions/v1/sync-diagnosticos-to-sheets',
@@ -1105,7 +1096,7 @@ export const Constants = {
 //   EXCEPTION WHEN OTHERS THEN
 //     RETURN NEW;
 //   END;$function$
-//   
+//
 
 // --- TRIGGERS ---
 // Table: diagnosticos
@@ -1133,4 +1124,3 @@ export const Constants = {
 //   CREATE INDEX idx_respostas_abertas_diagnostico_id ON public.respostas_abertas USING btree (diagnostico_id)
 // Table: sessions
 //   CREATE INDEX idx_sessions_company_id ON public.sessions USING btree (company_id)
-
