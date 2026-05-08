@@ -109,11 +109,10 @@ export default function ToolsQuestion() {
         <div className="relative bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-10 shadow-2xl z-10">
           <div className="mb-10">
             <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight mb-3">
-              Ferramentas e Sistemas
+              Quais ferramentas/sistemas sua empresa usa?
             </h2>
             <p className="text-slate-400 text-sm md:text-base font-normal leading-relaxed">
-              Quais ferramentas ou sistemas que você já usa na sua empresa? (Ex: Pacote Google,
-              Microsoft, CRM, ERP, Notion, Miro, etc...)
+              (Ex: Pacote Google, Microsoft, CRM, ERP, Notion, Miro, etc...)
             </p>
           </div>
 
