@@ -72,7 +72,7 @@ Deno.serve(async (req: Request) => {
     if (answersDb) {
       answersDb.forEach((a: any) => {
         labelsFromDb[a.question_name] = a.question_label
-
+        
         if (a.block === 'SEG') {
           let answerText = a.question_answer || 'Não respondido'
           try {
@@ -80,23 +80,18 @@ Deno.serve(async (req: Request) => {
             if (Array.isArray(parsed)) {
               answerText = parsed.join(', ')
             }
-          } catch (e) {}
+          } catch(e) {}
           segAnswers.push({ label: a.question_label, answer: answerText })
         }
-
-        if (
-          a.block === 'FERR' &&
-          (a.question_label === 'Quais ferramentas ou sistemas que você já usa na sua empresa?' ||
-            a.question_name === 'ferramentas' ||
-            a.question_label?.includes('ferramentas'))
-        ) {
+        
+        if (a.block === 'FERR' && (a.question_label === 'Quais ferramentas ou sistemas que você já usa na sua empresa?' || a.question_name === 'ferramentas' || a.question_label?.includes('ferramentas'))) {
           let answerText = a.question_answer || 'Não respondido'
           try {
             const parsed = JSON.parse(answerText)
             if (Array.isArray(parsed)) {
               answerText = parsed.join(', ')
             }
-          } catch (e) {}
+          } catch(e) {}
           ferrAnswers.push({ label: a.question_label, answer: answerText })
         }
       })
@@ -668,25 +663,17 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
     <h2 class="section-title">Ferramentas utilizadas</h2>
     <div style="margin-bottom: 32px;">
-      ${
-        diag.ferrAnswers && diag.ferrAnswers.length > 0
-          ? diag.ferrAnswers
-              .map(
-                (ans: any) => `
+      ${diag.ferrAnswers && diag.ferrAnswers.length > 0 ? diag.ferrAnswers.map((ans: any) => `
       <div class="history-item">
         <div class="history-q">${ans.label || 'Quais ferramentas ou sistemas que você já usa na sua empresa?'}</div>
         <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
       </div>
-      `,
-              )
-              .join('')
-          : `
+      `).join('') : `
       <div class="history-item">
         <div class="history-q">Quais ferramentas ou sistemas que você já usa na sua empresa?</div>
         <div class="history-a">Não respondido</div>
       </div>
-      `
-      }
+      `}
     </div>
 
     <h2 class="section-title">Segmento da Empresa</h2>
@@ -699,25 +686,17 @@ function generatePdfHtml(diag: any, logoUrl: string) {
 
     <h2 class="section-title">Perguntas do bloco SEG</h2>
     <div style="margin-bottom: 32px;">
-      ${
-        diag.segAnswers && diag.segAnswers.length > 0
-          ? diag.segAnswers
-              .map(
-                (ans: any) => `
+      ${diag.segAnswers && diag.segAnswers.length > 0 ? diag.segAnswers.map((ans: any) => `
       <div class="history-item">
         <div class="history-q">${ans.label || 'Pergunta de Segmento'}</div>
         <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
       </div>
-      `,
-              )
-              .join('')
-          : `
+      `).join('') : `
       <div class="history-item">
         <div class="history-q">Perguntas do bloco SEG</div>
         <div class="history-a">Não respondido</div>
       </div>
-      `
-      }
+      `}
     </div>
 
     <div class="footer">
