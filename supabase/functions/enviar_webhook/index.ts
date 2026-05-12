@@ -108,17 +108,8 @@ Deno.serve(async (req: Request) => {
       const val = answersJson[key]
       if (val !== undefined && val !== null && val !== '') {
         const block =
-          key === 'motivacao'
-            ? 'INTRO'
-            : key === 'ferramentas'
-              ? 'FERR'
-              : key.startsWith('Au')
-                ? 'Au'
-                : key.replace(/[0-9]/g, '')
-        const type =
-          key.endsWith('6') || key === 'T4' || key === 'motivacao' || key === 'ferramentas'
-            ? 'text'
-            : 'numeric'
+          key === 'motivacao' ? 'INTRO' : key === 'ferramentas' ? 'FERR' : key.startsWith('Au') ? 'Au' : key.replace(/[0-9]/g, '')
+        const type = key.endsWith('6') || key === 'T4' || key === 'motivacao' || key === 'ferramentas' ? 'text' : 'numeric'
         answersArray.push({
           key,
           label:

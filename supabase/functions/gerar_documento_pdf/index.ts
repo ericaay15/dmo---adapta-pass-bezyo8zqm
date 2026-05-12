@@ -72,7 +72,7 @@ Deno.serve(async (req: Request) => {
     if (answersDb) {
       answersDb.forEach((a: any) => {
         labelsFromDb[a.question_name] = a.question_label
-
+        
         if (a.block === 'SEG') {
           let answerText = a.question_answer || 'Não respondido'
           try {
@@ -80,21 +80,18 @@ Deno.serve(async (req: Request) => {
             if (Array.isArray(parsed)) {
               answerText = parsed.join(', ')
             }
-          } catch (e) {}
+          } catch(e) {}
           segAnswers.push({ label: a.question_label, answer: answerText })
         }
-
-        if (
-          a.block === 'FERR' &&
-          a.question_label === 'Quais ferramentas ou sistemas que você já usa na sua empresa?'
-        ) {
+        
+        if (a.block === 'FERR' && a.question_label === 'Quais ferramentas ou sistemas que você já usa na sua empresa?') {
           let answerText = a.question_answer || 'Não respondido'
           try {
             const parsed = JSON.parse(answerText)
             if (Array.isArray(parsed)) {
               answerText = parsed.join(', ')
             }
-          } catch (e) {}
+          } catch(e) {}
           ferrAnswers.push({ label: a.question_label, answer: answerText })
         }
       })
@@ -664,25 +661,17 @@ function generatePdfHtml(diag: any, logoUrl: string) {
     <h2 class="section-title">Histórico de Respostas</h2>
     ${historyHtml}
 
-    ${
-      diag.ferrAnswers && diag.ferrAnswers.length > 0
-        ? `
+    ${diag.ferrAnswers && diag.ferrAnswers.length > 0 ? `
     <h2 class="section-title">Ferramentas Utilizadas</h2>
     <div style="margin-bottom: 32px;">
-      ${diag.ferrAnswers
-        .map(
-          (ans: any) => `
+      ${diag.ferrAnswers.map((ans: any) => `
       <div class="history-item">
         <div class="history-q">${ans.label}</div>
         <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
       </div>
-      `,
-        )
-        .join('')}
+      `).join('')}
     </div>
-    `
-        : ''
-    }
+    ` : ''}
 
     <h2 class="section-title">Segmento da Empresa</h2>
     <div style="margin-bottom: 32px;">
@@ -692,25 +681,17 @@ function generatePdfHtml(diag: any, logoUrl: string) {
       </div>
     </div>
 
-    ${
-      diag.segAnswers && diag.segAnswers.length > 0
-        ? `
+    ${diag.segAnswers && diag.segAnswers.length > 0 ? `
     <h2 class="section-title">Perguntas do Bloco SEG</h2>
     <div style="margin-bottom: 32px;">
-      ${diag.segAnswers
-        .map(
-          (ans: any) => `
+      ${diag.segAnswers.map((ans: any) => `
       <div class="history-item">
         <div class="history-q">${ans.label}</div>
         <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
       </div>
-      `,
-        )
-        .join('')}
+      `).join('')}
     </div>
-    `
-        : ''
-    }
+    ` : ''}
 
     <div class="footer">
       <p>Este documento é confidencial e foi gerado pelo Adapta Pass para uso exclusivo de <strong>${empresa.nome || 'sua empresa'}</strong>.</p>
