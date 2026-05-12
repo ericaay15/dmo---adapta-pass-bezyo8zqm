@@ -66,39 +66,70 @@ Deno.serve(async (req: Request) => {
       .select('question_name, question_label, question_answer, block')
       .eq('session_id', sessionId)
 
+    const answersJson: any = aggregatedAnswers.answers_json || {}
+    const scoring: any = session.scoring_json || {}
+
     const labelsFromDb: Record<string, string> = {}
     const segAnswers: any[] = []
     const ferrAnswers: any[] = []
     if (answersDb) {
       answersDb.forEach((a: any) => {
         labelsFromDb[a.question_name] = a.question_label
-        
-        if (a.block === 'SEG') {
+
+        if (
+          a.block === 'SEG' ||
+          a.question_name === 'temasSelecionados' ||
+          a.question_name === 'temaOutros'
+        ) {
           let answerText = a.question_answer || 'Não respondido'
           try {
             const parsed = JSON.parse(answerText)
             if (Array.isArray(parsed)) {
               answerText = parsed.join(', ')
             }
-          } catch(e) {}
-          segAnswers.push({ label: a.question_label, answer: answerText })
+          } catch (e) {}
+          segAnswers.push({ label: a.question_label || a.question_name, answer: answerText })
         }
-        
-        if (a.block === 'FERR' && a.question_label === 'Quais ferramentas ou sistemas que você já usa na sua empresa?') {
+
+        if (a.block === 'FERR' || a.question_name === 'ferramentas') {
           let answerText = a.question_answer || 'Não respondido'
           try {
             const parsed = JSON.parse(answerText)
             if (Array.isArray(parsed)) {
               answerText = parsed.join(', ')
             }
-          } catch(e) {}
-          ferrAnswers.push({ label: a.question_label, answer: answerText })
+          } catch (e) {}
+          ferrAnswers.push({
+            label:
+              a.question_label || 'Quais ferramentas ou sistemas que você já usa na sua empresa?',
+            answer: answerText,
+          })
         }
       })
     }
 
-    const answersJson: any = aggregatedAnswers.answers_json || {}
-    const scoring: any = session.scoring_json || {}
+    // Fallbacks to ensure data is present even if answers table doesn't have the explicit rows
+    if (ferrAnswers.length === 0 && answersJson.ferramentas) {
+      let answerText = answersJson.ferramentas
+      try {
+        if (Array.isArray(answerText)) answerText = answerText.join(', ')
+      } catch (e) {}
+      ferrAnswers.push({
+        label: 'Quais ferramentas ou sistemas que você já usa na sua empresa?',
+        answer: answerText,
+      })
+    }
+
+    if (segAnswers.length === 0) {
+      if (answersJson.temasSelecionados) {
+        let answerText = answersJson.temasSelecionados
+        if (Array.isArray(answerText)) answerText = answerText.join(', ')
+        segAnswers.push({ label: 'Temas selecionados para aprofundamento', answer: answerText })
+      }
+      if (answersJson.temaOutros) {
+        segAnswers.push({ label: 'Outros temas mencionados', answer: answersJson.temaOutros })
+      }
+    }
 
     const diag = {
       labelsFromDb,
@@ -146,7 +177,8 @@ Deno.serve(async (req: Request) => {
 
     const html = generatePdfHtml(diag, logoUrl)
 
-    const fileName = `plano-de-sucesso-${sessionId}.html`
+    const timestamp = Date.now()
+    const fileName = `plano-de-sucesso-${sessionId}-${timestamp}.html`
 
     const { error: uploadError } = await supabase.storage
       .from('documentos')
@@ -661,17 +693,25 @@ function generatePdfHtml(diag: any, logoUrl: string) {
     <h2 class="section-title">Histórico de Respostas</h2>
     ${historyHtml}
 
-    ${diag.ferrAnswers && diag.ferrAnswers.length > 0 ? `
+    ${
+      diag.ferrAnswers && diag.ferrAnswers.length > 0
+        ? `
     <h2 class="section-title">Ferramentas Utilizadas</h2>
     <div style="margin-bottom: 32px;">
-      ${diag.ferrAnswers.map((ans: any) => `
+      ${diag.ferrAnswers
+        .map(
+          (ans: any) => `
       <div class="history-item">
         <div class="history-q">${ans.label}</div>
         <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
       </div>
-      `).join('')}
+      `,
+        )
+        .join('')}
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <h2 class="section-title">Segmento da Empresa</h2>
     <div style="margin-bottom: 32px;">
@@ -681,17 +721,25 @@ function generatePdfHtml(diag: any, logoUrl: string) {
       </div>
     </div>
 
-    ${diag.segAnswers && diag.segAnswers.length > 0 ? `
+    ${
+      diag.segAnswers && diag.segAnswers.length > 0
+        ? `
     <h2 class="section-title">Perguntas do Bloco SEG</h2>
     <div style="margin-bottom: 32px;">
-      ${diag.segAnswers.map((ans: any) => `
+      ${diag.segAnswers
+        .map(
+          (ans: any) => `
       <div class="history-item">
         <div class="history-q">${ans.label}</div>
         <div class="history-a">${String(ans.answer).replace(/\n/g, '<br/>')}</div>
       </div>
-      `).join('')}
+      `,
+        )
+        .join('')}
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <div class="footer">
       <p>Este documento é confidencial e foi gerado pelo Adapta Pass para uso exclusivo de <strong>${empresa.nome || 'sua empresa'}</strong>.</p>
